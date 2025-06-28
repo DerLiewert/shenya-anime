@@ -1,0 +1,126 @@
+.tooltip {
+  border-radius: 10px;
+  background-color: rgba(var(--bg-color-rgb), 0.95);
+  box-shadow: 0px 0px 8px 2px var(--main-color);
+  padding: 30px 20px;
+
+  &__labels {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 5px 13px;
+    margin-bottom: 15px;
+  }
+  &__label {
+    font-size: 12px;
+    border-radius: 5px;
+    padding: 4px;
+  }
+
+  &__section {
+    & + & {
+      padding-top: 12px;
+      margin-top: 12px;
+      border-top: 1px solid rgb(var(--main-color-rgb), 0.2);
+    }
+  }
+
+  &__title {
+    font-size: 18px;
+    line-height: math.div(22, 16);
+    &:not(:last-child) {
+      margin-bottom: 7px;
+    }
+    a {
+      @media (any-hover: hover) {
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+
+  &__text {
+    font-size: 14px;
+    line-height: math.div(20, 14);
+  }
+
+  &__list {
+    & .info-row + .info-row {
+      margin-top: 8px;
+    }
+  }
+}
+
+/* Общий стиль стрелки */
+.tippy-arrow {
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: rgba(var(--bg-color-rgb), 0.95);
+    box-shadow: 0px 0px 8px 2px var(--main-color);
+    transform: rotate(45deg);
+  }
+}
+
+/* Цвет стрелки */
+.tippy-box[data-placement^='top'] > .tippy-arrow {
+  bottom: -20px;
+  width: 40px;
+  height: 20px;
+
+  &::before {
+    top: -5px;
+    left: 20px;
+  }
+}
+
+.tippy-box[data-placement^='bottom'] > .tippy-arrow {
+  top: -20px;
+  width: 40px;
+  height: 20px;
+
+  &::before {
+    bottom: -5px;
+    left: 20px;
+  }
+}
+
+.tippy-box[data-placement^='left'] > .tippy-arrow {
+  right: -20px;
+  height: 40px;
+  width: 20px;
+
+  &::before {
+    left: -5px;
+    top: 20px;
+  }
+}
+
+.tippy-box[data-placement^='right'] > .tippy-arrow {
+  left: -20px;
+  height: 40px;
+  width: 20px;
+
+  &::before {
+    right: -5px;
+    top: 20px;
+  }
+}
+
+.tippy-box[data-animation='fade-smooth'] {
+  will-change: opacity, transform;
+}
+
+.tippy-box[data-animation='fade-smooth'][data-state='hidden'] {
+  opacity: 0;
+}
+
+.tippy-box[data-animation='fade-smooth'][data-state='visible'] {
+  opacity: 1;
+}

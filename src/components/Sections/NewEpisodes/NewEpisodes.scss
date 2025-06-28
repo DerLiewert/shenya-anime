@@ -1,0 +1,185 @@
+.new-episodes {
+  &__section-header {
+    margin-bottom: 30px;
+    @include media-max($tablet) {
+      margin-bottom: 25px;
+    }
+    @include media-max($mobile) {
+      margin-bottom: 20px;
+    }
+    @include media-max($mobileSmall) {
+      margin-bottom: 15px;
+    }
+  }
+
+  &__subtitle {
+    margin-bottom: 20px;
+    @include media-max($mobile) {
+      margin-bottom: 15px;
+    }
+    @include media-max($mobileSmall) {
+      margin-bottom: 12px;
+    }
+  }
+
+  &__body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    @include media-max(1200px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @include media-max($tablet) {
+      gap: 15px;
+    }
+    @include media-max(650px) {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
+
+  &__item {
+    &._skeleton {
+      height: 148px;
+      @include media-max($mobile) {
+        height: 133px;
+      }
+    }
+  }
+
+  &__btn-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 25px;
+    @include media-max($tablet) {
+      margin-top: 20px;
+    }
+    @include media-max(650px) {
+      margin-top: 15px;
+    }
+
+    &._skeleton {
+      height: 46px;
+      @include media-max($mobile) {
+        height: 38px;
+      }
+    }
+  }
+
+  &__btn {
+    svg {
+      width: 7px;
+      height: 13px;
+      margin-bottom: 1px;
+      margin-left: 1px;
+    }
+  }
+}
+
+.new-episode {
+  @media (any-hover: hover) {
+    &:hover & {
+      &__image img {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  &__inner {
+    display: flex;
+    overflow: hidden;
+    padding: 8px;
+  }
+
+  &__image {
+    flex-shrink: 0;
+    width: 106px;
+    height: 100%;
+    min-height: 130px;
+    border-radius: 6px;
+    margin-right: 15px;
+
+    // @include media-between($mobileSmall, $mobile) {
+    //   // width: 130px;
+    //   width: 86px;
+    //   min-height: 120px;
+    //   margin-right: 10px;
+    // }
+
+    @include media-max($mobile) {
+      width: 86px;
+      min-height: 115px;
+      margin-right: 10px;
+    }
+    @include media-between($mobileSmall, 650px) {
+      width: 110px;
+    }
+    @include media-max($mobileSmall) {
+      margin-right: 7px;
+    }
+
+    // @include media-max(400px) {
+    // @include media-max($mobile) {
+    //   width: 100%;
+    //   height: 130px;
+    //   margin-right: 0;
+    //   margin-bottom: 10px;
+    // }
+    // @include media-max($mobileSmall) {
+    //   height: 110px;
+    // }
+
+    @media (any-hover: hover) {
+      img {
+        transition: transform 0.3s ease 0s;
+      }
+    }
+  }
+
+  &__body {
+    align-self: center;
+    // padding: 10px 20px;
+    @include media-max($mobile) {
+      padding: 0 5px 2px;
+    }
+  }
+
+  &__title {
+    margin-bottom: 8px;
+  }
+
+  &__list {
+  }
+
+  &__list-item {
+    font-size: 13px;
+    @include media-max($mobile) {
+      font-size: 12px;
+    }
+
+    & + & {
+      margin-top: 5px;
+      @include media-max($mobile) {
+        margin-top: 4px;
+      }
+    }
+  }
+
+  &__list-item._broadcast .info-row__name {
+    color: var(--accent-color);
+    opacity: 1;
+  }
+
+  &__list-name {
+  }
+
+  &__list-item .info-row__values {
+    @include media-max($mobile) {
+      margin-left: 10px;
+    }
+  }
+
+  &__list-value {
+  }
+}

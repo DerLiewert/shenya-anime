@@ -1,0 +1,97 @@
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  // align-items: flex-end;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 50px;
+
+  @include media-max($tablet) {
+    column-gap: 40px;
+  }
+  @include media-max($mobile) {
+    gap: 7px 30px;
+  }
+  @include media-max($mobileSmall) {
+    row-gap: 5px;
+  }
+
+  &__title {
+    line-height: math.div(48, 36);
+    padding-left: 15px;
+    border-left: 10px solid var(--primary-color);
+
+    @include media-max($tablet) {
+      border-width: 8px;
+    }
+    @include media-max($mobile) {
+      border-width: 6px;
+      padding-left: 10px;
+    }
+    @include media-max($mobileSmall) {
+      border-width: 4px;
+      padding-left: 7px;
+    }
+  }
+
+  &__link {
+    color: var(--primary-color);
+    font-size: 20px;
+    line-height: math.div(29, 20);
+    // line-height: 29px;
+    text-transform: capitalize;
+    display: flex;
+    align-items: center;
+    margin-top: 7px;
+
+    svg {
+      display: inline-block;
+      width: 25px;
+      height: 12px;
+      background: url('/assets/long-arrow.svg') center / contain no-repeat;
+      margin-left: 6px;
+
+      @include media-max($mobile) {
+        width: 20px;
+        height: 10px;
+      }
+      @include media-max($mobileSmall) {
+        width: 18px;
+        height: 9px;
+      }
+    }
+
+    @media (any-hover: hover) {
+      transition: color 0.3s ease 0s;
+      svg {
+        transition: transform 0.3s ease 0s;
+        path {
+          transition: fill 0.3s ease 0s;
+        }
+      }
+
+      &:hover {
+        color: var(--primary-color-dark);
+        svg {
+          transform: translate3d(3px, 0, 0);
+          path {
+            fill: var(--primary-color-dark);
+          }
+        }
+      }
+    }
+
+    @include media-max($tablet) {
+      font-size: 18px;
+      margin-top: 5px;
+    }
+    @include media-max($mobile) {
+      font-size: 16px;
+      margin-top: 3px;
+    }
+    @include media-max($mobileSmall) {
+      font-size: 14px;
+      margin-top: 1px;
+    }
+  }
+}

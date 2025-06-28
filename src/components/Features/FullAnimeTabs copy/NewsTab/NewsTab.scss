@@ -1,0 +1,83 @@
+.anime-news {
+  &__items {
+    &:not(:last-child) {
+      margin-bottom: 20px;
+      @include media-max($mobile) {
+        margin-bottom: 15px;
+      }
+    }
+  }
+  &__item {
+    & + & {
+      margin-top: 15px;
+      @include media-max($mobileSmall) {
+        margin-top: 12px;
+      }
+    }
+  }
+}
+
+.news-item {
+  overflow: hidden;
+  @include media-min($mobileSmall) {
+    display: flex;
+  }
+
+  &__image {
+    flex-shrink: 0;
+    width: 100px;
+    @include media-max($mobileSmall) {
+      height: 150px;
+      width: 100%;
+    }
+  }
+
+  &__content {
+    padding: 10px;
+    @include media-max($mobile) {
+      padding: 8px;
+    }
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: math.div(24, 18);
+    margin-bottom: 5px;
+    @include media-max($mobile) {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+  }
+
+  &__info {
+    font-size: 12px;
+    line-height: 16px;
+    opacity: 0.7;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 7px 25px;
+    margin-bottom: 10px;
+    @include media-max($mobile) {
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+  }
+
+  &__date {
+  }
+
+  &__author {
+  }
+
+  &__text {
+    font-size: 14px;
+    line-height: 1.4;
+    opacity: 0.7;
+    @include media-max($mobile) {
+      font-size: 13px;
+    }
+  }
+}

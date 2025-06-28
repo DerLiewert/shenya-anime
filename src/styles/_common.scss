@@ -1,0 +1,685 @@
+.fz-48 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  @include media-max($tablet) {
+    font-size: 36px;
+  }
+  @include media-max($mobile) {
+    font-size: 28px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 24px;
+  }
+}
+
+.fz-36 {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: math.div(48, 36);
+
+  @include media-max($tablet) {
+    font-size: 32px;
+  }
+  @include media-max($mobile) {
+    font-size: 26px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 20px;
+  }
+}
+
+.fz-24 {
+  font-size: 24px;
+  font-weight: 600;
+
+  @include media-max($tablet) {
+    font-size: 20px;
+  }
+  @include media-max($mobile) {
+    font-size: 18px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 16px;
+  }
+}
+
+.fz-20 {
+  font-size: 20px;
+  @include media-max($tablet) {
+    font-size: 16px;
+  }
+  @include media-max($mobile) {
+    font-size: 14px;
+  }
+}
+
+.fz-16 {
+  font-size: 16px;
+  @include media-max($mobile) {
+    font-size: 14px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 13px;
+  }
+}
+
+.fz-14 {
+  font-size: 14px;
+  @include media-max($mobile) {
+    font-size: 13px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 12px;
+  }
+}
+
+.fz-13 {
+  font-size: 13px;
+  @include media-max($mobile) {
+    font-size: 12px;
+  }
+}
+
+//========================================================================================================================================================
+
+.title {
+  font-family: 'Inknut Antiqua', serif;
+  line-height: 1.25;
+  color: var(--primary-color);
+
+  @media (any-hover: hover) {
+    a,
+    ._title-parent & {
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      transition: color 0.3s ease 0s, text-decoration-color 0.3s ease 0s;
+    }
+
+    a:hover,
+    ._title-parent:hover & {
+      color: var(--primary-color-dark);
+      text-decoration-color: var(--primary-color-dark);
+    }
+  }
+
+  &--main-color {
+    color: var(--main-color);
+  }
+
+  &--fz-48 {
+    font-size: 48px;
+    font-weight: 700;
+
+    @include media-max($pc) {
+      font-size: 42px;
+    }
+    @include media-max($tablet) {
+      font-size: 36px;
+    }
+    @include media-max($mobile) {
+      font-size: 28px;
+    }
+    @include media-max($mobileSmall) {
+      font-size: 24px;
+    }
+  }
+
+  &--fz-36 {
+    font-size: 36px;
+    font-weight: 700;
+
+    @include media-max($tablet) {
+      font-size: 32px;
+    }
+    @include media-max($mobile) {
+      font-size: 26px;
+    }
+    @include media-max($mobileSmall) {
+      font-size: 20px;
+    }
+  }
+
+  &--fz-24 {
+    font-size: 24px;
+    font-weight: 600;
+
+    @include media-max($tablet) {
+      font-size: 20px;
+    }
+    @include media-max($mobile) {
+      font-size: 18px;
+    }
+    @include media-max($mobileSmall) {
+      font-size: 16px;
+    }
+  }
+
+  &--fz-14 {
+    font-size: 14px;
+    font-weight: 600;
+
+    @include media-max($mobile) {
+      font-size: 13px;
+    }
+  }
+
+  &--fz-auto {
+  }
+}
+
+.link {
+  position: relative;
+  padding: 0 1px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+
+    border: 1px dashed transparent;
+    border-bottom-color: #fff;
+    transition: border-color 0.15s ease 0s;
+  }
+  @media (any-hover: hover) {
+    &:hover::before {
+      border-color: #fff;
+    }
+  }
+
+  &--primary {
+    color: var(--primary-color);
+    font-weight: 500;
+    &::before {
+      border-bottom-color: var(--primary-color);
+    }
+    @media (any-hover: hover) {
+      &:hover::before {
+        border-color: var(--primary-color);
+      }
+    }
+  }
+}
+
+.bg {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-color-light);
+
+  &--dark {
+    background-color: var(--bg-color-dark);
+  }
+
+  img,
+  .img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    &._not-found {
+      object-position: top;
+    }
+  }
+
+  img {
+    object-fit: cover;
+  }
+
+  &--contain {
+    img {
+      object-fit: contain;
+    }
+  }
+}
+
+.image-centered {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-color-light);
+  img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    transform: translate3d(-50%, -50%, 0);
+  }
+  &--height {
+    img {
+      height: 100%;
+      width: auto;
+    }
+  }
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  color: var(--primary-color);
+  svg {
+    width: 20px;
+    height: 14px;
+    transform: rotate(180deg);
+    margin-right: 5px;
+  }
+
+  @include media-max($mobile) {
+    font-size: 14px;
+    svg {
+      width: 16px;
+      height: 10px;
+    }
+  }
+
+  @media (any-hover: hover) {
+    transition: color 0.3s ease 0s;
+    svg path {
+      transition: fill 0.3s ease 0s;
+    }
+
+    &:hover {
+      color: var(--primary-color-dark);
+      svg path {
+        fill: var(--primary-color-dark);
+      }
+    }
+  }
+}
+
+.visible-line {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  &--2 {
+    -webkit-line-clamp: 2;
+  }
+  &--3 {
+    -webkit-line-clamp: 3;
+  }
+  &--4 {
+    -webkit-line-clamp: 4;
+  }
+  &--5 {
+    -webkit-line-clamp: 5;
+  }
+}
+
+.border {
+  border: 1px solid var(--main-color);
+  border-radius: 10px;
+
+  @include media-max($mobile) {
+    border-radius: 8px;
+  }
+
+  @at-root a#{&} {
+    @media (any-hover: hover) {
+      transition: border-color 0.3s ease 0s;
+      &:hover {
+        border-color: var(--primary-color-dark);
+      }
+    }
+  }
+}
+
+.border-opacity {
+  border: 1px solid rgba(var(--main-color-rgb), 0.3);
+  border-radius: 10px;
+
+  @include media-max($mobile) {
+    border-radius: 8px;
+  }
+
+  @at-root a#{&} {
+    @media (any-hover: hover) {
+      transition: border-color 0.3s ease 0s;
+      &:hover {
+        border-color: rgba(var(--main-color-rgb), 0.7);
+      }
+    }
+  }
+}
+
+.border-radius {
+  border-radius: 10px;
+
+  @include media-max($mobile) {
+    border-radius: 8px;
+  }
+}
+
+.tab-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+
+  @include media-max($mobile) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @include media-max($mobileSmall) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.tab-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+
+  @include media-max(600px) {
+    grid-template-columns: 1fr;
+  }
+  @include media-max($mobileSmall) {
+    gap: 12px;
+  }
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--primary-color);
+  border-radius: 2px;
+  padding: 3px;
+
+  &._released {
+    background-color: var(--released-color);
+  }
+  &._ongoing {
+    background-color: var(--ongoing-color);
+  }
+  &._anons {
+    background-color: var(--anons-color);
+  }
+  &._unknown {
+    background-color: var(--anons-unknown);
+  }
+
+  &--shadow {
+    box-shadow: 0px 0px 5px 2px var(--main-color);
+  }
+}
+
+.score {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  background-color: var(--primary-color);
+  padding: 4px 5px 4px 2px;
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    background: url('/assets/star.svg') center / contain no-repeat;
+    margin-right: 3px;
+    // margin-top: -1px;
+  }
+
+  &--shadow {
+    box-shadow: 0px 0px 4px 2px rgb(255, 255, 255);
+  }
+}
+
+.bnts-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn {
+  $btn: &;
+  font-weight: 500;
+  text-align: center;
+  padding: 15px 25px;
+  border-radius: 10px;
+  background-color: var(--primary-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+
+  @include media-max($mobile) {
+    font-size: 14px;
+    padding: 12px 20px;
+    border-radius: 8px;
+  }
+
+  &--upper {
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  @media (any-hover: hover) {
+    &:hover {
+      background-color: var(--primary-color-dark);
+    }
+  }
+
+  &--transparent,
+  &--outline {
+    background-color: transparent;
+
+    @media (any-hover: hover) {
+      &:hover {
+        background-color: var(--main-color);
+        color: var(--bg-color);
+      }
+    }
+  }
+
+  &--outline {
+    border: 1px solid var(--main-color);
+  }
+
+  &--white {
+    background-color: var(--main-color);
+    color: var(--bg-color);
+
+    @media (any-hover: hover) {
+      &:hover {
+        // background-color: var(--primary-color);
+        color: var(--main-color);
+      }
+    }
+  }
+
+  &--icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    column-gap: 7px;
+    svg,
+    img {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+    }
+  }
+
+  &--fill {
+    svg path {
+      fill: var(--main-color);
+      transition: fill 0.3s ease;
+    }
+
+    &#{$btn}--white {
+      svg path {
+        fill: var(--bg-color);
+      }
+
+      @media (any-hover: hover) {
+        &:hover {
+          svg path {
+            fill: var(--main-color);
+          }
+        }
+      }
+    }
+
+    &#{$btn}--transparent {
+      @media (any-hover: hover) {
+        &:hover {
+          svg path {
+            fill: var(--bg-color);
+          }
+        }
+      }
+    }
+  }
+
+  &--stroke {
+    svg path {
+      stroke: var(--main-color);
+      transition: stroke 0.3s ease;
+    }
+
+    &#{$btn}--white {
+      svg path {
+        stroke: var(--bg-color);
+      }
+
+      @media (any-hover: hover) {
+        &:hover {
+          svg path {
+            stroke: var(--main-color);
+          }
+        }
+      }
+    }
+
+    &#{$btn}--transparent {
+      @media (any-hover: hover) {
+        &:hover {
+          svg path {
+            stroke: var(--bg-color);
+          }
+        }
+      }
+    }
+  }
+}
+
+.show-more-btn {
+  width: 100%;
+  @include media-min($mobileSmall) {
+    max-width: 320px;
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+  }
+}
+
+//========================================================================================================================================================
+.loading {
+  font-family: var(--font-family-title);
+  text-align: center;
+  &__animation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    svg {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      animation: loading 2.5s ease-in-out infinite;
+      animation-delay: -2.5s;
+
+      &:nth-child(1) {
+        animation-delay: -2s;
+      }
+      &:nth-child(2) {
+        animation-delay: -1.75s;
+      }
+      &:nth-child(3) {
+        animation-delay: -1.5s;
+      }
+      &:nth-child(4) {
+        animation-delay: -1.25s;
+      }
+      &:nth-child(5) {
+        animation-delay: -1s;
+      }
+    }
+  }
+  &__text {
+    span {
+      animation: loading 2.5s ease-in-out infinite;
+      animation-delay: -2.5s;
+
+      &:nth-child(1) {
+        animation-delay: -2s;
+      }
+      &:nth-child(2) {
+        animation-delay: -1.75s;
+      }
+      &:nth-child(3) {
+        animation-delay: -1.5s;
+      }
+    }
+  }
+}
+
+@keyframes loading {
+  0% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0;
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.empty-value-message {
+  display: flex;
+  align-items: flex-end;
+  &__image {
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 37px; // 33px;
+    height: 59px; //51px;
+    object-fit: contain;
+    margin-right: 10px;
+    @include media-max($mobile) {
+      width: 28px;
+      height: 43px;
+    }
+  }
+
+  &__text {
+    line-height: 1.3;
+    @include media-max($mobile) {
+      font-size: 14px;
+    }
+  }
+}
+
+.swiper-scrollbar {
+  height: 2px;
+  width: calc(100% - 2px);
+  background-color: rgba(var(--primary-color-rgb), 0.3) !important;
+  margin: 0 auto;
+  .swiper-scrollbar-drag {
+    height: 100%;
+    background-color: rgba(var(--primary-color-rgb), 0.7);
+  }
+}

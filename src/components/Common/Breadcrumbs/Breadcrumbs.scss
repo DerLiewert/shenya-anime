@@ -1,0 +1,68 @@
+.breadcrumbs {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &__wrapper {
+    min-height: 0;
+    margin-bottom: 3px !important;
+  }
+  &__item {
+    width: auto;
+    display: flex;
+    align-items: center;
+    line-height: math.div(20, 16);
+    &:not(:last-child) {
+      margin-right: 8px;
+      &::after {
+        content: '/';
+        margin-left: 8px;
+      }
+
+      @include media-max($mobile) {
+        margin-right: 7px;
+        &::after {
+          margin-left: 7px;
+        }
+      }
+      @include media-max($mobileSmall) {
+        margin-right: 6px;
+        &::after {
+          margin-left: 6px;
+        }
+      }
+    }
+
+    @include media-max($mobile) {
+      font-size: 14px;
+    }
+    @include media-max($mobileSmall) {
+      font-size: 12px;
+    }
+  }
+
+  &__text {
+    white-space: nowrap;
+    &--current {
+      font-weight: 500;
+      color: var(--primary-color);
+    }
+  }
+
+  .swiper-scrollbar {
+    flex-shrink: 0;
+  }
+
+  @media (any-hover: hover) {
+    .swiper-scrollbar {
+      opacity: 0;
+      transition: opacity 0.3s ease 0s;
+    }
+
+    &:hover {
+      .swiper-scrollbar {
+        opacity: 1;
+      }
+    }
+  }
+}

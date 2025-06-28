@@ -1,0 +1,96 @@
+.anime-videos {
+  &__section {
+    & + & {
+      margin-top: 35px;
+    }
+  }
+
+  &__section-header {
+    margin-bottom: 20px;
+    @include media-max($mobile) {
+      margin-bottom: 17px;
+    }
+    @include media-max($mobileSmall) {
+      margin-bottom: 15px;
+    }
+  }
+
+  &__items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    @include media-max($mobile) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @include media-max($mobileSmall) {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 20px;
+      @include media-max($mobile) {
+        margin-bottom: 15px;
+      }
+    }
+  }
+
+  &__item {
+  }
+}
+.video-item {
+  height: 200px;
+  width: 100%;
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+
+  &__title,
+  &__play-btn {
+    box-shadow: 0px 0px 5px 2px var(--main-color);
+    background-color: rgba(var(--bg-color-rgb), 0.75);
+  }
+
+  &__title {
+    display: inline-block;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 500;
+    padding: 2px 5px;
+    margin: 7px;
+    border-radius: 5px;
+    position: relative;
+    z-index: 2;
+  }
+
+  &__image {
+  }
+
+  &__play-btn {
+    font-family: var(--font-family-title);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: math.div(20, 16);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid var(--main-color);
+    border-radius: 8px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 3;
+    transform: translate3d(-50%, -50%, 0);
+    svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+}
+
+.anime-video-gallery .lg-content {
+  // padding-bottom: 25px;
+}

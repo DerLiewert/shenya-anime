@@ -1,0 +1,6 @@
+.main > * + * {
+  margin-top: 50px;
+  @include media-max($mobile) {
+    margin-top: 40px;
+  }
+}

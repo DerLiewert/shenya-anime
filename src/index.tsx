@@ -1,19 +1,26 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { store } from './app/store';
+
+import 'swiper/scss';
+import 'lightgallery/scss/lightgallery.scss';
+import 'react-loading-skeleton/dist/skeleton.css';
+
+import './styles/global.scss';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { SkeletonTheme } from 'react-loading-skeleton';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  // <React.StrictMode>
+  <Router>
+    <Provider store={store}>
+      <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
+        <App />
+      </SkeletonTheme>
+    </Provider>
+  </Router>,
+  // </React.StrictMode>,
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();

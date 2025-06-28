@@ -1,0 +1,33 @@
+.footer {
+  border-top: 1px solid rgba(var(--main-color-rgb), 0.2);
+  padding: 30px 0;
+  margin-top: 40px;
+
+  @include media-max($mobile) {
+    padding: 25px 0;
+  }
+  @include media-max($mobileSmall){
+    padding: 20px 0;
+  }
+
+  &__text {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: math.div(18, 14);
+    text-align: center;
+    & + & {
+      margin-top: 5px;
+    }
+
+    @include media-max($mobile) {
+      font-size: 12px;
+    }
+  }
+
+  &__link {
+    text-decoration: underline;
+    &--primary {
+      color: var(--primary-color);
+    }
+  }
+}

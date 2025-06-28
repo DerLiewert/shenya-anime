@@ -1,0 +1,30 @@
+@mixin media-max($screenWidth) {
+  $max: $screenWidth - 0.02px;
+  @media (max-width: $max) {
+    @content;
+  }
+}
+
+@mixin media-min($screenWidth) {
+  @media (min-width: $screenWidth) {
+    @content;
+  }
+}
+
+@mixin media-between($screenWidthMin, $screenWidthMax) {
+  $max: $screenWidthMax - 0.02;
+  @media (min-width: $screenWidthMin) and (max-width: $max) {
+    @content;
+  }
+}
+
+@function containerPadding($negative: 0) {
+  @if $negative == 0 {
+    $result: math.div($containerPadding, 2) + px;
+    @return $result;
+  }
+  @if $negative == 1 {
+    $result: math.div($containerPadding, -2) + px;
+    @return $result;
+  }
+}

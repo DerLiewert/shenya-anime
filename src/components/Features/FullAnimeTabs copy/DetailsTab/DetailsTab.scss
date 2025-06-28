@@ -1,0 +1,312 @@
+.anime-details {
+  & > * + * {
+    margin-top: 40px;
+    @include media-max($mobile) {
+      margin-top: 30px;
+    }
+    @include media-max($mobileSmall) {
+      margin-top: 25px;
+    }
+  }
+
+  &__info {
+    display: flex;
+    justify-content: space-between;
+    gap: 50px;
+  }
+
+  &__score-stats {
+    max-width: 470px;
+    width: 100%;
+    @include media-max($pc) {
+      max-width: 33.7142857vw;
+    }
+    @include media-max($tablet) {
+      max-width: 43vw;
+    }
+    @include media-max($mobile) {
+      display: none;
+    }
+  }
+  &__score-stats-title {
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+
+  &__info-content {
+  }
+
+  &__info-top {
+    display: flex;
+    margin-bottom: 25px;
+    @include media-max($mobile) {
+      margin-bottom: 20px;
+    }
+  }
+
+  &__score {
+    margin-right: 15px;
+  }
+
+  &__info-labels {
+    align-self: center;
+  }
+
+  &__info-label {
+    font-size: 16px;
+    font-weight: 500;
+    & + & {
+      margin-top: 10px;
+      @include media-max($mobile) {
+        margin-top: 8px;
+      }
+    }
+
+    &--status {
+      padding: 4px 7px 4px;
+      border-radius: 5px;
+    }
+    @include media-max($mobile) {
+      font-size: 14px;
+    }
+  }
+
+  &__info-list {
+    li {
+      font-size: 16px;
+      @include media-max($mobile) {
+        font-size: 14px;
+      }
+    }
+    li + li {
+      margin-top: 12px;
+    }
+  }
+
+  /*====================
+  ====== synopsis ====== 
+  ======================*/
+  &__synopsis {
+  }
+
+  &__synopsis-header {
+    margin-bottom: 15px;
+    @include media-max($mobileSmall) {
+      margin-bottom: 10px;
+    }
+  }
+
+  &__text {
+    line-height: math.div(24, 16);
+    p + p {
+      margin-top: 7px;
+    }
+  }
+
+  /*===================
+  ===== streaming ===== 
+  =====================*/
+  &__streaming {
+  }
+
+  &__streaming-header {
+    margin-bottom: 20px;
+    @include media-max($mobile) {
+      margin-bottom: 15px;
+    }
+  }
+
+  &__streaming-items {
+  }
+
+  &__streaming-item {
+    line-height: math.div(22, 16);
+    padding: 9px 13px;
+    display: flex;
+    align-items: center;
+    &::before {
+      flex-shrink: 0;
+      content: '';
+      width: 20px;
+      height: 20px;
+      background: url('/assets/external-link.svg') center / contain no-repeat;
+      margin-right: 9px;
+    }
+
+    @include media-max($mobile) {
+      padding: 8px 12px;
+
+      &::before {
+        width: 18px;
+        height: 18px;
+        margin-right: 7px;
+      }
+    }
+  }
+
+  /*===================
+  ===== producers ===== 
+  =====================*/
+  &__producers {
+  }
+  &__producers-header {
+    margin-bottom: 20px;
+    @include media-max($mobile) {
+      margin-bottom: 15px;
+    }
+  }
+  &__producers-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    @include media-max($mobileSmall) {
+      gap: 12px;
+    }
+  }
+  &__producers-item {
+    line-height: math.div(22, 16);
+    padding: 6px 15px;
+
+    @include media-max($mobile) {
+      padding: 8px 12px;
+    }
+  }
+
+  /*===================
+  ====== related ======
+  =====================*/
+  &__related {
+  }
+
+  &__related-header {
+    margin-bottom: 22px;
+    @include media-max($mobile) {
+      margin-bottom: 15px;
+    }
+  }
+
+  &__related-block {
+    & + & {
+      margin-top: 25px;
+      @include media-max($mobile) {
+        margin-top: 20px;
+      }
+    }
+  }
+
+  &__related-subtitle {
+    font-weight: 500;
+    margin-bottom: 12px;
+
+    @include media-max($mobile) {
+      font-size: 15px;
+    }
+    @include media-max($mobileSmall) {
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+  }
+
+  &__related-items {
+  }
+
+  &__related-item {
+  }
+
+  &__show-more-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+
+  &__show-more {
+    position: relative;
+    font-size: 14px;
+    color: var(--secondary-color-light);
+    padding-right: 16px;
+    svg {
+      width: 6px;
+      height: 10px;
+
+      position: absolute;
+      top: 50%;
+      right: 2px;
+      transform: translateY(-50%) rotate(90deg);
+      path {
+        fill: var(--secondary-color-light);
+      }
+    }
+
+    @media (any-hover: hover) {
+      transition: color 0.3s ease 0s;
+      svg path {
+        transition: fill 0.3s ease 0s;
+      }
+
+      &:hover {
+        color: var(--secondary-color);
+        svg path {
+          fill: var(--secondary-color);
+        }
+      }
+    }
+  }
+}
+
+.related-item {
+  padding: 7px 14px 10px;
+
+  @include media-max($mobile) {
+    padding: 6px 12px 9px;
+  }
+
+  &__name {
+    line-height: 1.5;
+    margin-bottom: 5px;
+  }
+
+  &__type {
+    color: rgba(var(--main-color-rgb), 0.5);
+    text-transform: capitalize;
+  }
+}
+
+.big-score {
+  text-align: center;
+  color: var(--primary-color-dark);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+  padding: 3px 5px;
+  border: 1px solid var(--primary-color-dark);
+  border-radius: 5px;
+
+  svg {
+    width: 21px;
+    height: 21px;
+    margin-bottom: 3px;
+    path {
+      fill: var(--primary-color-dark);
+    }
+    @include media-max($mobile) {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__value {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 2px;
+    @include media-max($mobile) {
+      font-size: 16px;
+    }
+  }
+  &__votes {
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: rgba(var(--primary-color-dark-rgb), 0.65);
+  }
+}

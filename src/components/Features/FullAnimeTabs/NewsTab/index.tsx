@@ -1,0 +1,1 @@
+export {default as NewsTab} from './NewsTab'

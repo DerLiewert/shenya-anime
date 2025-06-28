@@ -1,0 +1,62 @@
+.card-item {
+  $self: &;
+  min-height: 0;
+  overflow: hidden;
+
+  &__image {
+    width: 100%;
+    min-height: 100px;
+    max-height: 300px;
+    aspect-ratio: 2.2 / 3;
+    border-radius: inherit;
+    position: relative;
+
+    img {
+      @media (any-hover: hover) {
+        transition: transform 0.3s ease 0s;
+        #{$self}:hover & {
+          transform: scale(1.02);
+        }
+      }
+    }
+  }
+
+  &__status,
+  &__score {
+    position: absolute;
+    z-index: 1;
+  }
+
+  &__status {
+    top: 10px;
+    left: 10px;
+  }
+
+  &__score {
+    bottom: 10px;
+    right: 10px;
+    @include media-max($mobile) {
+      font-size: 12px;
+      &::before {
+        transform: translateY(-0.5px);
+      }
+    }
+  }
+
+  &__content {
+    padding: 8px 8px 5px;
+  }
+
+  &__title {
+    line-height: math.div(20, 16);
+    margin-bottom: 5px;
+  }
+
+  &__text {
+    line-height: math.div(18, 14);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 5px 10px;
+  }
+}
