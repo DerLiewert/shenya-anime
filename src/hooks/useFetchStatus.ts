@@ -15,5 +15,6 @@ export function useFetchStatus(statusOrSelector: FetchStatus | StatusSelector | 
     isLoading: status === FetchStatus.LOADING,
     isSuccess: status === FetchStatus.SUCCESS,
     isError: status === FetchStatus.ERROR,
+    isIdle: !status,
   };
 }

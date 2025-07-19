@@ -1,10 +1,10 @@
 import React from 'react';
 import clsx from 'clsx';
-import { AnimeStatus } from '../../models';
+import { AnimeStatus, MangaStatus } from '../../models';
 import { getAnimeStatusClassName, valueOrDefault } from '../../utils';
 
 interface StatusProps {
-  status: AnimeStatus | null;
+  status: AnimeStatus | MangaStatus | null;
   className?: string;
   isShadow?: boolean;
 }

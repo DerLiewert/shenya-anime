@@ -1,1 +1,2 @@
-export {default as CatalogPage} from './CatalogPage'
+export {default as AnimeCatalogPage} from './AnimeCatalogPage'
+export {default as MangaCatalogPage} from './MangaCatalogPage'

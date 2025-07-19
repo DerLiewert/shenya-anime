@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const SearchIcon: React.FC = React.memo(() => {
+export const SearchIcon = () => {
   return (
     <svg width="33" height="34" viewBox="0 0 33 34" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -12,4 +12,4 @@ export const SearchIcon: React.FC = React.memo(() => {
       />
     </svg>
   );
-});
+};

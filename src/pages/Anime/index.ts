@@ -1,1 +1,1 @@
-export {default as AnimePage} from './AnimePage'
+export {default as FullAnimePage} from './AnimePage'

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const LongArrowIcon: React.FC = React.memo(() => {
+export const LongArrowIcon = () => {
   return (
     <svg width="27" height="15" viewBox="0 0 27 15" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
@@ -9,4 +9,4 @@ export const LongArrowIcon: React.FC = React.memo(() => {
       />
     </svg>
   );
-});
+};

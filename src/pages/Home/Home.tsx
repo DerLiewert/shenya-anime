@@ -21,6 +21,10 @@ import './Home.scss'
 
 const Home: React.FC = () => {
   useAbortableDispatch(fetchSeasonalAnime);
+  
+  // useAbortableDispatch(fetchAnimeScoreStats1);
+  // foo(fetchAnimeScoreStats1) // as AsyncThunk<any,any,any>);
+  
   // React.useEffect(() => {
   //   const actions = [
   //     fetchIntroAnime,

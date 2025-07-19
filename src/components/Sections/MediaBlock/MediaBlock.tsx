@@ -5,13 +5,13 @@ import { Navigation } from 'swiper/modules';
 import { useAppSelector } from '../../../app/hooks';
 import { RootState } from '../../../app/store';
 import { Anime } from '../../../models';
-import { AnimeTooltip, CardItem, ISectionHeaderProps, SectionHeader } from '../../Common';
+import { ISectionHeaderProps, SectionHeader } from '../../Common';
 
 import arrowIcon from '../../../assets/arrow.svg';
 
 import clsx from 'clsx';
 import './MediaBlock.scss';
-import { uniqueAnime } from '@/utils';
+import { uniqueItems } from '@/utils';
 import { FetchStatus } from '@/types';
 import Skeleton from 'react-loading-skeleton';
 import { EmptyValueMessage } from '@/components';
@@ -39,11 +39,9 @@ const MediaBlock: React.FC<MediaBlockProps> = ({ header, subtitle, selectFunctio
     ));
 
   const renderItems = () =>
-    uniqueAnime(items).map((item) => (
+    uniqueItems(items).map((item) => (
       <SwiperSlide key={item.mal_id} className="chapter__slide">
-        <AnimeTooltip item={item}>
-          <AnimeCard item={item} className="chapter__card" />
-        </AnimeTooltip>
+        <AnimeCard item={item} className="chapter__card" />
       </SwiperSlide>
     ));
 

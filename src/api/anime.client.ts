@@ -97,5 +97,9 @@ export const getAnimeStaff = (id: number, signal?: AbortSignal) => {
 };
 
 export const getAnimeSearch = (queryParams: Partial<AnimeSearchParams>, signal?: AbortSignal) => {
-  return getResource<Anime[], JikanPaginationPlus>({ endpoint: AnimeEndpoints.animeSearch, queryParams, signal });
+  return getResource<Anime[], JikanPaginationPlus>({
+    endpoint: AnimeEndpoints.animeSearch,
+    queryParams,
+    signal,
+  });
 };

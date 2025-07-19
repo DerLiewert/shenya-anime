@@ -1,0 +1,74 @@
+.entity-item {
+  display: flex;
+  padding: 5px;
+
+  &__image {
+    flex-shrink: 0;
+    width: 80px;
+    height: 100%;
+    min-height: 100px;
+    border-radius: 7px;
+    position: relative;
+    overflow: hidden;
+    margin-right: 5px;
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    @include media-max($mobile) {
+      width: 66px;
+      min-height: 90px;
+    }
+  }
+
+  &__content {
+    align-self: center;
+    padding: 5px;
+  }
+
+  &__title {
+    font-size: 15px;
+    line-height: 1.4;
+    @include media-max($mobile) {
+      font-size: 14px;
+    }
+    &:not(:last-child) {
+      margin-bottom: 3px;
+    }
+  }
+
+  &__subtitle,
+  &__bottom-text {
+    font-size: 14px;
+    line-height: math.div(16, 12);
+    color: rgba(var(--main-color-rgb), 0.7);
+    @include media-max($mobile) {
+      font-size: 12px;
+    }
+
+    span {
+      color: var(--main-color);
+      margin-left: 8px;
+    }
+
+    p {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    p + p {
+      margin-top: 2px;
+    }
+  }
+
+  &__subtitle {
+  }
+
+  &__bottom-text {
+    margin-top: 10px;
+    @include media-max($mobile) {
+      margin-top: 8px;
+    }
+  }
+}

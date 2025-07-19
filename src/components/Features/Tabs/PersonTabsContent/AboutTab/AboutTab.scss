@@ -1,0 +1,9 @@
+.about-tab {
+  &__text {
+    min-height: 0.1px;
+    line-height: 1.5;
+    & + & {
+      margin-top: 10px;
+    }
+  }
+}

@@ -1,4 +1,4 @@
-import { Manga } from '@/models';
+import { CommonCharacter, JikanImages, JikanNews, JikanPaginationPlus, Manga, MangaSearchParams, Recommendation, Statistics } from '@/models';
 import { getResource } from './api.client';
 import { MangaEndpoints } from './endpoints/manga.endpoints';
 
@@ -18,80 +18,51 @@ export const getMangaFullById = (id: number, signal?: AbortSignal) => {
   });
 };
 
-// export const getAnimeFullById = (id: number, signal?: AbortSignal) => {
-//   return getResource<Anime>({
-//     endpoint: AnimeEndpoints.animeFullById,
-//     pathParams: { id },
-//     signal,
-//   });
-// };
+export const getMangaStatistics = (id: number, signal?: AbortSignal) => {
+  return getResource<Statistics>({
+    endpoint: MangaEndpoints.mangaStatistics,
+    pathParams: { id },
+    signal,
+  });
+};
 
-// export const getAnimeStatistics = (id: number, signal?: AbortSignal) => {
-//   return getResource<Statistics>({
-//     endpoint: AnimeEndpoints.animeStatistics,
-//     pathParams: { id },
-//     signal,
-//   });
-// };
+export const getMangaCharacters = (id: number, signal?: AbortSignal) => {
+  return getResource<CommonCharacter[]>({
+    endpoint: MangaEndpoints.mangaCharacters,
+    pathParams: { id },
+    signal,
+  });
+};
 
-// export const getAnimeCharacters = (id: number, signal?: AbortSignal) => {
-//   return getResource<AnimeCharacter[]>({
-//     endpoint: AnimeEndpoints.animeCharacters,
-//     pathParams: { id },
-//     signal,
-//   });
-// };
+export const getMangaPictures = (id: number, signal?: AbortSignal) => {
+  return getResource<JikanImages[]>({
+    endpoint: MangaEndpoints.mangaPictures,
+    pathParams: { id },
+    signal,
+  });
+};
 
-// export const getAnimeEpisodes = (id: number, page: number = 1, signal?: AbortSignal) => {
-//   return getResource<AnimeEpisode[]>({
-//     endpoint: AnimeEndpoints.animeEpisodes,
-//     pathParams: { id },
-//     queryParams: { page },
-//     signal,
-//   });
-// };
+export const getMangaNews = (id: number, page: number = 1, signal?: AbortSignal) => {
+  return getResource<JikanNews[]>({
+    endpoint: MangaEndpoints.mangaNews,
+    pathParams: { id },
+    queryParams: { page },
+    signal,
+  });
+};
 
-// export const getAnimePictures = (id: number, signal?: AbortSignal) => {
-//   return getResource<JikanImages[]>({
-//     endpoint: AnimeEndpoints.animePictures,
-//     pathParams: { id },
-//     signal,
-//   });
-// };
+export const getMangaRecommendations = (id: number, signal?: AbortSignal) => {
+  return getResource<Recommendation[]>({
+    endpoint: MangaEndpoints.mangaRecommendations,
+    pathParams: { id },
+    signal,
+  });
+};
 
-// export const getAnimeVideos = (id: number, signal?: AbortSignal) => {
-//   return getResource<AnimeVideos>({
-//     endpoint: AnimeEndpoints.animeVideos,
-//     pathParams: { id },
-//     signal,
-//   });
-// };
-
-// export const getAnimeNews = (id: number, page: number = 1, signal?: AbortSignal) => {
-//   return getResource<JikanNews[]>({
-//     endpoint: AnimeEndpoints.animeNews,
-//     pathParams: { id },
-//     queryParams: { page },
-//     signal,
-//   });
-// };
-
-// export const getAnimeRecommendations = (id: number, signal?: AbortSignal) => {
-//   return getResource<Recommendation[]>({
-//     endpoint: AnimeEndpoints.animeRecommendations,
-//     pathParams: { id },
-//     signal,
-//   });
-// };
-
-// export const getAnimeStaff = (id: number, signal?: AbortSignal) => {
-//   return getResource<AnimeStaff[]>({
-//     endpoint: AnimeEndpoints.animeStaff,
-//     pathParams: { id },
-//     signal,
-//   });
-// };
-
-// export const getAnimeSearch = (queryParams: Partial<AnimeSearchParams>, signal?: AbortSignal) => {
-//   return getResource<Anime[], JikanPaginationPlus>({ endpoint: AnimeEndpoints.animeSearch, queryParams, signal });
-// };
+export const getMangaSearch = (queryParams: Partial<MangaSearchParams>, signal?: AbortSignal) => {
+  return getResource<Manga[], JikanPaginationPlus>({
+    endpoint: MangaEndpoints.mangaSearch,
+    queryParams,
+    signal,
+  });
+};

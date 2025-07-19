@@ -1,0 +1,18 @@
+.entity-tab {
+  &__items {
+    &:not(:last-child) {
+      margin-bottom: 20px;
+      @include media-max($mobile) {
+        margin-bottom: 15px;
+      }
+    }
+  }
+
+  &__item {
+  }
+
+  &__show-more-wrapper {
+  }
+  &__show-more {
+  }
+}

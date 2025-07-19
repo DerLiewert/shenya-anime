@@ -1,11 +1,12 @@
 import React, { useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useFetchStatus, useMatchMedia } from '@/hooks';
-import { searchParamsToString, uniqueAnime } from '@/utils';
+import { useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
+import { uniqueItems } from '@/utils';
 import { MEDIA_QUERY } from '@/variables';
 import {
+  Anime,
   AnimeRating,
   AnimeSearchOrder,
   AnimeSearchParams,
@@ -18,21 +19,24 @@ import {
   animeTypes,
   Genre,
   JikanPaginationPlus,
+  Manga,
   SortOptions,
 } from '@/models';
 import { FetchStatus } from '@/types';
 import { fetchAnimeByParams } from '@/store/anime/animeCatalogSlice';
 import { fetchAnimeGenres } from '@/store/anime/animeGenresSlice';
-import { AnimeCard, AnimeTooltip, FilterIcon, Pagination } from '@/components';
+import { AnimeCard, FilterIcon, MangaCard, Pagination } from '@/components';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
 import clsx from 'clsx';
 import './CatalogPage.scss';
+import { RootState } from '@/app/store';
+import { AsyncThunk } from '@reduxjs/toolkit';
 
 type OrderBy = Extract<AnimeSearchOrder, 'mal_id' | 'score' | 'popularity' | 'favorites'>;
 const allowedOrderBy: OrderBy[] = ['mal_id', 'score', 'popularity', 'favorites'];
 
-function parseSearchParams(search: string): Partial<AnimeSearchParams> {
+export function parseSearchParams(search: string): Partial<AnimeSearchParams> {
   const params = new URLSearchParams(search);
   const result: Partial<AnimeSearchParams> = {};
 
@@ -66,16 +70,13 @@ function parseSearchParams(search: string): Partial<AnimeSearchParams> {
           (result as any)[key] = score;
         }
         break;
-      // case 'sfw':
-      //   result.sfw = value === 'true';
-      //   break;
       case 'genres':
       case 'genres_exclude':
         if (value) {
           result[key] = value
             .split(',')
             .filter((v) => /^\d+$/.test(v))
-            .join(','); // отправляем в формате "1,2,3"
+            .join(','); // в формате "1,2,3"
         }
         break;
       case 'page':
@@ -97,9 +98,6 @@ function parseSearchParams(search: string): Partial<AnimeSearchParams> {
       case 'sfw':
         result[key as keyof AnimeSearchParams] = value === 'true';
         break;
-      // case 'q':
-      //   result.q = value;
-      //   break;
       default:
         break;
     }
@@ -125,28 +123,8 @@ function parseSearchParams(search: string): Partial<AnimeSearchParams> {
   return result;
 }
 
-type SelectOption<T, L = string> = {
-  value: T;
-  label: L;
-};
+type SelectOption<T, L = string> = { value: T; label: L };
 
-const animeTypeOptions = animeTypes.map((type) => ({
-  value: type,
-  label: type,
-}));
-const animeStatusOptions: Array<SelectOption<AnimeSearchStatus, AnimeStatus>> = [
-  { value: 'airing', label: 'Currently Airing' },
-  { value: 'complete', label: 'Finished Airing' },
-  { value: 'upcoming', label: 'Not yet aired' },
-];
-const animeRatingOptions: Array<SelectOption<AnimeSearchRating, AnimeRating>> = [
-  { value: 'g', label: 'G - All Ages' },
-  { value: 'pg', label: 'PG - Children' },
-  { value: 'pg13', label: 'PG-13 - Teens 13 or older' },
-  { value: 'r17', label: 'R - 17+ (violence & profanity)' },
-  { value: 'r', label: 'R+ - Mild Nudity' },
-  { value: 'rx', label: 'Rx - Hentai' },
-];
 const animeOrderByOptions: Array<SelectOption<AnimeSearchOrder>> = [
   { value: 'score', label: 'Score' },
   { value: 'popularity', label: 'Popularity' },
@@ -154,22 +132,17 @@ const animeOrderByOptions: Array<SelectOption<AnimeSearchOrder>> = [
   { value: 'mal_id', label: 'ID' },
 ];
 
+//========================================================================================================================================================
 type SelectValues = {
-  type: SelectOption<AnimeType> | null;
-  status: SelectOption<AnimeSearchStatus> | null;
-  rating: SelectOption<AnimeSearchRating> | null;
-  genres: SelectOption<number>[];
+  // type: SelectOption<AnimeType> | null;
+  // status: SelectOption<AnimeSearchStatus> | null;
+  // rating: SelectOption<AnimeSearchRating> | null;
+  // genres: SelectOption<number>[];
 };
 type FormValues = SelectValues & {
   min_score: number | null;
   max_score: number | null;
 };
-
-type ExtractOptionValue<T> = T extends SelectOption<infer U>
-  ? U
-  : T extends SelectOption<infer U>[]
-  ? U
-  : never;
 
 const setSortForOrderBy = (param: keyof AnimeSearchParams): SortOptions | undefined => {
   const sort: Record<keyof AnimeSearchParams, SortOptions> = {
@@ -181,19 +154,79 @@ const setSortForOrderBy = (param: keyof AnimeSearchParams): SortOptions | undefi
   return sort[param];
 };
 
-const CatalogPage: React.FC = () => {
-  const { items: genres, status: genresStatus } = useAppSelector((state) => state.animeGenres);
-  const location = useLocation();
-  const navigate = useNavigate();
+type ExtractOptionValue<T> = T extends SelectOption<infer U>
+  ? U
+  : T extends SelectOption<infer U>[]
+  ? U
+  : never;
+
+type SelectFilter<
+  SelectValues extends Record<string, any>,
+  Name extends keyof SelectValues = keyof SelectValues,
+> = {
+  selectName: Name;
+  options: SelectOption<ExtractOptionValue<SelectValues[Name]>>[];
+  placeholder: string;
+  isMulti?: SelectValues[Name] extends SelectOption<any>[] ? true : false;
+  label: string;
+};
+
+type StatusSelector = (state: RootState) => FetchStatus | undefined;
+
+interface CatalogPage<T extends Anime | Manga, SelectValues extends Record<string, any>> {
+  introTitle: string;
+  selectFilters: SelectFilter<SelectValues>[];
+
+  // Redux-related
+  itemsRelated: {
+    actionCreator: AsyncThunk<
+      { data: T[]; pagination: JikanPaginationPlus },
+      any,
+      { state: RootState; rejectValue: string }
+    >;
+    selector: (state: RootState) => {
+      items: T[];
+      pagination: JikanPaginationPlus | null;
+      status: FetchStatus;
+    };
+    status: StatusSelector | FetchStatus | undefined;
+  };
+
+  genresRelated: {
+    actionCreator: AsyncThunk<Genre[], void, any>;
+    selector: (state: RootState) => Genre[];
+    status: StatusSelector | FetchStatus | undefined;
+  };
+
+  renderItem: (item: T) => React.ReactNode;
+}
+
+const CatalogPage = <T extends Anime | Manga, SelectValues extends Record<string, any>>(
+  props: CatalogPage<T, SelectValues>,
+): React.JSX.Element => {
+  const { introTitle, selectFilters, genresRelated, itemsRelated, renderItem } = props;
   const dispatch = useAppDispatch();
+  const location = useLocation();
+  const appNavigate = useAppNavigate({ order_by: 'score' });
 
-  const [searchParams, setSearchParams] = React.useState<AnimeSearchParams>({
-    order_by: 'score',
-    ...parseSearchParams(location.search),
-  });
+  const searchParams = React.useMemo(() => {
+    const urlParams = parseSearchParams(location.search);
+    if (!urlParams.order_by) urlParams.order_by = 'score';
+    return {
+      ...urlParams,
+      sort: setSortForOrderBy(urlParams.order_by),
+    };
+  }, [location.search]);
 
-  const { items, pagination, status } = useAppSelector((state) => state.animeCatalog);
+  const genres = useAppSelector(genresRelated.selector);
+  const genresStatus = genresRelated.status;
+  const { items, pagination, status } = useAppSelector(itemsRelated.selector);
   const { isLoading } = useFetchStatus(status);
+
+  const isTablet = useMatchMedia('max', MEDIA_QUERY.tablet);
+  const [isShowFilters, setIsShowFilters] = React.useState(false);
+  const openFilters = () => setIsShowFilters(true);
+  const closeFilters = () => setIsShowFilters(false);
 
   const animeGenresOptions = React.useMemo(() => {
     return genres.length > 0
@@ -204,17 +237,77 @@ const CatalogPage: React.FC = () => {
       : [];
   }, [genres]);
 
-  const getFormDefaulValues = () => {
-    return {
-      type: searchParams.type
-        ? animeTypeOptions.find((obj) => obj.value === searchParams.type)
-        : null,
-      status: searchParams.status
-        ? animeStatusOptions.find((obj) => obj.value === searchParams.status)
-        : null,
-      rating: searchParams.rating
-        ? animeRatingOptions.find((obj) => obj.value === searchParams.rating)
-        : null,
+  const { control, handleSubmit, reset, register } = useForm<FormValues>({
+    defaultValues: getFormDefaulValues(),
+  });
+
+  const cardsRef = React.useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  // Получить жанры аниме, если их нет
+  React.useEffect(() => {
+    appNavigate(searchParams, { replace: isFirstRender.current });
+    if (genresStatus === FetchStatus.SUCCESS) return;
+    dispatch(genresRelated.actionCreator());
+  }, []);
+
+  // Обновить данные в форме после получения жанров и формирования animeGenresOptions или после смены url-параметров
+  React.useEffect(() => {
+    if (animeGenresOptions.length > 0) reset(getFormDefaulValues());
+  }, [animeGenresOptions, searchParams]);
+
+  // Получение даных об аниме за указанными параметрами
+  const fetchAnimeController = useRef<AbortController | null>(null);
+  React.useEffect(() => {
+    if (genresStatus === FetchStatus.LOADING) return;
+
+    fetchAnimeController.current?.abort();
+    fetchAnimeController.current = new AbortController();
+
+    const urlParams = parseSearchParams(location.search);
+    if (!urlParams.order_by) urlParams.order_by = 'score';
+    dispatch(
+      itemsRelated.actionCreator(
+        {
+          ...urlParams,
+          sort: setSortForOrderBy(urlParams.order_by),
+        },
+        { signal: fetchAnimeController.current.signal },
+      ),
+    );
+
+    return () => {
+      fetchAnimeController.current?.abort();
+    };
+  }, [location.search, genres]);
+
+  // Проверка значения параметра page при изменении pagination, чтоб он был в пределах (1 - последняя видимая страница в зависимости от запроса)
+  React.useEffect(() => {
+    if (searchParams.page && searchParams.page < 1) {
+      appNavigate({ ...searchParams, page: undefined }, { replace: isFirstRender.current });
+    } else if (
+      pagination &&
+      searchParams.page &&
+      pagination.last_visible_page < searchParams.page
+    ) {
+      appNavigate(
+        { ...searchParams, page: pagination.last_visible_page },
+        { replace: isFirstRender.current },
+      );
+    }
+  }, [pagination]);
+
+  React.useEffect(() => {
+    if (!isTablet && isShowFilters) setIsShowFilters(false);
+  }, [isTablet]);
+
+  React.useEffect(() => {
+    if (isFirstRender) isFirstRender.current = false;
+  }, []);
+
+  // Получить обьект с данными для формы фильтров
+  function getFormDefaulValues() {
+    const data: Record<string, any> = {
       min_score: searchParams.min_score && +searchParams.min_score ? +searchParams.min_score : null,
       max_score: searchParams.max_score && +searchParams.max_score ? +searchParams.max_score : null,
       genres:
@@ -226,98 +319,52 @@ const CatalogPage: React.FC = () => {
             )
           : [],
     };
-  };
 
-  const { control, handleSubmit, reset, register } = useForm<FormValues>({
-    defaultValues: getFormDefaulValues(),
-  });
-
-  React.useEffect(() => {
-    if (genresStatus === FetchStatus.SUCCESS) return;
-    dispatch(fetchAnimeGenres());
-  }, []);
-
-  React.useEffect(() => {
-    if (animeGenresOptions.length > 0) reset(getFormDefaulValues());
-  }, [animeGenresOptions]);
-
-  React.useEffect(() => {
-    navigate({
-      search: searchParamsToString(searchParams),
+    selectFilters.forEach((item) => {
+      const name = item.name;
+      if (item.isMulti) {
+        data[name] = searchParams[name]
+          ? item.options.filter((obj) => {
+              const values = searchParams[name];
+              return values && values.split(',').includes(obj.value.toString());
+            })
+          : [];
+      } else {
+        data[name] = searchParams[name]
+          ? item.options.find((obj) => obj.value === searchParams[name])
+          : null;
+      }
     });
 
-    if (animeGenresOptions.length > 0) reset(getFormDefaulValues());
-  }, [searchParams]);
+    return data;
+  }
 
-  const fetchAnimeController = useRef<AbortController | null>(null);
-  React.useEffect(() => {
-    if (genresStatus === FetchStatus.LOADING) return;
-
-    fetchAnimeController.current?.abort();
-
-    fetchAnimeController.current = new AbortController();
-    dispatch(
-      fetchAnimeByParams(
-        {
-          ...searchParams,
-          sort: setSortForOrderBy(searchParams.order_by as keyof AnimeSearchParams),
-        },
-        { signal: fetchAnimeController.current.signal },
-      ),
-    );
-
-    return () => {
-      fetchAnimeController.current?.abort();
+  // При сабмите формы собрать с неё данные и сохранить в searchParams
+  const onSubmit = (data: FormValues) => {
+    const navigateData: Record<string, any> = {
+      ...searchParams,
+      min_score: data.min_score,
+      max_score: data.max_score,
+      genres: data.genres?.map((g) => g.value).join(','),
+      page: undefined,
     };
-  }, [location.search, genres]);
 
-  React.useEffect(() => {
-    if (searchParams.page && searchParams.page < 1) {
-      setSearchParams((prev) => ({
-        ...prev,
-        page: undefined,
-      }));
-    } else if (
-      pagination &&
-      searchParams.page &&
-      pagination.last_visible_page < searchParams.page
-    ) {
-      setSearchParams((prev) => ({
-        ...prev,
-        page: pagination.last_visible_page,
-      }));
-    }
-  }, [pagination]);
+    selectFilters.forEach((item) => {
+      const name = item.name;
+      const valueFromForm = data[name];
+      if (valueFromForm) {
+        navigateData[name] = Array.isArray(valueFromForm)
+          ? valueFromForm.map((obj) => obj.value).join(',')
+          : valueFromForm.value;
+      } else {
+        navigateData[name] = null;
+      }
+    });
 
-  const onSubmit = handleSubmit((data: FormValues) => {
-    setSearchParams((prev) =>
-      parseSearchParams(
-        searchParamsToString({
-          ...prev,
-          type: data.type?.value || undefined,
-          status: data.status?.value || undefined,
-          rating: data.rating?.value || undefined,
-          min_score: data.min_score || undefined,
-          max_score: data.max_score || undefined,
-          genres: data.genres?.map((g: any) => g.value).join(',') || undefined,
-          page: undefined,
-        }),
-      ),
-    );
-  });
+    appNavigate(navigateData);
+  };
 
-  const isTablet = useMatchMedia('max', MEDIA_QUERY.tablet);
-
-  const [isShowFilters, setIsShowFilters] = React.useState(false);
-  const openFilters = () => setIsShowFilters(true);
-  const closeFilters = () => setIsShowFilters(false);
-
-  React.useEffect(() => {
-    if (!isTablet && isShowFilters) {
-      setIsShowFilters(false);
-    }
-  }, [isTablet]);
-
+  // Держать значение для minScore и maxScore в пределах нормы 1-9.99
   const onScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const min = Number(e.target.min);
     const max = Number(e.target.max);
@@ -328,18 +375,23 @@ const CatalogPage: React.FC = () => {
     else e.target.value = value.toFixed(2).replace(/\.?0+$/, '');
   };
 
-  function renderSelect<Name extends keyof SelectValues>(
+  // Рендер кастомного выпадающего списка
+  type InternalSelectValues = SelectValues & {
+    genres: SelectOption<number>[];
+  };
+
+  function renderSelect<Name extends keyof InternalSelectValues>(
     name: Name,
-    options: SelectOption<ExtractOptionValue<SelectValues[Name]>>[],
+    options: SelectOption<ExtractOptionValue<NonNullable<InternalSelectValues[Name]>>>[],
     placeholder: string,
-    isMulti: SelectValues[Name] extends SelectOption<any>[] ? true : false = false as any,
+    isMulti: InternalSelectValues[Name] extends SelectOption<any>[] ? true : false = false as any,
   ) {
     return (
       <Controller
         name={name as any}
         control={control}
         render={({ field }) => (
-          <Select<SelectOption<ExtractOptionValue<SelectValues[Name]>>, typeof isMulti>
+          <Select
             {...field}
             className="filters-item__select select"
             classNamePrefix="filters-item__select select"
@@ -359,6 +411,7 @@ const CatalogPage: React.FC = () => {
     );
   }
 
+  // Рендер сайдбара (фильтров)
   const renderCatalogSidebar = () => (
     <aside className={clsx('catalog-cards__sidebar catalog-sidebar', { _show: isShowFilters })}>
       <div className="catalog-sidebar__inner">
@@ -366,25 +419,21 @@ const CatalogPage: React.FC = () => {
           <div className="catalog-sidebar__title">Filters</div>
           <button className="catalog-sidebar__close-btn" onClick={closeFilters}></button>
         </div>
-        <form onSubmit={onSubmit} className="catalog-sidebar__filters">
-          <div className="catalog-sidebar__filters-item filters-item">
-            <div className="filters-item__title">Type</div>
-            {renderSelect('type', animeTypeOptions, 'Select anime type...')}
-          </div>
-          <div className="catalog-sidebar__filters-item filters-item">
-            <div className="filters-item__title">Status</div>
-            {renderSelect('status', animeStatusOptions, 'Select anime status...')}
-          </div>
-          <div className="catalog-sidebar__filters-item filters-item">
-            <div className="filters-item__title">Rating</div>
-            {renderSelect('rating', animeRatingOptions, 'Select anime rating...')}
-          </div>
+        <form onSubmit={handleSubmit(onSubmit)} className="catalog-sidebar__filters">
+          {selectFilters.map((item) => (
+            <div className="catalog-sidebar__filters-item filters-item">
+              <div className="filters-item__title">
+                {item.label.slice(0, 1).toUpperCase() + item.label.slice(1)}
+              </div>
+              {renderSelect(item.selectName, item.options, item.placeholder)}
+            </div>
+          ))}
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">Genre</div>
             {genresStatus === FetchStatus.LOADING ? (
               <Skeleton className="select__control " containerClassName="select" />
             ) : (
-              renderSelect('genres', animeGenresOptions, 'Genres for one anime ...', true)
+              renderSelect('genres', animeGenresOptions, 'Genres for one ...', true)
             )}
           </div>
 
@@ -404,8 +453,6 @@ const CatalogPage: React.FC = () => {
                       min: 1,
                       max: 9.99,
                       setValueAs: (value) => {
-                        console.log(value);
-
                         if (value === '') return null;
                         const min = 1;
                         const max = 9.99;
@@ -440,17 +487,25 @@ const CatalogPage: React.FC = () => {
             </div>
           </div>
 
-          <button className="catalog-sidebar__filters-btn btn btn--outline">Search</button>
+          <button className="catalog-sidebar__filters-btn btn btn--outline" type="submit">
+            Search
+          </button>
+          <button
+            className="catalog-sidebar__filters-btn btn btn--outline"
+            type="submit"
+            onClick={() => {
+              appNavigate({ order_by: searchParams.order_by });
+            }}>
+            Clear
+          </button>
         </form>
       </div>
     </aside>
   );
 
-  const cardsRef = React.useRef<HTMLDivElement>(null);
-
   return (
     <div className="catalog">
-      <CatalogIntro title="Anime Catalog" pagination={pagination} />
+      <CatalogIntro title={introTitle} pagination={pagination} />
 
       <div className="catalog__cards catalog-cards" ref={cardsRef}>
         <div className="container">
@@ -473,11 +528,7 @@ const CatalogPage: React.FC = () => {
                 )}
                 options={animeOrderByOptions}
                 onChange={(selected) => {
-                  setSearchParams((prev) => ({
-                    ...prev,
-                    order_by: selected?.value,
-                    page: undefined,
-                  }));
+                  appNavigate({ ...searchParams, order_by: selected?.value, page: undefined });
                 }}
                 menuPortalTarget={document.body}
                 isSearchable={false}
@@ -490,18 +541,14 @@ const CatalogPage: React.FC = () => {
             <div className="catalog-cards__content">
               <div className="catalog-cards__items">
                 {isLoading
-                  ? Array.from({ length: 25 }).map((_, i) => (
+                  ? Array.from({ length: 24 }).map((_, i) => (
                       <Skeleton
                         key={i}
                         containerClassName="catalog-cards__card _skeleton-container border-opacity"
                         className=" _skeleton "
                       />
                     ))
-                  : uniqueAnime(items).map((item) => (
-                      <AnimeTooltip item={item} key={item.mal_id}>
-                        <AnimeCard item={item} className="catalog-cards__card" />
-                      </AnimeTooltip>
-                    ))}
+                  : uniqueItems(items).map(renderItem)}
               </div>
               {pagination && (
                 <Pagination
@@ -510,7 +557,7 @@ const CatalogPage: React.FC = () => {
                   itemsPerPage={pagination.items.per_page}
                   className="catalog-cards__pagination"
                   onChangePage={(page) => {
-                    setSearchParams((prev) => ({ ...prev, page: page > 1 ? page : undefined }));
+                    appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
 
                     if (!cardsRef.current) return;
 
@@ -541,7 +588,7 @@ type CatalogIntroProps = { pagination: JikanPaginationPlus | null; title: string
 
 const CatalogIntro: React.FC<CatalogIntroProps> = ({ pagination, title }) => {
   return (
-    <section className="catalog__intro catalog-intro">
+    <section className="catalog__intro catalog-intro catalog-intro--anime">
       <div className="container">
         <div className="catalog-intro__inner">
           <h2 className="catalog-intro__title title">{title}</h2>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const CryoIcon: React.FC = React.memo(() => {
+export const CryoIcon = () => {
   return (
     <svg
       version="1.1"
@@ -170,4 +170,4 @@ export const CryoIcon: React.FC = React.memo(() => {
       />
     </svg>
   );
-});
+};

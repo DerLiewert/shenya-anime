@@ -1,16 +1,13 @@
 import React from 'react';
 import { SectionHeader } from '../../Common/SectionHeader';
 import { useAppSelector } from '../../../app/hooks';
-import { getImageUrl, uniqueAnime, valueOrDefault } from '../../../utils';
+import { getImageUrl, uniqueItems, valueOrDefault } from '../../../utils';
 
-import Masonry from 'react-masonry-css';
 import { InfoRow, InfoValue } from '../../Common';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
 import { fetchTodaySchedulesAnime } from '@/store/anime/todaySchedulesAnimeSlice';
 import { Link } from 'react-router-dom';
 import { ArrowIcon, EmptyValueMessage } from '@/components';
-import { FetchStatus } from '@/types';
-
 import Skeleton from 'react-loading-skeleton';
 
 import './NewEpisodes.scss';
@@ -27,7 +24,7 @@ const NewEpisodes: React.FC = () => {
     ));
 
   const renderItems = () =>
-    uniqueAnime(items)
+    uniqueItems(items)
       .splice(0, 6)
       .map((item) => (
         <Link
@@ -93,7 +90,7 @@ const NewEpisodes: React.FC = () => {
           <Skeleton className="new-episodes__btn-wrapper border-opacity _skeleton" />
         ) : (
           isSuccess &&
-          uniqueAnime(items).length > 6 && (
+          uniqueItems(items).length > 6 && (
             <div className="new-episodes__btn-wrapper">
               <Link
                 to={`#`}

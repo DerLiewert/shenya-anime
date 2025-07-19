@@ -14,6 +14,7 @@ interface PaginationProps {
 
 const Pagination: React.FC<PaginationProps> = React.memo(
   ({ currentPage: current, totalItems, itemsPerPage, onChangePage, className }) => {
+    const isFirstRender = React.useRef(true);
     const [pageItems, setPageItems] = useState<Array<Item>>([]);
     const [currentPage, setCurrentPage] = useState<Omit<Item, 'isEllipsis'>>({
       value: current,
@@ -29,8 +30,9 @@ const Pagination: React.FC<PaginationProps> = React.memo(
     }, [current]);
 
     useEffect(() => {
-      onChangePage(currentPage.value);
+      if (!isFirstRender.current) onChangePage(currentPage.value);
       if (currentPage.isRerender) setPageItems(setPagesArray(lastPage, currentPage.value, 4));
+      isFirstRender.current = false;
     }, [currentPage]);
 
     useEffect(() => {
@@ -125,8 +127,6 @@ const setPagesArray = (
   currentPage: number,
   pageRangeDisplayed: number = 3,
 ): Item[] => {
-  console.log('setPagesArray');
-
   if (pageRangeDisplayed < 3) pageRangeDisplayed = 3;
 
   // количество отображаемых элементов с номерами страниц
@@ -138,7 +138,6 @@ const setPagesArray = (
     for (let i = 1; i <= totalPage; i++) {
       pageArr.push({ value: i, isRerender: false, isEllipsis: false });
     }
-    console.log('pageArr', pageArr);
     return pageArr;
   }
 
@@ -155,8 +154,6 @@ const setPagesArray = (
       pageArr.push({ value: totalPage - 1, isRerender: false, isEllipsis: false });
       pageArr.push({ value: totalPage, isRerender: false, isEllipsis: false });
     }
-
-    console.log('pageArr', pageArr);
     return pageArr;
   }
 
@@ -182,8 +179,6 @@ const setPagesArray = (
       });
     }
     // pageArr.push(totalPage);
-
-    console.log('pageArr', pageArr);
     return pageArr;
   }
 
@@ -219,7 +214,6 @@ const setPagesArray = (
   });
   pageArr.push({ value: totalPage, isRerender: true, isEllipsis: false });
 
-  console.log('pageArr', pageArr);
   return pageArr;
 };
 

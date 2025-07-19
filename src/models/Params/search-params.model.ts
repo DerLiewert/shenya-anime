@@ -1,4 +1,4 @@
-import type { AnimeRating, AnimeType } from '../Anime';
+import type { AnimeType } from '../Anime';
 import type { MangaType } from '../Manga';
 
 export type SortOptions = 'asc' | 'desc';
@@ -23,18 +23,16 @@ export type AnimeSearchStatus = (typeof animeSearchStatus)[number];
 export const animeSearchRating = ['g', 'pg', 'pg13', 'r17', 'r', 'rx'] as const;
 export type AnimeSearchRating = (typeof animeSearchRating)[number];
 
-// export enum AnimeRating {
-//   G = 'G - All Ages',
-//   PG = 'PG - Children',
-//   PG13 = 'PG-13 - Teens 13 or older',
-//   R17 = 'R - 17+ (violence & profanity)',
-//   R = 'R+ - Mild Nudity',
-//   Rx = 'Rx - Hentai',
-// }
-
 export type MangaSearchOrder = 'chapters' | 'volumes' | SearchOrder;
 
-export type MangaSearchStatus = 'publishing' | 'complete' | 'hiatus' | 'discontinued' | 'upcoming';
+export const mangaSearchStatus = [
+  'publishing',
+  'complete',
+  'hiatus',
+  'discontinued',
+  'upcoming',
+] as const;
+export type MangaSearchStatus = (typeof mangaSearchStatus)[number];
 
 export interface JikanSearchParams {
   q?: string;

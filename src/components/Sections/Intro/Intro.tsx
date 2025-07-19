@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import './Intro.scss';
 
 import IntroSlide, { IntroSlideSkeleton } from './IntroSlide';
-import { uniqueAnime } from '@/utils';
+import { uniqueItems } from '@/utils';
 import { FetchStatus } from '@/types';
 import { useAbortableDispatch } from '@/hooks';
 import { fetchIntroAnime } from '@/store/anime/introAnimeSlice';
@@ -43,7 +43,7 @@ const Intro: React.FC = () => {
           // }}
           pagination={{ clickable: true }}>
           <ResizeHeightFixer />
-          {uniqueAnime(items)
+          {uniqueItems(items)
             .slice(0, 10)
             .map((item) => (
               <SwiperSlide

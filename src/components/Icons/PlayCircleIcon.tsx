@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const PlayCircleIcon = React.memo(() => {
+export const PlayCircleIcon = () => {
   return (
     <svg
       fill="#ffffff"
@@ -19,4 +19,4 @@ export const PlayCircleIcon = React.memo(() => {
       <polygon points="189.776,141.328 189.776,370.992 388.672,256.16 		" />
     </svg>
   );
-});
+};

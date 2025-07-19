@@ -101,8 +101,15 @@
 .catalog-intro {
   margin-bottom: 25px;
   padding: 100px 0;
-  background: url('../../assets/anime-catalog.webp') center / cover no-repeat;
+
   position: relative;
+
+  &--anime {
+    background: url('../../assets/anime-catalog.webp') center / cover no-repeat;
+  }
+  &--manga {
+    background: url('../../assets/manga-catalog-bg.jpg') center / cover no-repeat;
+  }
 
   @include media-max($tablet) {
     padding: 75px 0;

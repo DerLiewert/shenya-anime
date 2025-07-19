@@ -7,3 +7,8 @@ export const getAnimeGenres = () => {
         endpoint: GenresEndpoints.animeGenres
     })
 }
+export const getMangaGenres = () => {
+    return getResource<Genre[]>({
+        endpoint: GenresEndpoints.mangaGenres
+    })
+}
