@@ -40,7 +40,9 @@
   "scripts": {
     "start": "craco start",
     "build": "craco build",
-    "test": "craco test"
+    "test": "craco test",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -63,7 +65,8 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@types/node": "^22.15.2",
-    "@types/swiper": "^6.0.0"
+    "@types/swiper": "^6.0.0",
+    "gh-pages": "^6.3.0"
   },
-  "homepage": "https://github.com/DerLiewert/shenya-anime"
+  "homepage": "https://derliewert.github.io/shenya-anime/"
 }
