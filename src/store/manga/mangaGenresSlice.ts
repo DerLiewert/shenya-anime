@@ -1,6 +1,6 @@
 import { getMangaGenres } from '@/api';
 import { Genre } from '@/models';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 interface InitialState {

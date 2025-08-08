@@ -1,0 +1,64 @@
+.schedules {
+  .catalog-intro {
+    background: url('../../assets/calendar-bg.jpg') center / cover no-repeat;
+  }
+
+  &__tabs {
+  }
+}
+.schedules-tabs {
+  &__list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 5px;
+    // margin-bottom: 25px;
+    margin-bottom: 15px;
+  }
+
+  &__trigger {
+    cursor: pointer;
+    flex: 1 1 48%;
+    white-space: nowrap;
+    padding: 5px 25px;
+    border-radius: 7px;
+    background-color: var(--bg-color-light);
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+    transition-property: font-weight, color, background-color;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 40px;
+
+    &[aria-selected='true'] {
+      font-weight: 600;
+      background-color: var(--primary-color);
+      color: var(--main-color);
+    }
+
+    &:focus {
+      background-color: var(--primary-color-dark);
+    }
+    @media (any-hover: hover) {
+      &:hover {
+        background-color: var(--primary-color-dark);
+      }
+    }
+
+    @include media-max($mobile) {
+      min-height: 36px;
+      padding: 5px 20px;
+    }
+    @include media-max($mobileSmall) {
+      min-height: 32px;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  }
+
+  &__content {
+  }
+}

@@ -1,15 +1,13 @@
 import { useAppDispatch } from '@/app/hooks';
-import { RootState } from '@/app/store';
+import { AsyncThunkConfig } from '@/typescript';
 import { AsyncThunk } from '@reduxjs/toolkit';
 import { useEffect } from 'react';
 
-type SpecialConfig = { state: RootState; rejectValue: string };
-
-export function useAbortableDispatch<Returned, Arg, Config extends SpecialConfig = SpecialConfig>(
-  actionCreator: AsyncThunk<Returned, Arg, Config>,
-  payload?: Arg,
-  shouldFetch?: boolean,
-): void;
+export function useAbortableDispatch<
+  Returned,
+  Arg,
+  Config extends AsyncThunkConfig = AsyncThunkConfig,
+>(actionCreator: AsyncThunk<Returned, Arg, Config>, payload?: Arg, shouldFetch?: boolean): void;
 
 export function useAbortableDispatch<Returned, Arg>(
   actionCreator: AsyncThunk<Returned, Arg, {}>,

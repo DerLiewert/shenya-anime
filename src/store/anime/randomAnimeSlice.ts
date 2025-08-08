@@ -1,6 +1,6 @@
 import { getAnimeSearch } from '@/api';
 import { getResource } from '@/api/api.client';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
 import { Anime, JikanPaginationPlus } from '../../models';

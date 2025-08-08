@@ -12,7 +12,7 @@ import arrowIcon from '../../../assets/arrow.svg';
 import clsx from 'clsx';
 import './MediaBlock.scss';
 import { uniqueItems } from '@/utils';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import Skeleton from 'react-loading-skeleton';
 import { EmptyValueMessage } from '@/components';
 import { animeEmptyValueMessages, commonMessages } from '@/variables/emptyValueMessages';

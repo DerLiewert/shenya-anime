@@ -6,8 +6,8 @@ export interface AnimeEpisode {
   title_romanji: string | null;
   aired: string | null;
   score: number | null;
-  duration: number;
   filler: boolean;
   recap: boolean;
   forum_url: string | null;
 }
+

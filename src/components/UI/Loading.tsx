@@ -1,9 +1,9 @@
 import React from 'react';
 import { CryoIcon } from '../Icons';
 
-export const Loading = () => {
+export const Loading = ({ className }: { className?: string }) => {
   return (
-    <div className="loading">
+    <div className={`${className} loading`}>
       <div className="loading__animation">
         <CryoIcon />
         <CryoIcon />

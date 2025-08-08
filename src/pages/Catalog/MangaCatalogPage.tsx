@@ -1,10 +1,10 @@
 import React, { useRef } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useFetchStatus, useMatchMedia } from '@/hooks';
-import { searchParamsToString, uniqueItems } from '@/utils';
-import { MEDIA_QUERY } from '@/variables';
+import { useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
+import { uniqueItems } from '@/utils';
+import { mangaOrderByOptions, mangaStatusOptions, mangaTypeOptions, MEDIA_QUERY } from '@/variables';
 import {
   Genre,
   JikanPaginationPlus,
@@ -12,12 +12,11 @@ import {
   MangaSearchParams,
   mangaSearchStatus,
   MangaSearchStatus,
-  MangaStatus,
-  MangaType,
-  mangaTypes,
+  MangaSearchType,
+  mangaSearchType,
   SortOptions,
 } from '@/models';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { FilterIcon, MangaCard, Pagination } from '@/components';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
@@ -41,8 +40,8 @@ function parseSearchParams(search: string): Partial<MangaSearchParams> {
         }
         break;
       case 'type':
-        if (mangaTypes.includes(value as MangaType)) {
-          result.type = value as MangaType;
+        if (mangaSearchType.includes(value as MangaSearchType)) {
+          result.type = value as MangaSearchType;
         }
         break;
       case 'status':
@@ -115,26 +114,8 @@ type SelectOption<T, L = string> = {
   label: L;
 };
 
-const mangaTypeOptions = mangaTypes.map((type) => ({
-  value: type,
-  label: type,
-}));
-const mangaStatusOptions: Array<SelectOption<MangaSearchStatus, MangaStatus>> = [
-  { value: 'complete', label: 'Finished' },
-  { value: 'publishing', label: 'Publishing' },
-  { value: 'hiatus', label: 'On Hiatus' },
-  { value: 'upcoming', label: 'Not yet published' },
-  { value: 'discontinued', label: 'Discontinued' },
-];
-const mangaOrderByOptions: Array<SelectOption<MangaSearchOrder>> = [
-  { value: 'score', label: 'Score' },
-  { value: 'popularity', label: 'Popularity' },
-  { value: 'favorites', label: 'Favorites' },
-  { value: 'mal_id', label: 'ID' },
-];
-
 type SelectValues = {
-  type: SelectOption<MangaType> | null;
+  type: SelectOption<MangaSearchType> | null;
   status: SelectOption<MangaSearchStatus> | null;
   genres: SelectOption<number>[];
 };
@@ -164,14 +145,20 @@ const setSortForOrderBy = (
 };
 
 const MangaCatalogPage: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
-  const [searchParams, setSearchParams] = React.useState<MangaSearchParams>({
+  const location = useLocation();
+  const appNavigate = useAppNavigate(parseSearchParams, {
     order_by: 'score',
-    ...parseSearchParams(location.search),
   });
+
+  const searchParams = React.useMemo<MangaSearchParams>(() => {
+    const urlParams = parseSearchParams(location.search);
+    if (!urlParams.order_by) urlParams.order_by = 'score';
+    return {
+      ...urlParams,
+      sort: setSortForOrderBy(urlParams.order_by as keyof MangaSearchParams),
+    };
+  }, [location.search]);
 
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.mangaGenres);
   const { items, pagination, status } = useAppSelector((state) => state.mangaCatalog);
@@ -196,9 +183,11 @@ const MangaCatalogPage: React.FC = () => {
   });
 
   const cardsRef = React.useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   // Получить жанры аниме, если их нет
   React.useEffect(() => {
+    appNavigate(searchParams, { replace: isFirstRender.current });
     if (genresStatus === FetchStatus.SUCCESS) return;
     dispatch(fetchMangaGenres());
   }, []);
@@ -208,27 +197,16 @@ const MangaCatalogPage: React.FC = () => {
     if (mangaGenresOptions.length > 0) reset(getFormDefaulValues());
   }, [mangaGenresOptions]);
 
-  // Обновить url если изменились параметры поиска в searchParams
-  const isFirstRender = useRef(true);
-  React.useEffect(() => {
-    navigate(
-      {
-        search: searchParamsToString(searchParams),
-      },
-      { replace: isFirstRender.current },
-    );
-
-    if (isFirstRender) isFirstRender.current = false;
-  }, [searchParams]);
-
   // Получение даных об аниме за указанными параметрами
   const fetchMangaController = useRef<AbortController | null>(null);
   React.useEffect(() => {
     if (genresStatus === FetchStatus.LOADING) return;
 
     fetchMangaController.current?.abort();
-
     fetchMangaController.current = new AbortController();
+
+    const urlParams = parseSearchParams(location.search);
+    if (!urlParams.order_by) urlParams.order_by = 'score';
     dispatch(
       fetchMangaByParams(
         {
@@ -247,26 +225,21 @@ const MangaCatalogPage: React.FC = () => {
   // Проверка значения параметра page при изменении pagination, чтоб он был в пределах (1 - последняя видимая страница в зависимости от запроса)
   React.useEffect(() => {
     if (searchParams.page && searchParams.page < 1) {
-      setSearchParams((prev) => ({
-        ...prev,
-        page: undefined,
-      }));
+      appNavigate({ ...searchParams, page: undefined }, { replace: isFirstRender.current });
     } else if (
       pagination &&
       searchParams.page &&
       pagination.last_visible_page < searchParams.page
     ) {
-      setSearchParams((prev) => ({
-        ...prev,
-        page: pagination.last_visible_page,
-      }));
+      appNavigate(
+        { ...searchParams, page: pagination.last_visible_page },
+        { replace: isFirstRender.current },
+      );
     }
   }, [pagination]);
 
   React.useEffect(() => {
-    if (!isTablet && isShowFilters) {
-      setIsShowFilters(false);
-    }
+    if (!isTablet && isShowFilters) setIsShowFilters(false);
   }, [isTablet]);
 
   // Получить данные с формы
@@ -293,19 +266,15 @@ const MangaCatalogPage: React.FC = () => {
 
   // При сабмите формы собрать с неё данные и сохранить в searchParams
   const onSubmit = handleSubmit((data: FormValues) => {
-    setSearchParams((prev) =>
-      parseSearchParams(
-        searchParamsToString({
-          ...prev,
-          type: data.type?.value,
-          status: data.status?.value,
-          min_score: data.min_score,
-          max_score: data.max_score,
-          genres: data.genres?.map((g: any) => g.value).join(','),
-          page: undefined,
-        }),
-      ),
-    );
+    appNavigate({
+      ...searchParams,
+      type: data.type?.value,
+      status: data.status?.value,
+      min_score: data.min_score,
+      max_score: data.max_score,
+      genres: data.genres?.map((g: any) => g.value).join(','),
+      page: undefined,
+    });
   });
 
   // Держать значение для minScore и maxScore в пределах нормы 1-9.99
@@ -460,11 +429,7 @@ const MangaCatalogPage: React.FC = () => {
                 )}
                 options={mangaOrderByOptions}
                 onChange={(selected) => {
-                  setSearchParams((prev) => ({
-                    ...prev,
-                    order_by: selected?.value,
-                    page: undefined,
-                  }));
+                  appNavigate({ ...searchParams, order_by: selected?.value, page: undefined });
                 }}
                 menuPortalTarget={document.body}
                 isSearchable={false}
@@ -495,9 +460,7 @@ const MangaCatalogPage: React.FC = () => {
                   itemsPerPage={pagination.items.per_page}
                   className="catalog-cards__pagination"
                   onChangePage={(page) => {
-                    console.log('onChangePage');
-
-                    setSearchParams((prev) => ({ ...prev, page: page > 1 ? page : undefined }));
+                    appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
 
                     if (!cardsRef.current) return;
 

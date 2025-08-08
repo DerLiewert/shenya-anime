@@ -1,7 +1,7 @@
 import React from 'react';
+import { AnimeStatus, MangaStatus } from '@/models';
+import { getAnimeStatusClassName, valueOrDefault } from '@/utils';
 import clsx from 'clsx';
-import { AnimeStatus, MangaStatus } from '../../models';
-import { getAnimeStatusClassName, valueOrDefault } from '../../utils';
 
 interface StatusProps {
   status: AnimeStatus | MangaStatus | null;

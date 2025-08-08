@@ -51,6 +51,7 @@ export const characterEmptyValueMessages = {
 };
 
 export const personEmptyValueMessages = {
+  synopsis: 'No synopsis has been added for this person.',
   pictures: 'No pictures are available for this person.',
   anime: 'No anime has been added for this person.',
   manga: 'No manga has been added for this person.',

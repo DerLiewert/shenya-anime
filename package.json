@@ -64,6 +64,6 @@
     "@craco/craco": "^7.1.0",
     "@types/node": "^22.15.2",
     "@types/swiper": "^6.0.0"
-  }
-  
+  },
+  "homepage": "https://github.com/DerLiewert/shenya-anime"
 }

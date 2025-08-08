@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import './InfoRowWithValue.scss';
 
+/* ======== InfoRow ======== */
 interface InfoRowProps {
   name: string;
   children: React.ReactNode;
@@ -20,47 +21,7 @@ export const InfoRow: React.FC<InfoRowProps> = ({ name, children, Tag = 'li', cl
   );
 };
 
-// interface InfoValueProps {
-//   name: string;
-//   children: React.ReactNode;
-//   isListItem?: boolean;
-//   className?: string;
-// }
-// const InfoValue: React.FC<InfoValueProps> = ({
-//   name,
-//   children,
-//   className = '',
-// }) => {
-//   return (
-//     <p className={clsx(className, 'detail-item__value')}>{children}</p>
-//   );
-// };
-
-// Два варианта пропсов
-
-// interface CommonInfoValueProps {
-//   className?: string;
-//   children: React.ReactNode;
-// }
-
-// type AllowedTags = 'p' | 'a'; // Только разрешённые теги
-
-// type InfoValueProps = {
-//   as?: AllowedTags;
-// } & CommonInfoValueProps & JSX.IntrinsicElements[AllowedTags];
-
-// export const InfoValue = (props: InfoValueProps) => {
-//   const { as, className, children, ...rest } = props;
-
-//   const Tag = as || 'p';
-
-//   return (
-//     <Tag className={clsx('detail-item__value', className)} {...rest}>
-//       {children}
-//     </Tag>
-//   );
-// };
-
+/* ======== InfoValue ======== */
 interface CommonInfoValueProps {
   children: React.ReactNode;
   className?: string;
@@ -97,29 +58,3 @@ export const InfoValue: React.FC<InfoValueProps> = (props) => {
     </p>
   );
 };
-
-//========================================================================================================================================================
-
-// interface OptionalLinkValueProps {
-//   condition: string | null;
-//   linkProps?: React.ComponentProps<'a'>;
-//   fallbackProps?: React.ComponentProps<'p'>;
-//   children: React.ReactNode;
-// }
-
-// export const OptionalLinkValue: React.FC<OptionalLinkValueProps> = ({
-//   condition,
-//   children,
-//   linkProps = {},
-//   fallbackProps = {},
-// }) => {
-//   if (condition) {
-//     return (
-//       <InfoValue isLink {...linkProps}>
-//         {children}
-//       </InfoValue>
-//     );
-//   }
-
-//   return <InfoValue {...fallbackProps}>{children}</InfoValue>;
-// };

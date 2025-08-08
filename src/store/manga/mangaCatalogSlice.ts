@@ -1,6 +1,6 @@
 import { getMangaSearch } from '@/api/manga.client';
 import { JikanPaginationPlus, JikanResponse, Manga, MangaSearchParams } from '@/models';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -37,13 +37,6 @@ const mangaCatalogSlice = createSlice({
 });
 
 export default mangaCatalogSlice.reducer;
-
-// export const fetchAnimeByParams = createAsyncThunk(
-//   'anime-catalog/fetchAnimeByParams',
-//   async (queryParams: AnimeSearchParams, { signal }) => {
-//     return await getAnimeSearch(queryParams, signal);
-//   },
-// );
 
 export const fetchMangaByParams = createAsyncThunk<
   JikanResponse<Manga[], JikanPaginationPlus>,

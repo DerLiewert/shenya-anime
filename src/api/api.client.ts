@@ -1,8 +1,8 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { BASE_URL } from './base.const';
 import { JikanPaginationBase, JikanResponse } from '@/models';
-import limiter from '@/utils/requestLimiter';
-import { searchParamsToString } from '@/utils';
+
+import { limiter, searchParamsToString } from '@/utils';
 
 export const api = axios.create({
   baseURL: BASE_URL,

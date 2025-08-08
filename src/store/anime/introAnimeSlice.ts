@@ -1,5 +1,5 @@
 import { getResource } from '@/api/api.client';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Anime } from '../../models';
 

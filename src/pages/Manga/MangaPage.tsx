@@ -10,12 +10,12 @@ import {
 } from '@/components';
 import { getMangaPaths } from '@/utils';
 import { fetchFullMangaById } from '@/store/manga/mangaFullByIdSlice';
-import { JikanNamedResource, Manga } from '@/models';
+import { JikanNamedResource, MangaFull } from '@/models';
 import './MangaPage.scss';
 
 const MangaPage = () => {
   return (
-    <EntityPageLayout<Manga>
+    <EntityPageLayout<MangaFull>
       actionCreator={fetchFullMangaById}
       selector={(state) => state.mangaFullById.item}
       status={(state) => state.mangaFullById.status.item}
@@ -78,7 +78,7 @@ type ResourcesList = {
   emptyMessage: string;
 };
 
-const MangaResources: React.FC<{ item: Manga }> = ({ item }) => {
+const MangaResources: React.FC<{ item: MangaFull }> = ({ item }) => {
   const resources = item && item.external ? item.external : [];
   const official = resources.filter((obj) => obj.name === 'Official Site' || obj.name[0] === '@');
   const others = resources.filter((obj) => obj.name !== 'Official Site' && obj.name[0] !== '@');
@@ -120,13 +120,4 @@ const MangaResources: React.FC<{ item: Manga }> = ({ item }) => {
       })}
     </div>
   );
-};
-
-/* =====================
- ======== Tabs ========
-===================== */
-export type TabRoute = {
-  value: string;
-  element: React.ReactNode;
-  children?: TabRoute[];
 };

@@ -4,12 +4,7 @@ import { Swiper, SwiperProps, SwiperSlide } from 'swiper/react';
 import type { Swiper as ISwiper } from 'swiper';
 import clsx from 'clsx';
 import './TabList.scss';
-
-export type TabRoute = {
-  value: string;
-  element: React.ReactNode;
-  children?: TabRoute[];
-};
+import { TabRoute } from '@/typescript';
 
 interface TabListProps {
   tabs: Array<TabRoute | { value: string }>;

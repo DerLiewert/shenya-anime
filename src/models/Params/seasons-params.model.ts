@@ -1,12 +1,17 @@
-import type { AnimeType } from '../Anime'
+import { AnimeSeason } from '../Anime';
 
 export interface JikanSeasonsParams {
-	page?: number
-	limit?: number
-	filter?: AnimeType
+  page?: number;
+  limit?: number;
+  filter?: SeasonAnimeType;
+  sfw?: boolean;
+  unapproved?: boolean;
+  continuing?: boolean;
+}
+export interface JikanSeasonsPlusParams extends JikanSeasonsParams {
+  year: number;
+  season: AnimeSeason;
 }
 
-/**
- * QueryParams used in **getSeasonNow** call
- */
-export type SeasonNowParams = Omit<JikanSeasonsParams, 'filter'>
+export const seasonAnimeType = ['tv', 'movie', 'ova', 'special', 'ona', 'music'];
+export type SeasonAnimeType = (typeof seasonAnimeType)[number];

@@ -1,14 +1,17 @@
-import { parseSearchParams } from '@/pages/Catalog/AnimeCatalogPage';
 import { searchParamsToString } from '@/utils';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-export function useAppNavigate(defaultParams?: Record<string, any>) {
+export function useAppNavigate<T>(
+  parseSearchParams: (search: string) => Partial<T>,
+  defaultParams?: Record<string, any>,
+) {
   const navigate = useNavigate();
   const location = useLocation();
 
   return (paramsObject: Record<string, any>, options?: { replace?: boolean }) => {
     // const validated = parseSearchParams(searchParamsToString(defaultParams ? {...defaultParams, ...paramsObject} : paramsObject));
 
+    console.log('paramsObject', paramsObject);
     if (defaultParams) {
       for (const param in defaultParams as any) {
         if (paramsObject[param] === defaultParams[param]) delete paramsObject[param];

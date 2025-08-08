@@ -14,34 +14,46 @@ export interface Manga {
   approved: boolean;
   titles: JikanResourceTitle[];
   title: string;
-  title_english?: string;
-  title_japanese: string;
-  title_synonyms?: string[];
-  type: MangaType;
-  chapters: number;
-  volumes: number;
+  title_english: string | null;
+  title_japanese: string | null;
+  title_synonyms: string[];
+  type: MangaType | null;
+  chapters: number | null;
+  volumes: number | null;
   status: MangaStatus;
   publishing: boolean;
   published: JikanResourcePeriod;
-  score: number;
-  scored_by: number;
-  rank: number;
-  popularity: number;
-  members: number;
-  favorites: number;
-  synopsis: string;
-  background: string;
+  score: number | null;
+  scored_by: number | null;
+  rank: number | null;
+  popularity: number | null;
+  members: number | null;
+  favorites: number | null;
+  synopsis: string | null;
+  background: string | null;
   authors: JikanResource[];
   serializations: JikanResource[];
   genres: JikanResource[];
   explicit_genres: JikanResource[];
   themes: JikanResource[];
   demographics: JikanResource[];
-  relations?: JikanResourceRelation[];
-  external?: JikanNamedResource[];
 }
 
-export const mangaTypes = ['Manga', 'Novel', 'Lightnovel', 'Oneshot', 'Doujin', 'Manhwa', 'Manhua'] as const;
+export interface MangaFull extends Manga {
+  relations: JikanResourceRelation[];
+  external: JikanNamedResource[];
+}
+
+export const mangaTypes = [
+  'Manga',
+  'Novel',
+  'Light Novel',
+  'One-shot',
+  'Doujinshi',
+  'Manhua',
+  'Manhwa',
+  'OEL',
+] as const;
 export type MangaType = (typeof mangaTypes)[number];
 
 export const mangaStatus = [

@@ -1,6 +1,6 @@
 import { getAnimeSearch } from '@/api/anime.client';
 import { Anime, AnimeSearchParams, JikanPaginationPlus, JikanResponse } from '@/models';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 
@@ -26,8 +26,6 @@ const animeCatalogSlice = createSlice({
     });
     builder.addCase(fetchAnimeByParams.fulfilled, (state, action) => {
       const { data, pagination } = action.payload;
-      // state.items = data ? data : [];
-      // console.log(data, pagination);
       state.items = data ? data : [];
       state.pagination = pagination ? pagination : null;
       state.status = FetchStatus.SUCCESS;

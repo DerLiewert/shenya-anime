@@ -1,33 +1,27 @@
-import type { AnimeType } from '../Anime'
-import type { MangaType } from '../Manga'
-
-type TopFilter = 'upcoming' | 'bypopularity' | 'favorite'
-
-export type TopAnimeFilter = 'airing' | TopFilter
-
-export type TopMangaFilter = 'publishing' | TopFilter
+import { AnimeSearchRating, AnimeSearchType } from "./anime-params.model";
+import { MangaSearchType } from "./manga-params.model";
 
 export interface JikanTopParams {
-	page?: number
-	limit?: number
+  page?: number;
+  limit?: number;
 }
 
-/**
- * QueryParams used in **getTopAnime** call
- *
- * See also: [Jikan API Documentation](https://docs.api.jikan.moe/#tag/top/operation/getTopAnime)
- */
+export type TopFilter = 'upcoming' | 'bypopularity' | 'favorite';
+
+// ======== Anime ========
 export interface AnimeTopParams extends JikanTopParams {
-	type?: AnimeType
-	filter?: TopAnimeFilter
+  type?: AnimeSearchType;
+  filter?: TopAnimeFilter;
+  rating?: AnimeSearchRating;
+  sfw?: boolean;
 }
 
-/**
- * QueryParams used in **getTopManga** call
- *
- * See also: [Jikan API Documentation](https://docs.api.jikan.moe/#tag/top/operation/getTopManga)
- */
+export type TopAnimeFilter = 'airing' | TopFilter;
+
+// ======== Manga ========
 export interface MangaTopParams extends JikanTopParams {
-	type?: MangaType
-	filter?: TopMangaFilter
+  type?: MangaSearchType;
+  filter?: TopMangaFilter;
 }
+
+export type TopMangaFilter = 'publishing' | TopFilter;

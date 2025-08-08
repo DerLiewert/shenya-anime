@@ -1,10 +1,9 @@
 import React from 'react';
+import { formattedScore } from '@/utils';
 import clsx from 'clsx';
-import { formattedScore } from '../../utils';
-import { Anime } from '../../models';
 
 interface StatusProps {
-  score: Anime['score'];
+  score: number | null;
   className?: string;
   isShadow?: boolean;
 }

@@ -1,12 +1,12 @@
 // TooltipWrapper.tsx
 import React from 'react';
-import {Manga } from '@/models';
+import { Manga } from '@/models';
 import { SpecialStatus } from '@/variables';
 
 import { EmptyValueMessage, FormatDate, Loading, Score, Status } from '../../UI';
 import { InfoRow, InfoValue } from '../../Common/InfoRowWithValue';
 import { Link } from 'react-router-dom';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { useFetchStatus } from '@/hooks';
 import TooltipWrapperProps from './Tooltip';
 import { getMangaById } from '@/api/manga.client';
@@ -19,7 +19,9 @@ type MangaTooltipProps = { children: React.ReactElement } & (
 
 const MangaTooltip = ({ children, item, id }: MangaTooltipProps) => {
   const [mangaItem, setMangaItem] = React.useState(item);
-  const [status, setStatus] = React.useState<FetchStatus>( item ? FetchStatus.SUCCESS : FetchStatus.LOADING);
+  const [status, setStatus] = React.useState<FetchStatus>(
+    item ? FetchStatus.SUCCESS : FetchStatus.LOADING,
+  );
 
   const onShowTippy = () => {
     if (!id || mangaItem) return;

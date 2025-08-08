@@ -4,22 +4,19 @@ import { useAbortableDispatch, useFetchStatus, useShowMore } from '@/hooks';
 
 import { EmptyValueMessage, Loading } from '@/components/UI';
 import { RootState } from '@/app/store';
-import { FetchStatus } from '@/types';
+import { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
 import { AsyncThunk } from '@reduxjs/toolkit';
 import { Recommendation } from '@/models';
 import './RecommendationsTab.scss';
 
-type StatusSelector = (state: RootState) => FetchStatus | undefined;
-
 interface RecommendationsTabProps {
   selector: (state: RootState) => Recommendation[];
   status: StatusSelector | FetchStatus | undefined;
-  actionCreator: AsyncThunk<Recommendation[], any, { state: RootState; rejectValue: string }>;
+  actionCreator: AsyncThunk<Recommendation[], any, AsyncThunkConfig>;
   entityItem: (item: Recommendation, index: number) => React.ReactNode;
   visibleItemCount?: number;
   emptyValueMessage: string;
 }
-
 
 const RecommendationsTab = (props: RecommendationsTabProps) => {
   const {
@@ -35,11 +32,7 @@ const RecommendationsTab = (props: RecommendationsTabProps) => {
   const { isLoading, isSuccess } = useFetchStatus(status);
   const { visibleCount, showMore } = useShowMore(visibleItemCount);
 
-  useAbortableDispatch(
-    actionCreator,
-    undefined,
-    recommendations.length === 0 && !isSuccess,
-  );
+  useAbortableDispatch(actionCreator, undefined, recommendations.length === 0 && !isSuccess);
 
   return (
     <>

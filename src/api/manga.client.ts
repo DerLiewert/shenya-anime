@@ -1,4 +1,4 @@
-import { CommonCharacter, JikanImages, JikanNews, JikanPaginationPlus, Manga, MangaSearchParams, Recommendation, Statistics } from '@/models';
+import { CommonCharacter, JikanImages, JikanNews, JikanPaginationPlus, Manga, MangaFull, MangaSearchParams, Recommendation, Statistics } from '@/models';
 import { getResource } from './api.client';
 import { MangaEndpoints } from './endpoints/manga.endpoints';
 
@@ -11,7 +11,7 @@ export const getMangaById = (id: number, signal?: AbortSignal) => {
 };
 
 export const getMangaFullById = (id: number, signal?: AbortSignal) => {
-  return getResource<Manga>({
+  return getResource<MangaFull>({
     endpoint: MangaEndpoints.mangaFullById,
     pathParams: { id },
     signal,

@@ -1,0 +1,44 @@
+.broadcast {
+  &__filter {
+    margin-bottom: 15px;
+  }
+
+  &__select {
+  }
+
+  &__items {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    @include media-max(1200px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    @include media-max($tablet) {
+      gap: 15px;
+    }
+    @include media-max(650px) {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+  }
+
+  &__item {
+    &._skeleton {
+      height: 148px;
+      @include media-max($mobile) {
+        height: 133px;
+      }
+    }
+  }
+
+  &__loader {
+    margin-top: 25px;
+  }
+
+  &__show-more-wrapper {
+    margin-top: 25px;
+  }
+
+  &__show-more {
+  }
+}

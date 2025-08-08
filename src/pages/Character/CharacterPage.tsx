@@ -23,7 +23,7 @@ const CharacterPage = () => {
       introBg={BG}
       render={(item) => ({
         title: item && item.name,
-        subtitles: item ? [item.name_kanji].filter((str): str is string => Boolean(str)) : [],
+        subtitles: item && item.name_kanji ? [item.name_kanji]: [],
         resources: item && <AdditionalInfo item={item} />,
         breadcrumbs: item
           ? [

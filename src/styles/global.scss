@@ -15,6 +15,10 @@
   align-items: stretch;
 }
 
+body.menu-open {
+  overflow: hidden;
+}
+
 .wrapper {
   flex-direction: column;
   overflow: hidden;

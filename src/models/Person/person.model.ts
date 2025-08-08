@@ -1,4 +1,4 @@
-import type { JikanImages, CharacterRole, CommonCharacterData } from '../Common';
+import type { JikanImages, CharacterRole, JikanEntity } from '../Common';
 
 export interface Person {
   mal_id: number;
@@ -22,22 +22,16 @@ export interface PersonFull extends Person {
 
 export interface PersonAnime {
   position: string;
-  anime: CommonPersonData & { title: string };
+  anime: JikanEntity & { title: string };
 }
 
 export interface PersonManga {
   position: string;
-  manga: CommonPersonData & { title: string };
-}
-
-export interface CommonPersonData {
-  mal_id: number;
-  url: string;
-  images: JikanImages;
+  manga: JikanEntity & { title: string };
 }
 
 export interface PersonVoices {
   role: CharacterRole;
-  anime: CommonPersonData & { title: string };
-  character: CommonCharacterData & { name: string };
+  anime: JikanEntity & { title: string };
+  character: JikanEntity & { name: string };
 }

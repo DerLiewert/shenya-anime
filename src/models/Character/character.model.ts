@@ -1,8 +1,8 @@
 import type {
-  JikanImages,
   CharacterRole,
   CharacterVoiceActor,
-  CommonCharacterData,
+  JikanEntity,
+  JikanImages,
 } from '../Common';
 
 export interface Character {
@@ -24,10 +24,10 @@ export interface CharacterFull extends Character {
 
 export interface CharacterAnime {
   role: CharacterRole;
-  anime: CommonCharacterData & { title: string };
+  anime: JikanEntity & { title: string };
 }
 
 export interface CharacterManga {
   role: CharacterRole;
-  manga: CommonCharacterData & { title: string };
+  manga: JikanEntity & { title: string };
 }

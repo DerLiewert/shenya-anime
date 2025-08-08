@@ -1,4 +1,4 @@
-import type { JikanImages } from './image.model'
+import type { JikanImages } from './image.model';
 
 export interface JikanNews {
   mal_id: number;

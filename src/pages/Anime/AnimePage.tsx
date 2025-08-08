@@ -16,20 +16,14 @@ import {
 } from '@/components';
 
 import { fetchFullAnimeById } from '@/store/anime/animeFullByIdSlice';
-import { Anime, JikanNamedResource } from '@/models';
+import { AnimeFull, JikanNamedResource } from '@/models';
 
 import './AnimePage.scss';
 import EntityPageLayout from '@/components/Layout/EntityPageLayout/EntityPageLayout';
 
-export type TabRoute = {
-  value: string;
-  element: React.ReactNode;
-  children?: TabRoute[];
-};
-
 const AnimePage = () => {
   return (
-    <EntityPageLayout<Anime>
+    <EntityPageLayout<AnimeFull>
       actionCreator={fetchFullAnimeById}
       selector={(state) => state.animeFullById.item}
       status={(state) => state.animeFullById.status.item}
@@ -110,7 +104,7 @@ type ResourcesList = {
   emptyMessage: string;
 };
 
-const AnimeResources: React.FC<{ item: Anime }> = ({ item }) => {
+const AnimeResources: React.FC<{ item: AnimeFull }> = ({ item }) => {
   const resources = item && item.external ? item.external : [];
   const official = resources.filter((obj) => obj.name === 'Official Site' || obj.name[0] === '@');
   const others = resources.filter((obj) => obj.name !== 'Official Site' && obj.name[0] !== '@');
@@ -139,7 +133,7 @@ const AnimeResources: React.FC<{ item: Anime }> = ({ item }) => {
   );
 
   return (
-    <div className="anime-leftside__resources">
+    <div className="anime-leftside__resources border-radius">
       {renderResourcesList({
         resources: official,
         title: 'Available At',

@@ -270,7 +270,6 @@
 
   &__resources {
     background-color: var(--bg-color-light);
-    border-radius: 10px;
     padding: 15px 15px 18px;
     @include media-max($mobile) {
       padding: 10px 10px 13px;

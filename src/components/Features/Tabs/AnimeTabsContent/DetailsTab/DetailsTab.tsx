@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useShowMoreMap } from '@/hooks';
 import { formattedScore, getShortAnimeRating, splitText } from '@/utils';
 import { SpecialStatus, animeEmptyValueMessages } from '@/variables';
-import { Anime } from '@/models';
+import { AnimeFull } from '@/models';
 import {
   AnimeTooltip,
   InfoRow,
@@ -22,7 +22,7 @@ import ScoreStats from '../../../ScoreStats/ScoreStats';
 import './DetailsTab.scss';
 
 const DetailsTab: React.FC = () => {
-  const item: Anime | null = useAppSelector((state) => state.animeFullById.item);
+  const item: AnimeFull | null = useAppSelector((state) => state.animeFullById.item);
   const { visibleCounts, init, showMore } = useShowMoreMap(6);
 
   React.useEffect(() => {

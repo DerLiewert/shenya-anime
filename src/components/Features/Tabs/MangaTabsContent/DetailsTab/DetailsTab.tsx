@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useShowMoreMap } from '@/hooks';
 import { formattedScore, getShortAnimeRating, splitText } from '@/utils';
 import { SpecialStatus, mangaEmptyValueMessages } from '@/variables';
-import { AnimeStatus, Manga } from '@/models';
+import { AnimeStatus, MangaFull } from '@/models';
 import {
   AnimeTooltip,
   InfoRow,
@@ -19,7 +19,7 @@ import {
 import ScoreStats from '../../../ScoreStats/ScoreStats';
 import './DetailsTab.scss';
 
-const DetailsTab: React.FC<{ item: Manga | null }> = ({ item }) => {
+const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
   const { visibleCounts, init, showMore } = useShowMoreMap(6);
 
   React.useEffect(() => {

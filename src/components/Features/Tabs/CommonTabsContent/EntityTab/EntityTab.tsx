@@ -4,16 +4,14 @@ import { useShowMore } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
 import { useFetchStatus } from '@/hooks/useFetchStatus';
 import { RootState } from '@/app/store';
-import { FetchStatus } from '@/types';
+import { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
 import { AsyncThunk } from '@reduxjs/toolkit';
 import './EntityTab.scss';
-
-type StatusSelector = (state: RootState) => FetchStatus | undefined;
 
 interface EntityTabProps<T> {
   selector: (state: RootState) => T[];
   status: StatusSelector | FetchStatus | undefined;
-  actionCreator?: AsyncThunk<T[], any, { state: RootState; rejectValue: string }>;
+  actionCreator?: AsyncThunk<T[], any, AsyncThunkConfig>;
   entityItem: (item: T, index: number) => React.ReactNode;
   visibleItemCount?: number;
   emptyValueMessage: string;

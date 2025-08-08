@@ -95,7 +95,6 @@
 }
 
 .catalog {
-  padding-top: 100px;
 }
 
 .catalog-intro {
@@ -127,9 +126,9 @@
     height: 100%;
     background: linear-gradient(
       -90deg,
-      rgba(var(--bg-color-rgb), 0.4),
-      rgba(var(--bg-color-rgb), 0.6) 28.365%,
-      rgba(var(--bg-color-rgb), 0.8) 100%
+      rgba(var(--bg-color-rgb), 0.3),
+      rgba(var(--bg-color-rgb), 0.5) 28.365%,
+      rgba(var(--bg-color-rgb), 0.7) 90%
     );
   }
   &__inner {

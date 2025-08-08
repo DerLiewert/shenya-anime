@@ -10,6 +10,7 @@ import {
   AnimeStaff,
   AnimeSearchParams,
   JikanPaginationPlus,
+  AnimeFull,
 } from '@/models';
 import { getResource } from './api.client';
 import { AnimeEndpoints } from './endpoints/anime.endpoints';
@@ -23,7 +24,7 @@ export const getAnimeById = (id: number, signal?: AbortSignal) => {
 };
 
 export const getAnimeFullById = (id: number, signal?: AbortSignal) => {
-  return getResource<Anime>({
+  return getResource<AnimeFull>({
     endpoint: AnimeEndpoints.animeFullById,
     pathParams: { id },
     signal,

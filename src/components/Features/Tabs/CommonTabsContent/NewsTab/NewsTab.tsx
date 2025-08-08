@@ -4,27 +4,25 @@ import { useAbortableDispatch, useShowMore } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
 import { mangaEmptyValueMessages } from '@/variables/emptyValueMessages';
 import { useFetchStatus } from '@/hooks/useFetchStatus';
-import type { JikanNews, JikanPaginationBase } from '@/models';
+import type { JikanNews } from '@/models';
 import type { RootState } from '@/app/store';
 import type { AsyncThunk } from '@reduxjs/toolkit';
-import type { FetchStatus } from '@/types';
+import type {
+  AsyncThunkConfig,
+  DataWithExtendedBasicPagination,
+  FetchStatus,
+  StatusSelector,
+} from '@/typescript';
 import './NewsTab.scss';
 import { getImageUrl } from '@/utils';
 
-type StatusSelector = (state: RootState) => FetchStatus | undefined;
-
-type DataWithPagination<T> = {
-  data: T[];
-  pagination: (JikanPaginationBase & { current_page: number }) | null;
-};
-
 interface NewsTabProps {
   status: StatusSelector | FetchStatus | undefined;
-  newsSelector: (state: RootState) => DataWithPagination<JikanNews>;
+  newsSelector: (state: RootState) => DataWithExtendedBasicPagination<JikanNews>;
   actionCreator: AsyncThunk<
-    DataWithPagination<JikanNews>,
+    DataWithExtendedBasicPagination<JikanNews>,
     { page?: number },
-    { state: RootState; rejectValue: string }
+    AsyncThunkConfig
   >;
   visibleNewsCount?: number;
 }

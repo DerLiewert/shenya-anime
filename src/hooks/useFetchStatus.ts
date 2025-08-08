@@ -1,6 +1,6 @@
 import { useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 
 type StatusSelector = (state: RootState) => FetchStatus | undefined;
 

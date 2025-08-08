@@ -6,6 +6,8 @@ import type {
   JikanResourceRelation,
   JikanResourceTitle,
 } from '../Common';
+import type { AnimeSeason } from './anime-season.model';
+import type { AnimeTheme } from './anime-theme.model';
 import type { AnimeYoutubeVideo } from './anime-video.model';
 
 export interface Anime {
@@ -45,10 +47,13 @@ export interface Anime {
   explicit_genres: JikanResource[];
   themes: JikanResource[];
   demographics: JikanResource[];
-  relations?: JikanResourceRelation[];
-  theme?: AnimeTheme;
-  external?: JikanNamedResource[];
-  streaming?: JikanNamedResource[];
+}
+
+export interface AnimeFull extends Anime {
+  relations: JikanResourceRelation[];
+  theme: AnimeTheme;
+  external: JikanNamedResource[];
+  streaming: JikanNamedResource[];
 }
 
 export interface AnimeBroadcast {
@@ -58,42 +63,11 @@ export interface AnimeBroadcast {
   string: string | null;
 }
 
-export interface AnimeTheme {
-  openings: string[];
-  endings: string[];
-}
-
 export const animeTypes = ['TV', 'Movie', 'OVA', 'Special', 'ONA', 'Music', 'TV Special'] as const;
 export type AnimeType = (typeof animeTypes)[number];
 
-// export type AnimeType = 'TV' | 'Movie' | 'OVA' | 'Special' | 'ONA' | 'Music';
-
-// export enum AnimeType {
-//   TV = 'TV',
-//   Movie = 'Movie',
-//   OVA = 'OVA',
-//   Special = 'Special',
-//   ONA = 'ONA',
-//   Music = 'Music',
-// }
-
 export const animeStatus = ['Finished Airing', 'Currently Airing', 'Not yet aired'] as const;
 export type AnimeStatus = (typeof animeStatus)[number];
-
-// export enum AnimeStatus {
-//   FinishedAiring = 'Finished Airing',
-//   CurrentlyAiring = 'Currently Airing',
-//   NotYetAired = 'Not yet aired',
-// }
-
-// export enum AnimeRating {
-//   G = 'G - All Ages',
-//   PG = 'PG - Children',
-//   PG13 = 'PG-13 - Teens 13 or older',
-//   R17 = 'R - 17+ (violence & profanity)',
-//   R = 'R+ - Mild Nudity',
-//   Rx = 'Rx - Hentai',
-// }
 
 export const animeRating = [
   'G - All Ages',
@@ -104,19 +78,3 @@ export const animeRating = [
   'Rx - Hentai',
 ] as const;
 export type AnimeRating = (typeof animeRating)[number];
-
-// export enum AnimeRating {
-//   G = 'G - All Ages',
-//   PG = 'PG - Children',
-//   PG13 = 'PG-13 - Teens 13 or older',
-//   R17 = 'R - 17+ (violence & profanity)',
-//   R = 'R+ - Mild Nudity',
-//   Rx = 'Rx - Hentai',
-// }
-
-export enum AnimeSeason {
-  Spring = 'spring',
-  Summer = 'summer',
-  Fall = 'fall',
-  Winter = 'winter',
-}

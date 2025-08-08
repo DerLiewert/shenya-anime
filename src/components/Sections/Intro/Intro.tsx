@@ -12,7 +12,7 @@ import './Intro.scss';
 
 import IntroSlide, { IntroSlideSkeleton } from './IntroSlide';
 import { uniqueItems } from '@/utils';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { useAbortableDispatch } from '@/hooks';
 import { fetchIntroAnime } from '@/store/anime/introAnimeSlice';
 

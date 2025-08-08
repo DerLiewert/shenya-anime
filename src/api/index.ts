@@ -11,3 +11,4 @@ export * from './endpoints/top.endpoints';
 
 export * from './anime.client';
 export * from './genres.client';
+export * from './seasons.client';

@@ -1,11 +1,4 @@
-import {
-  AsyncThunk,
-  CaseReducer,
-  createAsyncThunk,
-  createSlice,
-  Draft,
-  PayloadAction,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import {
   getAnimeCharacters,
@@ -19,36 +12,29 @@ import {
   getAnimeVideos,
 } from '@/api/anime.client';
 import {
-  Anime,
   AnimeCharacter,
   AnimeEpisode,
+  AnimeFull,
   AnimeStaff,
   AnimeVideos,
   JikanImages,
   JikanNews,
-  JikanPaginationBase,
-  JikanResponse,
   Recommendation,
   StatisticsScore,
 } from '@/models';
-import { FetchStatus } from '@/types';
-import { RootState } from '@/app/store';
+import { DataWithExtendedBasicPagination, FetchStatus } from '@/typescript';
+import { createAnimeThunkWithId, createHandle, toDataWithExtendedBasicPagination } from '@/utils';
 
-type DataKeys = Exclude<keyof AnimeFullState, 'isLoading' | 'error'>;
-
-type DataWithPagination<T> = {
-  data: T[];
-  pagination: (JikanPaginationBase & { current_page: number }) | null;
-};
+type DataKeys = Exclude<keyof AnimeFullState, 'status'>;
 
 interface AnimeFullState {
-  item: Anime | null;
+  item: AnimeFull | null;
   scoreStats: StatisticsScore[];
-  episodes: DataWithPagination<AnimeEpisode>;
+  episodes: DataWithExtendedBasicPagination<AnimeEpisode>;
   characters: AnimeCharacter[];
   pictures: JikanImages[];
   videos: AnimeVideos | null;
-  news: DataWithPagination<JikanNews>;
+  news: DataWithExtendedBasicPagination<JikanNews>;
   staff: AnimeStaff[];
   recommendations: Recommendation[];
   status: Partial<Record<DataKeys, FetchStatus>>;
@@ -85,40 +71,7 @@ export const animeFullByIdSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    const handleAsync = <
-      K extends DataKeys,
-      Returned extends AnimeFullState[K],
-      ThunkArg = void,
-      ThunkConfig extends {} = {},
-    >(
-      key: K,
-      thunk: AsyncThunk<Returned, ThunkArg, ThunkConfig>,
-      onFulfilled?: CaseReducer<Draft<AnimeFullState>, ReturnType<typeof thunk.fulfilled>>,
-    ) => {
-      builder
-        .addCase(thunk.pending, (state) => {
-          if (key === 'item') {
-            const newStatus: AnimeFullState['status'] = {
-              item: FetchStatus.LOADING,
-            };
-            Object.assign(state, initialState);
-            state.status = newStatus;
-          } else {
-            state.status[key] = FetchStatus.LOADING;
-          }
-        })
-        .addCase(thunk.fulfilled, (state, action) => {
-          if (onFulfilled) {
-            onFulfilled(state, action);
-          } else {
-            if (action.payload) state[key] = action.payload;
-          }
-          state.status[key] = FetchStatus.SUCCESS;
-        })
-        .addCase(thunk.rejected, (state) => {
-          state.status[key] = FetchStatus.ERROR;
-        });
-    };
+    const handleAsync = createHandle(builder, initialState);
 
     handleAsync('item', fetchFullAnimeById);
     handleAsync('scoreStats', fetchAnimeScoreStats);
@@ -152,21 +105,8 @@ export const { resetAnimeFull, setEpisodesPage } = animeFullByIdSlice.actions;
 export default animeFullByIdSlice.reducer;
 
 //========================================================================================================================================================
-function createAnimeThunkWithId<Returned, Arg = void>(
-  typePrefix: string,
-  callback: (id: number, arg: Arg, signal: AbortSignal) => Promise<Returned>,
-) {
-  return createAsyncThunk<Returned, Arg, { state: RootState; rejectValue: string }>(
-    typePrefix,
-    async (arg, { getState, signal, rejectWithValue }) => {
-      const id: number | undefined = getState().animeFullById.item?.mal_id;
-      if (!id) return rejectWithValue('Anime ID is missing');
-      return callback(id, arg, signal);
-    },
-  );
-}
 
-export const fetchFullAnimeById = createAsyncThunk<Anime, number>(
+export const fetchFullAnimeById = createAsyncThunk<AnimeFull, number>(
   'anime-full/fetchFullAnimeById',
   async (id, { signal }) => (await getAnimeFullById(id, signal)).data,
 );
@@ -202,28 +142,18 @@ export const fetchAnimeStaff = createAnimeThunkWithId<AnimeStaff[]>(
 );
 
 //========================================================================================================================================================
-function toDataWithPagination<T>(
-  response: JikanResponse<T[], JikanPaginationBase | undefined>,
-  page: number,
-): DataWithPagination<T> {
-  return {
-    data: response.data,
-    pagination: response.pagination ? { ...response.pagination, current_page: page } : null,
-  };
-}
-
 export const fetchAnimeEpisodes = createAnimeThunkWithId<
-  DataWithPagination<AnimeEpisode>,
+  DataWithExtendedBasicPagination<AnimeEpisode>,
   { page?: number }
 >('anime-full/fetchAnimeEpisodes', async (id, { page = 1 }, signal) => {
   const res = await getAnimeEpisodes(id, page, signal);
-  return toDataWithPagination(res, page);
+  return toDataWithExtendedBasicPagination(res, page);
 });
 
 export const fetchAnimeNews = createAnimeThunkWithId<
-  DataWithPagination<JikanNews>,
+  DataWithExtendedBasicPagination<JikanNews>,
   { page?: number }
 >('anime-full/fetchAnimeNews', async (id, { page = 1 }, signal) => {
   const res = await getAnimeNews(id, page, signal);
-  return toDataWithPagination(res, page);
+  return toDataWithExtendedBasicPagination(res, page);
 });

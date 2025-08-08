@@ -15,7 +15,7 @@ import { SkeletonTheme } from 'react-loading-skeleton';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 root.render(
   // <React.StrictMode>
-  <Router>
+  <Router basename='https://github.com/DerLiewert/shenya-anime'>
     <Provider store={store}>
       <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
         <App />

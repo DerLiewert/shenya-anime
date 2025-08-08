@@ -2,7 +2,7 @@ import React from 'react';
 import { useAbortableDispatch, useShowMore } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
 import { useFetchStatus } from '@/hooks/useFetchStatus';
-import { FetchStatus } from '@/types';
+import { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
 import { JikanImages } from '@/models';
 
 import LightGallery from 'lightgallery/react';
@@ -17,14 +17,12 @@ import { useAppSelector } from '@/app/hooks';
 import { AsyncThunk } from '@reduxjs/toolkit';
 import { getImageUrl } from '@/utils';
 
-type StatusSelector = (state: RootState) => FetchStatus | undefined;
-
 interface ImagesTabProps {
   status: StatusSelector | FetchStatus | undefined;
   visibleCount?: number;
   emptyValueMessage: string;
   selector: (state: RootState) => JikanImages[];
-  actionCreator: AsyncThunk<JikanImages[], any, { state: RootState; rejectValue: string }>;
+  actionCreator: AsyncThunk<JikanImages[], any, AsyncThunkConfig>;
 }
 
 const PicturesTab: React.FC<ImagesTabProps> = React.memo(

@@ -11,6 +11,9 @@ import characterFullByIdSlice from '@/store/character/characterFullByIdSlice';
 import personFullByIdSlice from '@/store/person/personFullByIdSlice';
 import mangaCatalogSlice from '@/store/manga/mangaCatalogSlice';
 import mangaGenresSlice from '@/store/manga/mangaGenresSlice';
+import schedulesAnimeSlice from '@/store/anime/schedulesAnimeSlice';
+import seasonsListSlice from '@/store/season/seasonListSlice';
+import seasonsAnimeSlice from '@/store/season/seasonsAnimeSlice';
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +24,10 @@ export const store = configureStore({
     animeFullById: animeFullByIdSlice,
     animeCatalog: animeCatalogSlice,
     animeGenres: animeGenresSlice,
+
+    schedulesAnime: schedulesAnimeSlice,
+    seasonsList: seasonsListSlice,
+    seasonsAnime: seasonsAnimeSlice,
 
     mangaFullById: mangaFullByIdSlice,
     mangaCatalog: mangaCatalogSlice,

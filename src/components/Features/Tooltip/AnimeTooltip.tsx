@@ -8,7 +8,7 @@ import { EmptyValueMessage, FormatDate, Loading, Score, Status } from '../../UI'
 import { InfoRow, InfoValue } from '../../Common/InfoRowWithValue';
 import { getAnimeById } from '@/api/anime.client';
 import { Link } from 'react-router-dom';
-import { FetchStatus } from '@/types';
+import { FetchStatus } from '@/typescript';
 import { useFetchStatus } from '@/hooks';
 import './Tooltip.scss';
 import TooltipWrapperProps from './Tooltip';

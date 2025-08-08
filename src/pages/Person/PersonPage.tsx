@@ -6,6 +6,8 @@ import {
   PersonPicturesTab,
   PersonVoicesTab,
   PersonAboutTab,
+  InfoRow,
+  InfoValue,
 } from '@/components';
 import { getPersonPaths } from '@/utils';
 import { fetchPersonFullById } from '@/store/person/personFullByIdSlice';
@@ -24,11 +26,13 @@ const PersonPage = () => {
       render={(item) => ({
         title: item && item.name,
         subtitles: item
-          ? [item.given_name + ' ' + item.family_name].filter((str): str is string =>
-              Boolean(str.trim()),
-            )
+          ? [
+              `${item.given_name ? item.given_name : ''} ${
+                item.family_name ? item.family_name : ''
+              }`,
+            ].filter((str) => Boolean(str.trim()))
           : [],
-        // resources: item && <AdditionalInfo item={item} />,
+        resources: item && <AdditionalInfo item={item} />,
         breadcrumbs: item
           ? [
               { label: 'Top', url: '#' },
@@ -66,3 +70,55 @@ const PersonPage = () => {
   );
 };
 export default PersonPage;
+
+/* =====================
+ === AdditionalInfo ===
+===================== */
+
+const AdditionalInfo: React.FC<{ item: PersonFull }> = ({ item }) => {
+  const isAdditional = item.alternate_names.length > 0 || item.birthday || item.website_url;
+  return (
+    <div className="additional-info border-radius">
+      <h4 className="anime-leftside__title">Additional details</h4>
+      {isAdditional ? (
+        <ul className="anime-leftside__list leftside-list">
+          {item.alternate_names.length > 0 && (
+            <InfoRow name="Other names" className="additional-info__row">
+              {item.alternate_names.map((name) => (
+                <InfoValue>{name}</InfoValue>
+              ))}
+            </InfoRow>
+          )}
+          <InfoRow name="Birthday" className="additional-info__row">
+            <InfoValue>{item.birthday ? item.birthday.split('T')[0] : 'Unknown'}</InfoValue>
+          </InfoRow>
+          {item.website_url && (
+            <InfoRow name="Website" className="additional-info__row">
+              <InfoValue className="visible-line visible-line--1">
+                <a href={item.website_url}>{item.website_url}</a>
+              </InfoValue>
+            </InfoRow>
+          )}
+
+          {/* <InfoRow name="Other names" className="additional-info__row">
+          {item.alternate_names.length > 0 ? (
+            item.alternate_names.map((name) => <InfoValue>{name}</InfoValue>)
+          ) : (
+            <InfoValue>Unknown</InfoValue>
+          )}
+        </InfoRow>
+        <InfoRow name="Birthday" className="additional-info__row">
+          <InfoValue>{item.birthday ? item.birthday.split('T')[0] : 'Unknown'}</InfoValue>
+        </InfoRow>
+        <InfoRow name="Website" className="additional-info__row">
+          <InfoValue className="visible-line visible-line--1">
+            {item.website_url ? <a href={item.website_url}>{item.website_url}</a> : 'Unknown'}
+          </InfoValue>
+        </InfoRow> */}
+        </ul>
+      ) : (
+        'no info'
+      )}
+    </div>
+  );
+};

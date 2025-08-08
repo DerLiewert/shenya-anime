@@ -24,17 +24,10 @@ import './AnimePage.scss';
 import NotFound from '@/pages/NotFound/NotFound';
 import { AsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '@/app/store';
-import { FetchStatus } from '@/types';
+import { FetchStatus, StatusSelector, TabRoute } from '@/typescript';
 
-export type TabRoute = {
-  value: string;
-  element: React.ReactNode;
-  children?: TabRoute[];
-};
 type ItemTypes = Anime | Manga | PersonFull | CharacterFull;
 type NullableItemTypes<T> = T | null;
-
-type StatusSelector = (state: RootState) => FetchStatus | undefined;
 
 interface EntityRenderResult {
   title: string | null;
@@ -231,7 +224,7 @@ const EntityPageLayout = <T extends ItemTypes>({
     const [current, ...rest] = pathParts;
 
     const tab = tabs.find((t) => t.value === current);
-    console.log(tab, current, rest);
+    // console.log(tab, current, rest);
     if (!tab) return false;
     if (rest.length === 0) return true;
     if (!tab.children) return false;

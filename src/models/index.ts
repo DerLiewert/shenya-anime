@@ -6,3 +6,4 @@ export * from './Manga';
 export * from './Params';
 export * from './Response';
 export * from './Person';
+export * from './Magazine';
