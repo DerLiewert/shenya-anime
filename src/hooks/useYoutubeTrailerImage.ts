@@ -13,6 +13,7 @@ export const useYoutubeTrailerImage = (images: TrailerImagesCollection | null | 
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
   const isFallback = useMemo(() => currentUrl === notFoundImage, [currentUrl]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (images) {
@@ -25,11 +26,17 @@ export const useYoutubeTrailerImage = (images: TrailerImagesCollection | null | 
       const img = e.currentTarget;
       const url = img.src;
 
-      if (!images || url === notFoundImage) return;
+      if (!images || url === notFoundImage) {
+        setIsLoading(false);
+        return;
+      }
 
       // Если максимальное изображение загрузилось и не заглушка — всё ок
       if (url === images.maximum_image_url) {
-        if (!isYoutubePlaceholder(img)) return;
+        if (!isYoutubePlaceholder(img)) {
+          setIsLoading(false);
+          return;
+        }
         if (images.large_image_url) {
           setCurrentUrl(images.large_image_url);
           return;
@@ -37,15 +44,19 @@ export const useYoutubeTrailerImage = (images: TrailerImagesCollection | null | 
       }
 
       // Иначе, если не пробовали fallback и есть large_image_url — переключаемся на него
-      if (url === images.large_image_url && !isYoutubePlaceholder(img)) return;
+      if (url === images.large_image_url && !isYoutubePlaceholder(img)) {
+        setIsLoading(false);
+        return;
+      }
 
       // Если и large_image_url уже пробовали или нет — показываем заглушку
       setCurrentUrl(notFoundImage);
+      setIsLoading(false);
     },
     [images],
   );
 
   const resetSrc = () => setCurrentUrl(null);
 
-  return { src: currentUrl, onLoad, isFallback, resetSrc };
+  return { src: currentUrl, onLoad, isFallback, isLoading, resetSrc };
 };

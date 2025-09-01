@@ -178,7 +178,9 @@ export const createHandle = <
         }
         (state.status as Record<K, FetchStatus>)[key] = FetchStatus.SUCCESS;
       })
-      .addCase(thunk.rejected, (state) => {
+      .addCase(thunk.rejected, (state, action) => {
+        const meta = (action as typeof action & { meta: { aborted: boolean } }).meta;
+        if (meta.aborted)  return;
         (state.status as Record<K, FetchStatus>)[key] = FetchStatus.ERROR;
       });
   };

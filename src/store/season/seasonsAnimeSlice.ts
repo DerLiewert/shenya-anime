@@ -37,17 +37,13 @@ export const seasonsAnimeSlice = createSlice({
       state.status = FetchStatus.LOADING;
     });
     builder.addCase(fetchSeasonsAnime.fulfilled, (state, action) => {
-      const { year, season, page = 1 } = action.meta.arg;
       const { data, pagination } = action.payload;
-
-      const isShowMore = page > 1;
-
-      state.items = isShowMore ? [...state.items, ...data] : data;
+      state.items = data ? data : [];
       state.pagination = pagination ? pagination : null;
-      state.season = { year, season };
       state.status = FetchStatus.SUCCESS;
     });
     builder.addCase(fetchSeasonsAnime.rejected, (state, action) => {
+      if (action.meta.aborted) return;
       state.status = FetchStatus.ERROR;
     });
   },

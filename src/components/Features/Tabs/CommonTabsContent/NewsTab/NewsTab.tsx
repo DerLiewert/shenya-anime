@@ -30,12 +30,14 @@ const NewsTab = (props: NewsTabProps) => {
   const { newsSelector, status, actionCreator, visibleNewsCount = 6 } = props;
 
   const dispatch = useAppDispatch();
+  const abortableDispatch = useAbortableDispatch();
   const { data: news, pagination } = useAppSelector(newsSelector);
   const { isLoading, isSuccess } = useFetchStatus(status);
   const { visibleCount, showMore, reset } = useShowMore(visibleNewsCount);
 
-  const param = React.useMemo(() => ({ page: 1 }), []);
-  useAbortableDispatch(actionCreator, param, news.length === 0 && !isSuccess);
+  React.useEffect(() => {
+    if (news.length === 0 && !isSuccess) abortableDispatch(actionCreator, { page: 1 });
+  }, []);
 
   React.useEffect(() => {
     if (pagination && news.length < visibleCount && pagination.has_next_page) {

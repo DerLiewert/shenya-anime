@@ -15,16 +15,16 @@ interface ScoreStatsProps {
 
 const ScoreStats: React.FC<ScoreStatsProps> = ({ type, isShowEmpryMessage = true }) => {
   const isAnime = type === 'anime';
+  const abortableDispatch = useAbortableDispatch();
   const { scoreStats, status } = useAppSelector((state) =>
     isAnime ? state.animeFullById : state.mangaFullById,
   );
   const { isLoading, isSuccess } = useFetchStatus(status.scoreStats);
 
-  useAbortableDispatch(
-    isAnime ? fetchAnimeScoreStats : fetchMangaScoreStats,
-    undefined,
-    scoreStats.length === 0 && !isSuccess,
-  );
+  React.useEffect(() => {
+    if (scoreStats.length === 0 && !isSuccess)
+      abortableDispatch(isAnime ? fetchAnimeScoreStats : fetchMangaScoreStats);
+  }, []);
 
   if (scoreStats.length === 0) {
     return isLoading ? (

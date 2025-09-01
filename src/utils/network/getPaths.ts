@@ -25,7 +25,12 @@ export const getPersonPaths = (id: Id) => {
 export const getCommonPaths = () => {
   return {
     home: `/home`,
+    anime: `/anime`,
+    manga: `/manga`,
     schedules: `/schedules`,
+    broadcast: `/schedules/broadcast`,
+    seasonal: `/schedules/seasonal`,
+    notFound: `/not-found`,
   };
 };
 

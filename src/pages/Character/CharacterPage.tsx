@@ -23,7 +23,7 @@ const CharacterPage = () => {
       introBg={BG}
       render={(item) => ({
         title: item && item.name,
-        subtitles: item && item.name_kanji ? [item.name_kanji]: [],
+        subtitles: item && item.name_kanji ? [item.name_kanji] : [],
         resources: item && <AdditionalInfo item={item} />,
         breadcrumbs: item
           ? [
@@ -37,22 +37,27 @@ const CharacterPage = () => {
           ? [
               {
                 value: 'about',
+                label: 'About',
                 element: <CharacterAboutTab item={item} />,
               },
               {
                 value: 'anime',
+                label: 'Anime',
                 element: <CharacterAnimeTab />,
               },
               {
                 value: 'manga',
+                label: 'Manga',
                 element: <CharacterMangaTab />,
               },
               {
                 value: 'voices',
+                label: 'Voices',
                 element: <CharacterVoicesTab />,
               },
               {
                 value: 'pictures',
+                label: 'Pictures',
                 element: <CharacterPicturesTab />,
               },
             ]

@@ -14,25 +14,13 @@ import './NewEpisodes.scss';
 import { animeEmptyValueMessages, commonMessages } from '@/variables/emptyValueMessages';
 
 const NewEpisodes: React.FC = () => {
+  const abortableDispatch = useAbortableDispatch();
   const { items, status } = useAppSelector((state) => state.todaySchedulesAnime);
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
-  useAbortableDispatch(fetchTodaySchedulesAnime, undefined, items.length === 0);
 
-  const renderSkeletons = () =>
-    Array.from({ length: 6 }).map((_, i) => (
-      <Skeleton key={i} className="new-episodes__item new-episode border-opacity _skeleton" />
-    ));
-
-  const renderItems = () =>
-    uniqueItems(items)
-      .splice(0, 6)
-      .map((item) => <BroadcastItem item={item} />);
-
-  const renderEmpty = () => (
-    <EmptyValueMessage
-      message={isError ? commonMessages.error : animeEmptyValueMessages.newEpisodes}
-    />
-  );
+  React.useEffect(() => {
+    if (items.length === 0) abortableDispatch(fetchTodaySchedulesAnime);
+  }, []);
 
   return (
     <div className="new-episodes">
@@ -40,11 +28,26 @@ const NewEpisodes: React.FC = () => {
         <SectionHeader
           className="new-episodes__section-header"
           title="New Episodes"
-          link={{ url: '#', text: 'View release calendar' }}
+          link={{ url: '/schedules/broadcast', text: 'View release calendar' }}
         />
         <h3 className="new-episodes__subtitle title title--fz-24 title--main-color">Today</h3>
         <div className="new-episodes__body">
-          {isLoading ? renderSkeletons() : isSuccess ? renderItems() : renderEmpty()}
+          {isLoading &&
+            Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                className="new-episodes__item new-episode border-opacity _skeleton"
+              />
+            ))}
+          {isSuccess ? (
+            uniqueItems(items)
+              .splice(0, 6)
+              .map((item) => <BroadcastItem item={item} key={item.mal_id} />)
+          ) : (
+            <EmptyValueMessage
+              message={isError ? commonMessages.error : animeEmptyValueMessages.newEpisodes}
+            />
+          )}
         </div>
         {isLoading ? (
           <Skeleton className="new-episodes__btn-wrapper border-opacity _skeleton" />

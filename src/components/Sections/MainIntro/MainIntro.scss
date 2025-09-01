@@ -1,4 +1,4 @@
-.intro {
+.main-intro {
   min-height: 100vh;
   display: flex;
   align-items: flex-end;
@@ -53,7 +53,7 @@
   }
 }
 
-.slide {
+.main-slide {
   position: relative;
   display: flex;
   align-items: flex-end;
@@ -110,6 +110,10 @@
     @include media-max($mobile) {
       width: 90.085%;
     }
+
+    &._loading {
+      display: none;
+    }
   }
 
   &__body {
@@ -124,7 +128,7 @@
     }
   }
 
-  &__image {
+  &__poster {
     flex-shrink: 0;
     width: 347px;
     height: 490px;
@@ -374,7 +378,7 @@
   }
 
   .swiper-slide-visible & {
-    &__image,
+    &__poster,
     &__title,
     &__text,
     &__info,

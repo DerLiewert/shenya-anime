@@ -23,7 +23,7 @@ import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
 import clsx from 'clsx';
 import './CatalogPage.scss';
-import { fetchMangaGenres } from '@/store/manga/mangaGenresSlice';
+import { fetchMangaGenres } from '@/store/genres/mangaGenresSlice';
 import { fetchMangaByParams } from '@/store/manga/mangaCatalogSlice';
 
 type OrderBy = Extract<MangaSearchOrder, 'mal_id' | 'score' | 'popularity' | 'favorites'>;

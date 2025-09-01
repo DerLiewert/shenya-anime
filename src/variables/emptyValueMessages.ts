@@ -12,6 +12,7 @@
 // };
 
 export const animeEmptyValueMessages = {
+  items: 'No anime found',
   synopsis: 'No synopsis has been added for this anime.',
   background: 'No background has been added for this anime.',
   scoreStats: 'No scores have been recorded for this anime.',
@@ -32,6 +33,7 @@ export const animeEmptyValueMessages = {
 };
 
 export const mangaEmptyValueMessages = {
+  items: 'No manga found',
   synopsis: 'No synopsis has been added for this manga.',
   background: 'No background has been added for this manga.',
   scoreStats: 'No scores have been recorded for this manga.',
@@ -51,7 +53,7 @@ export const characterEmptyValueMessages = {
 };
 
 export const personEmptyValueMessages = {
-  synopsis: 'No synopsis has been added for this person.',
+  about: 'No info about this person has been added.',
   pictures: 'No pictures are available for this person.',
   anime: 'No anime has been added for this person.',
   manga: 'No manga has been added for this person.',

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Broadcast, Seasonal } from '@/components';
+import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Broadcast, CommonIntro, Seasonal } from '@/components';
 import './Schedules.scss';
+import NotFound from '../NotFound/NotFound';
 
 const routeItems: { label: string; path: string; element: React.JSX.Element }[] = [
   { label: 'Currently Airing', path: 'broadcast', element: <Broadcast /> },
@@ -9,18 +10,25 @@ const routeItems: { label: string; path: string; element: React.JSX.Element }[] 
 ];
 
 function Schedules() {
+  const navigate = useNavigate();
   const location = useLocation();
   const segments = location.pathname.split('/').filter(Boolean);
-  const navigate = useNavigate();
 
-  React.useEffect(() => {
-    if (location.pathname === '/schedules')
-      navigate({ pathname: `/${segments[0]}/${routeItems[0].path}` }, { replace: true });
-  }, [location.pathname]);
+  // React.useEffect(() => {
+  //   if (segments.length === 1) {
+  //     navigate({ pathname: `/${segments[0]}/${routeItems[0].path}` }, { replace: true });
+  //   }
+  // }, [location.pathname]);
 
+  if (
+    (segments.length > 1 && !routeItems.find((obj) => obj.path === segments[1])) ||
+    segments.length > 2
+  )
+    return <NotFound />;
+    
   return (
     <div className="schedules">
-      <ScheduleslIntro title="Schedules Anime" />
+      <CommonIntro bgPrefix="schedules" title="Schedules Anime" />
       <div className="schedules__tabs schedules-tabs">
         <div className="container">
           <div className="schedules-tabs__list">
@@ -38,10 +46,13 @@ function Schedules() {
             ))}
           </div>
           <div className="schedules-tabs__content">
+            {/* <Route key={routeItems[0].path} path={'/'} element={routeItems[0].element} /> */}
             <Routes>
+              <Route index element={<Navigate to={routeItems[0].path} replace />} />
               {routeItems.map((item) => (
-                <Route key={item.path} path={'/' + item.path} element={item.element} />
+                <Route key={item.path} path={item.path} element={item.element} />
               ))}
+              {/* <Route path={'*'} element={<Navigate to="/not-found" replace />} /> */}
             </Routes>
           </div>
         </div>
@@ -51,18 +62,3 @@ function Schedules() {
 }
 
 export default Schedules;
-
-/*==========================
-/*====== ScheduleslIntro ======
-/*=========================*/
-const ScheduleslIntro: React.FC<{ title: string }> = ({ title }) => {
-  return (
-    <section className="catalog__intro catalog-intro ">
-      <div className="container">
-        <div className="catalog-intro__inner">
-          <h2 className="catalog-intro__title title">{title}</h2>
-        </div>
-      </div>
-    </section>
-  );
-};

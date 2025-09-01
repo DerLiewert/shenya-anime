@@ -12,13 +12,16 @@ import './EpisodesTab.scss';
 
 const EpisodesTab: React.FC = () => {
   const dispatch = useAppDispatch();
+  const abortableDispatch = useAbortableDispatch();
   const { data: episodes, pagination } = useAppSelector((state) => state.animeFullById.episodes);
   const { isLoading, isSuccess } = useFetchStatus((state) => state.animeFullById.status.episodes);
   const { visibleCount, showMore } = useShowMore(20);
 
   const param = React.useMemo(() => ({ page: 1 }), []);
 
-  useAbortableDispatch(fetchAnimeEpisodes, param, episodes.length === 0 && !isSuccess);
+  React.useEffect(() => {
+    if (episodes.length === 0 && !isSuccess) abortableDispatch(fetchAnimeEpisodes, param);
+  }, []);
 
   React.useEffect(() => {
     if (pagination && episodes.length < visibleCount && pagination.has_next_page) {

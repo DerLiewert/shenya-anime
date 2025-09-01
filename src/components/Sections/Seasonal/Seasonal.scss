@@ -32,14 +32,25 @@
     }
   }
 
-  &__loader {
-    margin-top: 25px;
+  &__card {
+    &._skeleton-container {
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      background-color: #1c1c1c;
+      padding-bottom: 52.2px;
+      ._skeleton {
+        aspect-ratio: 2.2 /3;
+        max-height: 300px;
+        position: static;
+      }
+      @include media-max($mobile) {
+        padding-bottom: 49.67px;
+      }
+    }
   }
 
-  &__show-more-wrapper {
+  &__pagination {
     margin-top: 25px;
-  }
-
-  &__show-more {
   }
 }

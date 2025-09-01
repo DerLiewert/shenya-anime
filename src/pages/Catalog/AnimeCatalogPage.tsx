@@ -26,8 +26,8 @@ import {
 } from '@/models';
 import { FetchStatus } from '@/typescript';
 import { fetchAnimeByParams } from '@/store/anime/animeCatalogSlice';
-import { fetchAnimeGenres } from '@/store/anime/animeGenresSlice';
-import { AnimeCard, FilterIcon, Pagination } from '@/components';
+import { fetchAnimeGenres } from '@/store/genres/animeGenresSlice';
+import { AnimeCard, CommonIntro, FilterIcon, Pagination } from '@/components';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
 import clsx from 'clsx';
@@ -290,6 +290,7 @@ const AnimeCatalogPage: React.FC = () => {
 
   // При сабмите формы собрать с неё данные и сохранить в searchParams
   const onSubmit = (data: FormValues) => {
+    setIsShowFilters(false);
     appNavigate({
       ...searchParams,
       type: data.type?.value,
@@ -443,8 +444,15 @@ const AnimeCatalogPage: React.FC = () => {
 
   return (
     <div className="catalog">
-      <CatalogIntro title="Anime Catalog" pagination={pagination} />
-
+      <CommonIntro
+        bgPrefix="anime"
+        title="Anime Catalog"
+        subtitle={
+          <>
+            Search anime results: <span>{(pagination && pagination.items.total) || '*****'}</span>
+          </>
+        }
+      />
       <div className="catalog__cards catalog-cards" ref={cardsRef}>
         <div className="container">
           <div className="catalog-cards__top">
@@ -555,23 +563,3 @@ const AnimeCatalogPage: React.FC = () => {
 // };
 
 export default AnimeCatalogPage;
-
-/*==========================
-/*====== CatalogIntro ======
-/*=========================*/
-type CatalogIntroProps = { pagination: JikanPaginationPlus | null; title: string };
-
-const CatalogIntro: React.FC<CatalogIntroProps> = ({ pagination, title }) => {
-  return (
-    <section className="catalog__intro catalog-intro catalog-intro--anime">
-      <div className="container">
-        <div className="catalog-intro__inner">
-          <h2 className="catalog-intro__title title">{title}</h2>
-          <div className="catalog-intro__result">
-            Search anime results: <span>{(pagination && pagination.items.total) || '*****'}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};

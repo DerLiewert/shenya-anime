@@ -7,13 +7,15 @@ export interface SchedulesParams {
   unapproved?: boolean;
 }
 
-export type SchedulesFilter =
-  | 'monday'
-  | 'tuesday'
-  | 'wednesday'
-  | 'thursday'
-  | 'friday'
-  | 'saturday'
-  | 'sunday'
-  | 'unknown'
-  | 'other';
+export const schedulesFilter = [
+  'sunday',
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+] as const;
+
+export type SchedulesFilter = (typeof schedulesFilter)[number];
+export type SchedulesFilterPlus = SchedulesFilter | 'unknown' | 'other';

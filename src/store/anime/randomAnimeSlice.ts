@@ -21,7 +21,9 @@ const initialState: randomAnimeState = {
 export const randomAnimeSlice = createSlice({
   name: 'random-anime',
   initialState,
-  reducers: {},
+  reducers: {
+    clearRandomAnimeState: () => initialState,
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchRandomAnime.pending, (state) => {
       state.status = FetchStatus.LOADING;
@@ -37,7 +39,7 @@ export const randomAnimeSlice = createSlice({
   },
 });
 
-// export const {} = randomAnimeSlice.actions
+export const { clearRandomAnimeState } = randomAnimeSlice.actions;
 
 export default randomAnimeSlice.reducer;
 

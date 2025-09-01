@@ -1,27 +1,50 @@
 import React from 'react';
 import { useAbortableDispatch } from '@/hooks';
 import { fetchSeasonalAnime } from '../../store/anime/seasonalAnimeSlice';
-import { Intro, MediaBlock, NewEpisodes, RandomAnime } from '@/components';
-import './Home.scss'
+import {
+  AnimeCard,
+  MainIntro,
+  MangaCard,
+  MediaBlock,
+  NewEpisodes,
+  RandomAnime,
+} from '@/components';
+import './Home.scss';
+import { Anime, Manga } from '@/models';
+import { fetchTopManga } from '@/store/manga/mangaTopSlice';
 
 const Home: React.FC = () => {
-  useAbortableDispatch(fetchSeasonalAnime);
   return (
     <React.Fragment>
-      <Intro />
-      <MediaBlock
+      <MainIntro />
+      <MediaBlock<Anime>
+        type='anime'
         header={{
           title: 'Top Anime',
-          link: { url: '#', text: 'View all' },
+          link: { url: '/anime', text: 'View all' },
         }}
         selectFunction={(state) => state.introAnime}
+        renderCard={(item) => <AnimeCard item={item} />}
       />
-      <MediaBlock
+      <MediaBlock<Manga>
+        type='manga'
+        header={{
+          title: 'Top Manga',
+          link: { url: '/manga', text: 'View all' },
+        }}
+        selectFunction={(state) => state.mangaTop}
+        renderCard={(item) => <MangaCard item={item} />}
+        actionCreator={fetchTopManga}
+      />
+      <MediaBlock<Anime>
+        type='anime'
         header={{
           title: 'Seasonal anime',
-          link: { url: '#', text: 'View all' },
+          link: { url: '/schedules/seasonal', text: 'View all' },
         }}
         selectFunction={(state) => state.seasonalAnime}
+        renderCard={(item) => <AnimeCard item={item} />}
+        actionCreator={fetchSeasonalAnime}
       />
       <NewEpisodes />
       <RandomAnime />

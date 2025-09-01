@@ -36,7 +36,7 @@ type LinkProps = {
 type TextProps = {
   isLink?: false;
   to?: never;
-  isLinkPrimary?: never;
+  isLinkPrimary?: boolean;
 } & React.HTMLAttributes<HTMLParagraphElement>;
 
 type InfoValueProps = CommonInfoValueProps & (LinkProps | TextProps);

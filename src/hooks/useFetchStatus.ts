@@ -2,9 +2,10 @@ import { useAppSelector } from '@/app/hooks';
 import { RootState } from '@/app/store';
 import { FetchStatus } from '@/typescript';
 
-type StatusSelector = (state: RootState) => FetchStatus | undefined;
+type Status = FetchStatus | undefined | null;
+type StatusSelector = (state: RootState) => Status;
 
-export function useFetchStatus(statusOrSelector: FetchStatus | StatusSelector | undefined) {
+export function useFetchStatus(statusOrSelector:  StatusSelector | Status) {
   const selectedStatus = useAppSelector((state) =>
     typeof statusOrSelector === 'function' ? statusOrSelector(state) : undefined,
   );

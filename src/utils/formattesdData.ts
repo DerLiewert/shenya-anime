@@ -9,8 +9,12 @@ export const splitText = (text: string, separator: string = '\n'): string[] => {
   return text.split(separator);
 };
 
+export const toFirstUppercase = (value: string): string => {
+  return value.slice(0, 1).toUpperCase() + value.slice(1);
+};
+
 // Because some identical anime objects may be repeated
-export const uniqueItems= <T,>(items: Array<T & {mal_id: number}>) => {
+export const uniqueItems= <T extends {mal_id: number}>(items: Array<T>) => {
   return items.filter(
     (item, index, arr) => index === arr.findIndex((obj) => obj.mal_id === item.mal_id),
   );

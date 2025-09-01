@@ -14,7 +14,9 @@ const links = [
   { path: '/schedules', label: 'Schedules' },
 ];
 
-const Header: React.FC = () => {
+const Header: React.FC<{ setIsSearchOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({
+  setIsSearchOpen,
+}) => {
   const location = useLocation();
   const segments = location.pathname.split('/').filter(Boolean);
 
@@ -67,7 +69,10 @@ const Header: React.FC = () => {
             </nav>
           </div>
           <div className="actions">
-            <button className="search" aria-label="Search">
+            <button
+              className="search-btn"
+              aria-label="Search"
+              onClick={() => setIsSearchOpen(true)}>
               <SearchIcon />
             </button>
             <button

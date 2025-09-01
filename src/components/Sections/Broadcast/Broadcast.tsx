@@ -1,85 +1,96 @@
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { BroadcastItem, EmptyValueMessage, Loading } from '@/components';
-import { useAbortableDispatch, useFetchStatus } from '@/hooks';
-import { SchedulesFilter } from '@/models';
+import { useAppSelector } from '@/app/hooks';
+import { BroadcastItem, EmptyValueMessage, Pagination } from '@/components';
+import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
+import { schedulesFilter, SchedulesFilter, SchedulesParams } from '@/models';
 import { fetchSchedulesAnime } from '@/store/anime/schedulesAnimeSlice';
-import { uniqueItems } from '@/utils';
-import { animeEmptyValueMessages, commonMessages, WEEK_DAYS } from '@/variables';
+import { scrollToTop, uniqueItems } from '@/utils';
+import { animeEmptyValueMessages, commonMessages, weekDaysOptions } from '@/variables';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
+import { useLocation } from 'react-router-dom';
 import Select from 'react-select';
+import isEqual from 'lodash.isequal';
 import './Broadcast.scss';
 
-export const schedulesFilter: SchedulesFilter[] = [
-  'sunday',
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-];
+type WithRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 
-const weekDaysOptions: { value: SchedulesFilter; label: string }[] = [
-  { value: schedulesFilter[0], label: WEEK_DAYS[0] },
-  { value: schedulesFilter[1], label: WEEK_DAYS[1] },
-  { value: schedulesFilter[2], label: WEEK_DAYS[2] },
-  { value: schedulesFilter[3], label: WEEK_DAYS[3] },
-  { value: schedulesFilter[4], label: WEEK_DAYS[4] },
-  { value: schedulesFilter[5], label: WEEK_DAYS[5] },
-  { value: schedulesFilter[6], label: WEEK_DAYS[6] },
-];
+function parseSearchParams(search: string): Partial<SchedulesParams> {
+  const params = new URLSearchParams(search);
+  const result: Partial<SchedulesParams> = {};
+
+  for (const [key, value] of params.entries()) {
+    switch (key) {
+      case 'filter':
+        if (schedulesFilter.includes(value as SchedulesFilter)) {
+          result.filter = value as SchedulesFilter;
+        }
+        break;
+      case 'page':
+      case 'limit':
+        const page = parseInt(value, 10);
+        if (!isNaN(page)) {
+          (result as any)[key] = page;
+        }
+        break;
+      case 'unapproved':
+      case 'kids':
+      case 'sfw':
+        result[key] = value === 'true';
+        break;
+      default:
+        break;
+    }
+  }
+
+  const availableParams: Array<keyof SchedulesParams> = ['filter', 'page'];
+
+  for (const key in result) {
+    if (!availableParams.includes(key as keyof SchedulesParams))
+      delete result[key as keyof SchedulesParams];
+  }
+
+  return result;
+}
 
 function Broadcast() {
-  const dispatch = useAppDispatch();
-  const prevDay = useAppSelector((state) => state.schedulesAnime.day);
-  const items = useAppSelector((state) => state.schedulesAnime.items);
-  const pagination = useAppSelector((state) => state.schedulesAnime.pagination);
-  const status = useAppSelector((state) => state.schedulesAnime.status);
-  const { isError, isIdle, isLoading, isSuccess } = useFetchStatus(status);
-  const [day, setDay] = React.useState(weekDaysOptions[0]);
+  const abortableDispatch = useAbortableDispatch();
+  const appNavigate = useAppNavigate(parseSearchParams);
+  const location = useLocation();
+  const { items, status, pagination } = useAppSelector((state) => state.schedulesAnime);
+  const { isError, isLoading, isSuccess } = useFetchStatus(status);
 
-  const param = React.useMemo(() => ({ day: day.value, page: 1 }), [day.value]);
-  useAbortableDispatch(fetchSchedulesAnime, param, isLoading || prevDay !== day.value);
+  const searchParams = React.useMemo<WithRequired<SchedulesParams, 'filter'>>(() => {
+    const urlParams = parseSearchParams(location.search);
+    const day = weekDaysOptions.find((obj) => obj.value === schedulesFilter[new Date().getDay()]);
+    return { filter: day ? day.value : weekDaysOptions[0].value, ...urlParams };
+  }, [location.search]);
 
-  const renderSkeletons = () =>
-    Array.from({ length: 12 }).map((_, i) => (
-      <Skeleton key={i} className="broadcast__item border-opacity _skeleton" />
-    ));
+  React.useEffect(() => {
+    appNavigate(searchParams, { replace: true });
+  }, []);
 
-  const renderItems = () =>
-    uniqueItems(items).map((item) => (
-      <BroadcastItem key={item.mal_id} className="broadcast__item" item={item} />
-    ));
-
-  const renderEmpty = () => (
-    <EmptyValueMessage
-      message={isError ? commonMessages.error : animeEmptyValueMessages.newEpisodes}
-    />
-  );
-
-  const onShowMore = () => {
-    if (pagination && pagination.has_next_page) {
-      dispatch(
-        fetchSchedulesAnime({
-          day: day.value,
-          page: pagination.current_page + 1,
-        }),
-      );
+  const prevParamsRef = React.useRef<SchedulesParams | null>(null);
+  React.useEffect(() => {
+    if (!prevParamsRef.current || !isEqual(prevParamsRef.current, searchParams)) {
+      prevParamsRef.current = searchParams;
+      abortableDispatch(fetchSchedulesAnime, searchParams);
     }
-  };
+  }, [location.search]);
+
+  const cardsRef = React.useRef<HTMLDivElement>(null);
+
   return (
-    <div className="broadcast">
+    <div className="broadcast" ref={cardsRef}>
       <div className="broadcast__filter">
         <Select
           className="broadcast__select select"
           classNamePrefix="select"
-          placeholder=""
+          placeholder="Select day of week..."
           defaultValue={weekDaysOptions[0]}
-          value={day}
+          value={weekDaysOptions.find((obj) => obj.value === searchParams.filter)}
           options={weekDaysOptions}
           onChange={(selected) => {
-            setDay(selected as any);
+            if (selected) appNavigate({ ...searchParams, filter: selected.value, page: undefined });
           }}
           menuPortalTarget={document.body}
           isSearchable={false}
@@ -87,19 +98,31 @@ function Broadcast() {
         />
       </div>
       <div className="broadcast__items">
-        { renderItems()}
-        {/* {isLoading ? renderSkeletons() : isSuccess ? renderItems() : renderEmpty()} */}
+        {isLoading &&
+          Array.from({ length: 12 }).map((_, i) => (
+            <Skeleton key={i} className="broadcast__item border-opacity _skeleton" />
+          ))}
+        {isSuccess &&
+          uniqueItems(items).map((item) => (
+            <BroadcastItem key={item.mal_id} className="broadcast__item" item={item} />
+          ))}
+        {isError && (
+          <EmptyValueMessage
+            message={isError ? commonMessages.error : animeEmptyValueMessages.newEpisodes}
+          />
+        )}
       </div>
-      {isLoading && <Loading />}
-      {items.length > 0 && pagination?.has_next_page && (
-        <div className="broadcast__show-more-wrapper bnts-wrapper">
-          <button
-            className="broadcast__show-more show-more-btn btn btn--upper btn--outline"
-            onClick={onShowMore}
-            disabled={isLoading}>
-            Show more
-          </button>
-        </div>
+      {pagination && (
+        <Pagination
+          currentPage={pagination.current_page}
+          totalItems={pagination.items.total}
+          itemsPerPage={pagination.items.per_page}
+          className="catalog-cards__pagination"
+          onChangePage={(page) => {
+            appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
+            scrollToTop(cardsRef);
+          }}
+        />
       )}
     </div>
   );

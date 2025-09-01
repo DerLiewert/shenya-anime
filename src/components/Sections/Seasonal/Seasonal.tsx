@@ -1,6 +1,9 @@
+import React from 'react';
+import Skeleton from 'react-loading-skeleton';
+import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { AnimeCard, Loading } from '@/components';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
+import { AnimeCard, Pagination } from '@/components';
 import {
   AnimeSeason,
   animeSeasons,
@@ -10,14 +13,13 @@ import {
 } from '@/models';
 import { fetchSeasonsList } from '@/store/season/seasonListSlice';
 import { fetchSeasonsAnime } from '@/store/season/seasonsAnimeSlice';
-import { getSeasonName, uniqueItems } from '@/utils';
-import React from 'react';
-import Skeleton from 'react-loading-skeleton';
-import { useLocation } from 'react-router-dom';
+import { getSeasonName, scrollToTop, uniqueItems } from '@/utils';
 import Select from 'react-select';
+import isEqual from 'lodash.isequal';
 import './Seasonal.scss';
+import { seasonOptions } from '@/variables';
 
-export function parseSearchParams(search: string): Partial<JikanSeasonsPlusParams> {
+function parseSearchParams(search: string): Partial<JikanSeasonsPlusParams> {
   const params = new URLSearchParams(search);
   const result: Partial<JikanSeasonsPlusParams> = {};
 
@@ -64,22 +66,23 @@ export function parseSearchParams(search: string): Partial<JikanSeasonsPlusParam
   return result;
 }
 
-const seasonOptions = animeSeasons.map((str) => ({ value: str, label: str }));
+const getDefaultParams = () => ({
+  year: new Date().getFullYear(),
+  season: getSeasonName(),
+  page: 1,
+});
 
-const getDefaultParams = () => ({ year: new Date().getFullYear(), season: getSeasonName() });
-
+// ===== Seasonal ===== //
 function Seasonal() {
   const dispatch = useAppDispatch();
+  const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
   const appNavigate = useAppNavigate(parseSearchParams);
+
   const seasonsList = useAppSelector((state) => state.seasonsList.items);
-  const { isLoading: isLoadingSeasons } = useFetchStatus((state) => state.seasonsList.status);
-  const {
-    items,
-    pagination,
-    season: prevSeason,
-    status,
-  } = useAppSelector((state) => state.seasonsAnime);
+  const { isSuccess: isSuccessSeasons } = useFetchStatus((state) => state.seasonsList.status);
+
+  const { items, pagination, status } = useAppSelector((state) => state.seasonsAnime);
   const { isLoading: isLoadingItems } = useFetchStatus(status);
 
   const yearOptions = React.useMemo(
@@ -93,79 +96,56 @@ function Seasonal() {
     return { ...defaultParams, ...urlParams };
   }, [location.search]);
 
-  const param = React.useMemo(
-    () => ({ ...searchParams, page: 1 }),
-    [searchParams.year, searchParams.season],
-  );
-
-  useAbortableDispatch(
-    fetchSeasonsAnime,
-    param,
-    isLoadingItems ||
-      prevSeason?.year !== searchParams.year ||
-      prevSeason?.season !== searchParams.season,
-  );
-
   React.useEffect(() => {
+    appNavigate(searchParams, { replace: true });
+    if (isSuccessSeasons) return;
     dispatch(fetchSeasonsList());
-    appNavigate({ ...searchParams }, {replace: true})
   }, []);
 
+  const prevParamsRef = React.useRef<JikanSeasonsPlusParams | null>(null);
   React.useEffect(() => {
-    dispatch(fetchSeasonsAnime(searchParams));
-  }, [searchParams]);
-
-  const onShowMore = () => {
-    if (pagination && pagination.has_next_page) {
-      dispatch(
-        fetchSeasonsAnime({
-          ...searchParams,
-          page: pagination.current_page + 1,
-        }),
-      );
+    if (!prevParamsRef.current || !isEqual(prevParamsRef.current, searchParams)) {
+      prevParamsRef.current = searchParams;
+      abortableDispatch(fetchSeasonsAnime, searchParams);
     }
-  };
+  }, [abortableDispatch, searchParams]);
+
+  const cardsRef = React.useRef<HTMLDivElement>(null);
 
   return (
-    <div className="seasonal">
+    <div className="seasonal" ref={cardsRef}>
       <div className="seasonal__filter">
-        {yearOptions.length > 0 && isLoadingSeasons ? (
-          <Skeleton className="select__control " containerClassName="select seasonal__select" />
-        ) : (
+        {isSuccessSeasons ? (
           <Select
             className="seasonal__select select"
             classNamePrefix="select"
-            placeholder=""
+            placeholder="Select year..."
             defaultValue={yearOptions[0]}
-            value={
-              yearOptions.find((obj) => obj.value === parseSearchParams(location.search).year) ?? {
-                value: searchParams.year,
-                label: searchParams.year,
-              }
-            }
+            value={yearOptions.find((obj) => obj.value === searchParams.year)}
             options={yearOptions}
             onChange={(selected) => {
-              if (selected) appNavigate({ ...searchParams, year: selected.value });
+              // if (selected && selected.value !== searchParams.year)
+              if (selected) appNavigate({ ...searchParams, year: selected.value, page: undefined });
             }}
             menuPortalTarget={document.body}
             isSearchable={false}
             unstyled
           />
+        ) : (
+          <Skeleton className="select__control " containerClassName="select seasonal__select" />
         )}
+
         {seasonOptions && seasonOptions.length > 0 && (
           <Select
             className="seasonal__select select"
             classNamePrefix="select"
-            placeholder=""
+            placeholder="Select season..."
             defaultValue={seasonOptions[0]}
-            value={
-              seasonOptions.find(
-                (obj) => obj.value === parseSearchParams(location.search).season,
-              ) ?? { value: searchParams.season, label: searchParams.season }
-            }
+            value={seasonOptions.find((obj) => obj.value === searchParams.season)}
             options={seasonOptions}
             onChange={(selected) => {
-              if (selected) appNavigate({ ...searchParams, season: selected.value });
+              if (selected)
+                appNavigate({ ...searchParams, season: selected.value, page: undefined });
             }}
             menuPortalTarget={document.body}
             isSearchable={false}
@@ -174,38 +154,30 @@ function Seasonal() {
         )}
       </div>
       <div className="seasonal__items ">
-        {uniqueItems(items).map((item) => (
-          <AnimeCard item={item} key={item.mal_id} />
-        ))}
+        {isLoadingItems
+          ? Array.from({ length: 24 }).map((_, i) => (
+              <Skeleton
+                key={i}
+                containerClassName="seasonal__card _skeleton-container border-opacity"
+                className=" _skeleton "
+              />
+            ))
+          : uniqueItems(items).map((item) => <AnimeCard item={item} key={item.mal_id} />)}
       </div>
-      {isLoadingItems && <Loading className="seasonal__loader" />}
-      {items.length > 0 && pagination?.has_next_page && (
-        <div className="seasonal__show-more-wrapper bnts-wrapper">
-          <button
-            className="seasonal__show-more show-more-btn btn btn--upper btn--outline"
-            onClick={onShowMore}
-            disabled={isLoadingItems}>
-            Show more
-          </button>
-        </div>
+      {pagination && (
+        <Pagination
+          className="seasonal__pagination"
+          currentPage={pagination.current_page}
+          totalItems={pagination.items.total}
+          itemsPerPage={pagination.items.per_page}
+          onChangePage={(page) => {
+            appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
+            scrollToTop(cardsRef);
+          }}
+        />
       )}
     </div>
   );
 }
 
 export default Seasonal;
-
-/*==========================
-/*====== CatalogIntro ======
-/*=========================*/
-const SeasonalIntro: React.FC<{ title: string }> = ({ title }) => {
-  return (
-    <section className="catalog__intro catalog-intro ">
-      <div className="container">
-        <div className="catalog-intro__inner">
-          <h2 className="catalog-intro__title title">{title}</h2>
-        </div>
-      </div>
-    </section>
-  );
-};

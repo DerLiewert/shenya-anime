@@ -1,7 +1,7 @@
 import React from 'react';
-import { EntityTab, EntityTabItem } from '@/components';
 import { AnimeStaff } from '@/models';
 import { fetchAnimeStaff } from '@/store/anime/animeFullByIdSlice';
+import { EntityTab, EntityTabItem } from '@/components';
 import { animeEmptyValueMessages } from '@/variables';
 import './StaffTab.scss';
 
@@ -13,7 +13,7 @@ const StaffTab: React.FC = () => {
       selector={(state) => state.animeFullById.staff}
       actionCreator={fetchAnimeStaff}
       visibleItemCount={18}
-      entityItem={(item, index) => {
+      entityItem={(item) => {
         return (
           <EntityTabItem
             key={item.person.mal_id}

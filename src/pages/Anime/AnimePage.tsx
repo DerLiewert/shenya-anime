@@ -1,8 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-
-import { getAnimePaths } from '@/utils';
-
+import { fetchFullAnimeById } from '@/store/anime/animeFullByIdSlice';
+import { AnimeFull, JikanNamedResource } from '@/models';
 import {
   AnimeCharacterTab,
   AnimeNewsTab,
@@ -13,13 +12,11 @@ import {
   AnimeEpisodesTab,
   AnimeStaffTab,
   AnimeVideosTab,
+  EntityPageLayout,
+  ReturnBack,
 } from '@/components';
-
-import { fetchFullAnimeById } from '@/store/anime/animeFullByIdSlice';
-import { AnimeFull, JikanNamedResource } from '@/models';
-
+import { getAnimePaths } from '@/utils';
 import './AnimePage.scss';
-import EntityPageLayout from '@/components/Layout/EntityPageLayout/EntityPageLayout';
 
 const AnimePage = () => {
   return (
@@ -46,16 +43,15 @@ const AnimePage = () => {
         tabs: [
           {
             value: 'details',
+            label: 'Details',
             element: <AnimeDetailsTab />,
             children: [
               {
                 value: 'staff',
+                label: 'Staff',
                 element: (
                   <>
-                    <Link to=".." className="anime-tabs__back-link back-link">
-                      <LongArrowIcon />
-                      Back to Details
-                    </Link>
+                    <ReturnBack textBackTo="Details" className='anime-tabs__back-link'/>
                     <AnimeStaffTab />
                   </>
                 ),
@@ -64,26 +60,32 @@ const AnimePage = () => {
           },
           {
             value: 'episodes',
+            label: 'Episodes',
             element: <AnimeEpisodesTab />,
           },
           {
             value: 'characters',
+            label: 'Characters',
             element: <AnimeCharacterTab />,
           },
           {
             value: 'pictures',
+            label: 'Pictures',
             element: <AnimePicturesTab />,
           },
           {
             value: 'videos',
+            label: 'Videos',
             element: <AnimeVideosTab />,
           },
           {
             value: 'news',
+            label: 'News',
             element: <AnimeNewsTab />,
           },
           {
             value: 'recommendations',
+            label: 'Recommendations',
             element: <AnimeRecommendationsTab />,
           },
         ],

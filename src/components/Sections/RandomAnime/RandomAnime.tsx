@@ -1,9 +1,9 @@
 import React from 'react';
-import { useAppSelector } from '@/app/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useYoutubeTrailerImage } from '@/hooks';
 import { Score } from '../../UI';
 import './RandomAnime.scss';
-import { fetchRandomAnime } from '@/store/anime/randomAnimeSlice';
+import { clearRandomAnimeState, fetchRandomAnime } from '@/store/anime/randomAnimeSlice';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
@@ -11,10 +11,10 @@ import { getImageUrl } from '@/utils';
 import { ArrowIcon, BookmarkIcon } from '@/components/Icons';
 
 const RandomAnime: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const abortableDispatch = useAbortableDispatch();
   const item = useAppSelector((state) => state.randomAnime.item);
   const { src, onLoad, isFallback } = useYoutubeTrailerImage(item && item.trailer.images);
-
-  useAbortableDispatch(fetchRandomAnime, undefined, !item);
 
   // if (!item)
   //   return (
@@ -77,6 +77,13 @@ const RandomAnime: React.FC = () => {
   //   );
 
   // if (!item) return null;
+
+  React.useEffect(() => {
+    abortableDispatch(fetchRandomAnime);
+    return () => {
+      dispatch(clearRandomAnimeState());
+    };
+  }, []);
 
   return (
     <section className="random-anime">

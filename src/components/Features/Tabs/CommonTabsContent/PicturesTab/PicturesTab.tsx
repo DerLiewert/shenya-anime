@@ -25,62 +25,64 @@ interface ImagesTabProps {
   actionCreator: AsyncThunk<JikanImages[], any, AsyncThunkConfig>;
 }
 
-const PicturesTab: React.FC<ImagesTabProps> = React.memo(
-  ({
-    selector,
-    actionCreator,
-    status,
-    emptyValueMessage,
-    visibleCount: visibleImagesCount = 12,
-  }) => {
-    const pictures = useAppSelector(selector);
-    const { isLoading, isSuccess } = useFetchStatus(status);
-    const { visibleCount, showMore } = useShowMore(visibleImagesCount);
+const PicturesTab: React.FC<ImagesTabProps> = ({
+  selector,
+  actionCreator,
+  status,
+  emptyValueMessage,
+  visibleCount: visibleImagesCount = 12,
+}) => {
+  const abortableDispatch = useAbortableDispatch();
+  const pictures = useAppSelector(selector);
+  const { isLoading, isSuccess } = useFetchStatus(status);
+  const { visibleCount, showMore } = useShowMore(visibleImagesCount);
 
-    useAbortableDispatch(actionCreator, undefined, pictures.length === 0 && !isSuccess);
+  React.useEffect(() => {
+    if (pictures.length === 0 && !isSuccess) abortableDispatch(actionCreator);
+  }, []);
 
-    if (isLoading) return <Loading />;
-    return (
-      <div className="pictures-tab">
-        {isSuccess && pictures.length > 0 ? (
-          <LightGallery
-            addClass="pictures-tab-gallery"
-            elementClassNames="pictures-tab__items"
-            licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
-            plugins={[lgThumbnail, lgZoom]}
-            speed={300}
-            thumbHeight={'60px'}
-            thumbWidth={80}
-            mobileSettings={{
-              showCloseIcon: true,
-              download: true,
-              controls: false,
-            }}>
-            {pictures.slice(0, visibleCount).map((picture, i) => (
-              <a
-                key={picture.jpg.image_url}
-                href={getImageUrl(picture)}
-                className="pictures-tab__item bg bg--dark border">
-                <img src={getImageUrl(picture)} alt={`${i}`} loading="lazy" />
-              </a>
-            ))}
-          </LightGallery>
-        ) : (
-          <EmptyValueMessage message={emptyValueMessage} />
-        )}
-        {pictures.length > 0 && pictures.length > visibleCount && (
-          <div className="pictures-tab__show-more-wrapper bnts-wrapper">
-            <button
-              className="pictures-tab__show-more show-more-btn btn btn--upper btn--outline"
-              onClick={showMore}
-              disabled={isLoading}>
-              Show more
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  },
-);
+  if (isLoading) return <Loading />;
+  
+  return (
+    <div className="pictures-tab">
+      {isSuccess && pictures.length > 0 ? (
+        <LightGallery
+          addClass="pictures-tab-gallery"
+          elementClassNames="pictures-tab__items"
+          licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
+          plugins={[lgThumbnail, lgZoom]}
+          speed={300}
+          thumbHeight={'60px'}
+          thumbWidth={80}
+          mobileSettings={{
+            showCloseIcon: true,
+            download: true,
+            controls: false,
+          }}>
+          {pictures.slice(0, visibleCount).map((picture, i) => (
+            <a
+              key={picture.jpg.image_url}
+              href={getImageUrl(picture)}
+              className="pictures-tab__item bg bg--dark border">
+              <img src={getImageUrl(picture)} alt={`${i}`} loading="lazy" />
+            </a>
+          ))}
+        </LightGallery>
+      ) : (
+        <EmptyValueMessage message={emptyValueMessage} />
+      )}
+      {pictures.length > 0 && pictures.length > visibleCount && (
+        <div className="pictures-tab__show-more-wrapper bnts-wrapper">
+          <button
+            className="pictures-tab__show-more show-more-btn btn btn--upper btn--outline"
+            onClick={showMore}
+            disabled={isLoading}>
+            Show more
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default PicturesTab;

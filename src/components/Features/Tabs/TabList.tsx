@@ -7,7 +7,7 @@ import './TabList.scss';
 import { TabRoute } from '@/typescript';
 
 interface TabListProps {
-  tabs: Array<TabRoute | { value: string }>;
+  tabs: Array<TabRoute | { value: string, label: string }>;
   activeTab: string;
   className?: string;
   onTabTrigger: (value: string) => void;
@@ -120,7 +120,8 @@ const TabList: React.FC<TabListProps> = React.memo(
               data-value={tab.value}
               onClick={onTabTriggerClick}
               onKeyDown={(e) => handleKeyDown(e, index)}>
-              {tab.value.charAt(0).toUpperCase() + tab.value.slice(1)}
+              {/* {tab.label.charAt(0).toUpperCase() + tab.label.slice(1)} */}
+              {tab.label}
             </div>
           </SwiperSlide>
         ))}

@@ -1,0 +1,75 @@
+.common-intro {
+  margin-bottom: 25px;
+  padding: 100px 0;
+
+  position: relative;
+
+  &--anime {
+    background: url('/assets/anime-catalog.webp') center / cover no-repeat;
+  }
+  &--manga {
+    background: url('/assets/manga-catalog-bg.jpg') center / cover no-repeat;
+  }
+  &--schedules {
+    background: url('/assets/calendar-bg.jpg') center / cover no-repeat;
+  }
+
+  @include media-max($tablet) {
+    padding: 75px 0;
+  }
+  @include media-max($mobileSmall) {
+    padding: 50px 0;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      -90deg,
+      rgba(var(--bg-color-rgb), 0.3),
+      rgba(var(--bg-color-rgb), 0.5) 28.365%,
+      rgba(var(--bg-color-rgb), 0.7) 90%
+    );
+  }
+  &__inner {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  &__title {
+    font-size: 64px;
+    margin-bottom: 25px;
+    @include media-max($pc) {
+      font-size: 56px;
+      margin-bottom: 20px;
+    }
+    @include media-max($tablet) {
+      font-size: 48px;
+    }
+    @include media-max($mobile) {
+      font-size: 36px;
+      margin-bottom: 15px;
+    }
+    @include media-max($mobileSmall) {
+      font-size: 32px;
+    }
+  }
+
+  &__sub-title {
+    font-size: 18px;
+    span {
+      color: var(--primary-color);
+    }
+    @include media-max($tablet) {
+      font-size: 16px;
+    }
+    @include media-max($mobile) {
+      font-size: 14px;
+    }
+  }
+}

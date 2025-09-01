@@ -8,3 +8,4 @@ export * from './getShortAnimeRating';
 export * from './valueOrUnknown';
 export * from './catalogLink';
 export * from './general';
+export * from './scrollToTop';

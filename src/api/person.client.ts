@@ -1,6 +1,7 @@
 import { getResource } from './api.client';
 import { PersonEndpoints } from './endpoints/person.endpoints';
-import { PersonFull, JikanImages } from '@/models';
+import { PersonFull, JikanImages, Person } from '@/models';
+import { PersonSearchParams } from '@/models/Params/person-params.model';
 
 export const getPersonFullById = (id: number, signal?: AbortSignal) => {
   return getResource<PersonFull>({
@@ -15,4 +16,8 @@ export const getPersonPictures = (id: number, signal?: AbortSignal) => {
     pathParams: { id },
     signal,
   });
+};
+
+export const getPersonSearch = (queryParams: Partial<PersonSearchParams>) => {
+  return getResource<Person[]>({ endpoint: PersonEndpoints.peopleSearch, queryParams });
 };

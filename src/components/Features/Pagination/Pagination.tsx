@@ -1,8 +1,8 @@
 import clsx from 'clsx';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './Pagination.scss';
 
-type Item = { value: number; isRerender: boolean; isEllipsis: boolean };
+type Item = { value: number; isRerender: boolean; isEllipsis?: boolean };
 
 interface PaginationProps {
   currentPage: number;
@@ -15,8 +15,8 @@ interface PaginationProps {
 const Pagination: React.FC<PaginationProps> = React.memo(
   ({ currentPage: current, totalItems, itemsPerPage, onChangePage, className }) => {
     const isFirstRender = React.useRef(true);
-    const [pageItems, setPageItems] = useState<Array<Item>>([]);
-    const [currentPage, setCurrentPage] = useState<Omit<Item, 'isEllipsis'>>({
+    const [pageItems, setPageItems] = React.useState<Array<Item>>([]);
+    const [currentPage, setCurrentPage] = React.useState<Omit<Item, 'isEllipsis'>>({
       value: current,
       isRerender: false,
     });
@@ -25,17 +25,17 @@ const Pagination: React.FC<PaginationProps> = React.memo(
       return Math.ceil(totalItems / itemsPerPage);
     }, [totalItems, itemsPerPage]);
 
-    useEffect(() => {
-      if (currentPage.value !== current) setCurrentPage({ value: current, isRerender: false });
+    React.useEffect(() => {
+      if (currentPage.value !== current) setCurrentPage({ value: current, isRerender: true });
     }, [current]);
 
-    useEffect(() => {
+    React.useEffect(() => {
       if (!isFirstRender.current) onChangePage(currentPage.value);
       if (currentPage.isRerender) setPageItems(setPagesArray(lastPage, currentPage.value, 4));
       isFirstRender.current = false;
     }, [currentPage]);
 
-    useEffect(() => {
+    React.useEffect(() => {
       setPageItems(setPagesArray(lastPage, currentPage.value, 4));
     }, [lastPage]);
 
@@ -47,7 +47,7 @@ const Pagination: React.FC<PaginationProps> = React.memo(
       // if (pageItem.isRerender) setPageItems(setPagesArray(lastPage, pageItem.value, 4));
     };
 
-    const [searchPage, setSearchPage] = useState<string>('');
+    const [searchPage, setSearchPage] = React.useState<string>('');
 
     const goToSearchPage = () => {
       if (+searchPage === 0 || +searchPage === currentPage.value) return;

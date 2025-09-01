@@ -53,7 +53,7 @@
     width: auto;
     height: auto;
   }
-
+  .card-item,
   &__card {
     height: 100%;
     width: 220px;
@@ -75,7 +75,7 @@
       @include media-max($mobile) {
         height: 297.4px;
       }
-      @include media-max($mobileSmall){
+      @include media-max($mobileSmall) {
         height: 283.75px;
       }
     }

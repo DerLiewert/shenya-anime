@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Outlet, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '@/app/hooks';
 import {
   useAbortableDispatch,
@@ -60,6 +60,7 @@ const EntityPageLayout = <T extends ItemTypes>({
   status,
   render,
 }: EntityPageLayoutProps<T>) => {
+  const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const id = Number(useParams<{ id: string }>().id);
@@ -70,7 +71,6 @@ const EntityPageLayout = <T extends ItemTypes>({
 
   const item = useAppSelector(selector);
   const renderItems = React.useMemo(() => render(item), [item]);
-  useAbortableDispatch(actionCreator, id, !item || item.mal_id !== id);
 
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
   const { src, onLoad, isFallback } = useYoutubeTrailerImage(
@@ -89,6 +89,10 @@ const EntityPageLayout = <T extends ItemTypes>({
 
   const [activeTab, setActiveTab] = React.useState(getTab());
   const tabsRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    abortableDispatch(actionCreator, id);
+  }, [id]);
 
   React.useEffect(() => {
     const currentTab = getTab();

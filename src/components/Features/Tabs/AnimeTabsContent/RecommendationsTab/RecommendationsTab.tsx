@@ -1,9 +1,7 @@
 import React from 'react';
 import { fetchAnimeRecommendations } from '@/store/anime/animeFullByIdSlice';
-
+import { AnimeRecommendationCard, RecommendationsTab } from '@/components';
 import { animeEmptyValueMessages } from '@/variables';
-import { RecommendationsTab } from '../../CommonTabsContent';
-import { AnimeRecommendationCard } from '@/components';
 import './RecommendationsTab.scss';
 
 const AnimeRecommendationsTab = () => {

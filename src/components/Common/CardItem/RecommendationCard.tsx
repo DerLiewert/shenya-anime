@@ -3,7 +3,7 @@ import { RecommendationEntry } from '@/models';
 import { getImageUrl } from '@/utils';
 import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-import { AnimeTooltip, MangaTooltip } from '..';
+import { AnimeTooltip, MangaTooltip } from '@/components';
 
 interface RecommendationCard {
   item: RecommendationEntry;

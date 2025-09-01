@@ -1,4 +1,4 @@
-export * from './Intro';
+export * from './MainIntro';
 export * from './MediaBlock';
 export * from './NewEpisodes';
 export * from './RandomAnime';

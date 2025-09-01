@@ -1,0 +1,33 @@
+.back-link {
+  display: flex;
+  align-items: center;
+  color: var(--primary-color);
+  svg {
+    width: 20px;
+    height: 14px;
+    transform: rotate(180deg);
+    margin-right: 5px;
+  }
+
+  @include media-max($mobile) {
+    font-size: 14px;
+    svg {
+      width: 16px;
+      height: 10px;
+    }
+  }
+
+  @media (any-hover: hover) {
+    transition: color 0.3s ease 0s;
+    svg path {
+      transition: fill 0.3s ease 0s;
+    }
+
+    &:hover {
+      color: var(--primary-color-dark);
+      svg path {
+        fill: var(--primary-color-dark);
+      }
+    }
+  }
+}

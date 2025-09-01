@@ -38,26 +38,32 @@ const MangaPage = () => {
         tabs: [
           {
             value: 'details',
+            label: 'Details',
             element: <MangaDetailsTab item={item} />,
           },
           {
             value: 'characters',
+            label: 'Characters',
             element: <MangaCharacterTab />,
           },
           {
             value: 'pictures',
+            label: 'Pictures',
             element: <MangaPicturesTab />,
           },
           {
             value: 'news',
+            label: 'News',
             element: <MangaNewsTab />,
           },
           {
             value: 'recommendations',
+            label: 'Recommendations',
             element: <MangaRecommendationsTab />,
           },
           {
-            value: 'more info',
+            value: 'more-info',
+            label: 'More info',
             element: <div>more info</div>,
           },
         ],

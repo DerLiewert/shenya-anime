@@ -3,32 +3,48 @@ import { useAppSelector } from '@/app/hooks';
 
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
+import type { Swiper as ISwiper } from 'swiper';
 import 'swiper/scss';
 import 'swiper/scss/effect-fade';
 import 'swiper/scss/autoplay';
 
-import clsx from 'clsx';
-import './Intro.scss';
-
-import IntroSlide, { IntroSlideSkeleton } from './IntroSlide';
+import MainIntroSlide, { MainIntroSkeleton } from './MainIntroSlide';
 import { uniqueItems } from '@/utils';
 import { FetchStatus } from '@/typescript';
 import { useAbortableDispatch } from '@/hooks';
 import { fetchIntroAnime } from '@/store/anime/introAnimeSlice';
 
-const Intro: React.FC = () => {
+import clsx from 'clsx';
+import './MainIntro.scss';
+
+const MainIntro: React.FC = () => {
+  const abortableDispatch = useAbortableDispatch();
   const { items, status } = useAppSelector((state) => state.introAnime);
-  useAbortableDispatch(fetchIntroAnime, undefined, items.length === 0);
+
+  const [realIndex, setRealIndex] = React.useState(0);
+
+  const shouldRenderImage = (index: number) => {
+    if (index === realIndex) return true;
+
+    const total = items.length;
+    const prev = (realIndex - 1 + total) % total;
+    const next = (realIndex + 1) % total;
+    return index === prev || index === next;
+  };
+
+  React.useEffect(() => {
+    if (items.length === 0) abortableDispatch(fetchIntroAnime);
+  }, []);
 
   return (
-    <div className="intro">
+    <div className="main-intro">
       {status === FetchStatus.LOADING ? (
-        <IntroSlideSkeleton />
+        <MainIntroSkeleton />
       ) : (
         <Swiper
           tag="section"
-          className="intro__slider"
-          wrapperClass="intro__wrapper"
+          className="main-intro__slider"
+          wrapperClass="main-intro__wrapper"
           modules={[EffectFade, Autoplay, Pagination]}
           spaceBetween={0}
           slidesPerView={1}
@@ -37,19 +53,14 @@ const Intro: React.FC = () => {
           effect="fade"
           fadeEffect={{ crossFade: true }}
           autoHeight={true}
-          lazyPreloadPrevNext={1}
-          // autoplay={{
-          //   delay: 5000,
-          // }}
+          onRealIndexChange={(swiper: ISwiper) => setRealIndex(swiper.realIndex)}
           pagination={{ clickable: true }}>
           <ResizeHeightFixer />
           {uniqueItems(items)
             .slice(0, 10)
-            .map((item) => (
-              <SwiperSlide
-                key={item.mal_id}
-                className={clsx('slide', 'intro__slide swiper-slide-visible')}>
-                <IntroSlide item={item} />
+            .map((item, index) => (
+              <SwiperSlide key={item.mal_id} className={clsx('main-slide', 'main-intro__slide')}>
+                <MainIntroSlide item={item} shouldRenderImage={shouldRenderImage(index)} />
               </SwiperSlide>
             ))}
         </Swiper>
@@ -73,4 +84,4 @@ const ResizeHeightFixer = () => {
   return null;
 };
 
-export default Intro;
+export default MainIntro;

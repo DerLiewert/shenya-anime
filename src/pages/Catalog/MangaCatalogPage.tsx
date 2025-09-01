@@ -4,7 +4,12 @@ import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
 import { uniqueItems } from '@/utils';
-import { mangaOrderByOptions, mangaStatusOptions, mangaTypeOptions, MEDIA_QUERY } from '@/variables';
+import {
+  mangaOrderByOptions,
+  mangaStatusOptions,
+  mangaTypeOptions,
+  MEDIA_QUERY,
+} from '@/variables';
 import {
   Genre,
   JikanPaginationPlus,
@@ -17,12 +22,12 @@ import {
   SortOptions,
 } from '@/models';
 import { FetchStatus } from '@/typescript';
-import { FilterIcon, MangaCard, Pagination } from '@/components';
+import { CommonIntro, FilterIcon, MangaCard, Pagination } from '@/components';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
 import clsx from 'clsx';
 import './CatalogPage.scss';
-import { fetchMangaGenres } from '@/store/manga/mangaGenresSlice';
+import { fetchMangaGenres } from '@/store/genres/mangaGenresSlice';
 import { fetchMangaByParams } from '@/store/manga/mangaCatalogSlice';
 
 type OrderBy = Extract<MangaSearchOrder, 'mal_id' | 'score' | 'popularity' | 'favorites'>;
@@ -406,7 +411,15 @@ const MangaCatalogPage: React.FC = () => {
 
   return (
     <div className="catalog">
-      <CatalogIntro title="Manga Catalog" pagination={pagination} />
+      <CommonIntro
+        bgPrefix="manga"
+        title="Manga Catalog"
+        subtitle={
+          <>
+            Search manga results: <span>{(pagination && pagination.items.total) || '*****'}</span>
+          </>
+        }
+      />
 
       <div className="catalog__cards catalog-cards" ref={cardsRef}>
         <div className="container">
@@ -483,23 +496,3 @@ const MangaCatalogPage: React.FC = () => {
 };
 
 export default MangaCatalogPage;
-
-/*==========================
-/*====== CatalogIntro ======
-/*=========================*/
-type CatalogIntroProps = { pagination: JikanPaginationPlus | null; title: string };
-
-const CatalogIntro: React.FC<CatalogIntroProps> = ({ pagination, title }) => {
-  return (
-    <section className="catalog__intro catalog-intro catalog-intro--manga">
-      <div className="container">
-        <div className="catalog-intro__inner">
-          <h2 className="catalog-intro__title title">{title}</h2>
-          <div className="catalog-intro__result">
-            Search manga results: <span>{(pagination && pagination.items.total) || '*****'}</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};

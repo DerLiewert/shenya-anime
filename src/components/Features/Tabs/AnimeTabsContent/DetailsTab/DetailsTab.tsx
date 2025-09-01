@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAppSelector } from '@/app/hooks';
 import { Link } from 'react-router-dom';
-import { useShowMoreMap } from '@/hooks';
+import { useMatchMedia, useShowMoreMap } from '@/hooks';
 import { formattedScore, getShortAnimeRating, splitText } from '@/utils';
-import { SpecialStatus, animeEmptyValueMessages } from '@/variables';
+import { SpecialStatus, animeEmptyValueMessages, MEDIA_QUERY } from '@/variables';
 import { AnimeFull } from '@/models';
 import {
   AnimeTooltip,
@@ -22,8 +22,9 @@ import ScoreStats from '../../../ScoreStats/ScoreStats';
 import './DetailsTab.scss';
 
 const DetailsTab: React.FC = () => {
-  const item: AnimeFull | null = useAppSelector((state) => state.animeFullById.item);
+  const item = useAppSelector((state) => state.animeFullById.item);
   const { visibleCounts, init, showMore } = useShowMoreMap(6);
+  const isNotMobile = useMatchMedia('min', MEDIA_QUERY.mobile)
 
   React.useEffect(() => {
     if (item && item.relations) {
@@ -35,6 +36,8 @@ const DetailsTab: React.FC = () => {
 
   return (
     <div className="anime-details">
+      
+      {/*=== Info ===*/}
       <div className="anime-details__info">
         <div className="anime-details__info-content">
           <div className="anime-details__info-top">
@@ -147,11 +150,14 @@ const DetailsTab: React.FC = () => {
             )}
           </div>
         </div>
-        <div className="anime-details__score-stats">
+
+        {isNotMobile && <div className="anime-details__score-stats">
           <div className="anime-details__score-stats-title">Score Status</div>
           <ScoreStats type="anime" />
-        </div>
+        </div>}
       </div>
+
+      {/*=== Synopsis ===*/}
       <div className="anime-details__synopsis">
         <SectionHeader title="Synopsis" className="anime-details__synopsis-header" />
         <div className="anime-details__text fz-16">
@@ -162,6 +168,8 @@ const DetailsTab: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/*=== Streaming ===*/}
       <div className="anime-details__streaming">
         <SectionHeader title="Where to Watch" className="anime-details__streaming-header" />
         {item.streaming && item.streaming.length > 0 ? (
@@ -181,6 +189,8 @@ const DetailsTab: React.FC = () => {
           <EmptyValueMessage message={animeEmptyValueMessages.streaming} />
         )}
       </div>
+
+      {/*=== Producers ===*/}
       <div className="anime-details__producers">
         <SectionHeader
           title="Producers"
@@ -202,6 +212,8 @@ const DetailsTab: React.FC = () => {
           <EmptyValueMessage message={animeEmptyValueMessages.producers} />
         )}
       </div>
+
+      {/*=== Related ===*/}
       <div className="anime-details__related">
         <SectionHeader title="Related Entries" className="anime-details__related-header" />
         {item.relations && item.relations.length > 0 ? (

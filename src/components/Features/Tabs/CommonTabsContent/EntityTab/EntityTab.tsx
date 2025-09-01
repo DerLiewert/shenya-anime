@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useShowMore } from '@/hooks';
+import { useAbortableDispatch, useShowMore } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
 import { useFetchStatus } from '@/hooks/useFetchStatus';
 import { RootState } from '@/app/store';
@@ -27,48 +27,37 @@ const EntityTab = <T,>(props: EntityTabProps<T>) => {
     entityItem,
   } = props;
 
-  const dispatch = useAppDispatch();
+  const abortableDispatch = useAbortableDispatch();
   const items = useAppSelector(selector);
   const { isLoading, isSuccess } = useFetchStatus(status);
   const { visibleCount, showMore } = useShowMore(visibleItemCount);
 
   React.useEffect(() => {
-    if (!actionCreator || !(items.length === 0 && !isSuccess)) return;
-
-    const controller = new AbortController();
-    dispatch(actionCreator(actionCreator, { signal: controller.signal }));
-
-    return () => {
-      controller.abort();
-    };
+    if (actionCreator && items.length === 0 && !isSuccess) abortableDispatch(actionCreator);
   }, [actionCreator]);
 
+  if (isLoading) return <Loading />;
+
   return (
-    <>
-      {isLoading ? (
-        <Loading />
+    <div className="entity-tab">
+      {isSuccess && items.length > 0 ? (
+        <div className="entity-tab__items tab-grid-2">
+          {items.slice(0, visibleCount).map(entityItem)}
+        </div>
       ) : (
-        <div className="entity-tab">
-          {isSuccess && items.length > 0 ? (
-            <div className="entity-tab__items tab-grid-2">
-              {items.slice(0, visibleCount).map(entityItem)}
-            </div>
-          ) : (
-            <EmptyValueMessage message={emptyValueMessage} />
-          )}
-          {items.length > 0 && items.length > visibleCount && (
-            <div className="entity-tab__show-more-wrapper bnts-wrapper">
-              <button
-                className="entity-tab__show-more show-more-btn btn btn--upper btn--outline"
-                onClick={showMore}
-                disabled={isLoading}>
-                Show more
-              </button>
-            </div>
-          )}
+        <EmptyValueMessage message={emptyValueMessage} />
+      )}
+      {items.length > 0 && items.length > visibleCount && (
+        <div className="entity-tab__show-more-wrapper bnts-wrapper">
+          <button
+            className="entity-tab__show-more show-more-btn btn btn--upper btn--outline"
+            onClick={showMore}
+            disabled={isLoading}>
+            Show more
+          </button>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
