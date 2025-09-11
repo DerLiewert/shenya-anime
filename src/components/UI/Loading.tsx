@@ -11,7 +11,7 @@ export const Loading = ({ className }: { className?: string }) => {
         <CryoIcon />
         <CryoIcon />
       </div>
-      <p className="loading__text">
+      <p className="loading__text fz-16">
         Loading<span>.</span>
         <span>.</span>
         <span>.</span>

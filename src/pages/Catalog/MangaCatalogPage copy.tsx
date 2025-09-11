@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useFetchStatus, useMatchMedia } from '@/hooks';
-import { searchParamsToString, uniqueItems } from '@/utils';
+import { searchParamsToString, getUniqueItems } from '@/utils';
 import { MEDIA_QUERY } from '@/variables';
 import {
   Genre,
@@ -184,7 +184,7 @@ const MangaCatalogPage: React.FC = () => {
 
   const mangaGenresOptions = React.useMemo(() => {
     return genres.length > 0
-      ? uniqueItems(genres).map((obj: Genre) => ({
+      ? getUniqueItems(genres).map((obj: Genre) => ({
           value: obj.mal_id,
           label: obj.name,
         }))
@@ -484,7 +484,7 @@ const MangaCatalogPage: React.FC = () => {
                         className=" _skeleton "
                       />
                     ))
-                  : uniqueItems(items).map((item) => (
+                  : getUniqueItems(items).map((item) => (
                       <MangaCard key={item.mal_id} item={item} className="catalog-cards__card" />
                     ))}
               </div>

@@ -1,131 +1,46 @@
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
+import { AsyncThunk } from '@reduxjs/toolkit';
+import { RootState } from '@/app/store';
+import { useAppSelector } from '@/app/hooks';
+import { Anime, Manga } from '@/models';
+import { FetchStatus } from '@/typescript';
+import { useAbortableDispatch, useFetchStatus } from '@/hooks';
+import { getUniqueItems } from '@/utils';
+import { EmptyValueMessage, SectionHeader, SectionHeaderProps } from '@/components';
+import { animeEmptyValueMessages, commonMessages, mangaEmptyValueMessages } from '@/variables';
+
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 
-import { useAppSelector } from '../../../app/hooks';
-import { RootState } from '../../../app/store';
-import { Anime, Manga } from '../../../models';
-import { ISectionHeaderProps, SectionHeader } from '../../Common';
-
-import arrowIcon from '../../../assets/arrow.svg';
+import arrowIcon from '@/assets/arrow.svg';
 
 import clsx from 'clsx';
 import './MediaBlock.scss';
-import { uniqueItems } from '@/utils';
-import { FetchStatus } from '@/typescript';
-import Skeleton from 'react-loading-skeleton';
-import { EmptyValueMessage } from '@/components';
-import {
-  animeEmptyValueMessages,
-  commonMessages,
-  mangaEmptyValueMessages,
-} from '@/variables/emptyValueMessages';
-import { AnimeCard } from '@/components/Common/CardItem/CardItem';
-import { useAbortableDispatch, useFetchStatus } from '@/hooks';
-import { AsyncThunk } from '@reduxjs/toolkit';
-
-// interface MediaBlockProps {
-//   header: ISectionHeaderProps;
-//   subtitle?: null | string;
-//   selectFunction: (state: RootState) => { items: Anime[]; status: FetchStatus };
-// }
-
-// const MediaBlock: React.FC<MediaBlockProps> = ({ header, subtitle, selectFunction }) => {
-//   const { items, status } = useAppSelector(selectFunction);
-//   const { isLoading, isSuccess, isError } = useFetchStatus(status);
-
-//   const renderSkeletons = () =>
-//     Array.from({ length: 6 }).map((_, i) => (
-//       <SwiperSlide key={i} className="chapter__slide">
-//         <Skeleton className="chapter__card _skeleton border-opacity" />
-//       </SwiperSlide>
-//     ));
-
-//   const renderItems = () =>
-//     uniqueItems(items).map((item) => (
-//       <SwiperSlide key={item.mal_id} className="chapter__slide">
-//         <AnimeCard item={item} className="chapter__card" />
-//       </SwiperSlide>
-//     ));
-
-//   const renderEmpty = () => (
-//     <EmptyValueMessage
-//       message={isError ? commonMessages.error : animeEmptyValueMessages.newEpisodes}
-//     />
-//   );
-
-//   return (
-//     <section className="chapter">
-//       <div className="chapter__container container">
-//         <SectionHeader
-//           className={clsx('chapter__header', header.className)}
-//           title={header.title}
-//           link={header.link}
-//         />
-//         <div className="chapter__body">
-//           {isLoading || (isSuccess && items.length > 0) ? (
-//             <Swiper
-//               tag="section"
-//               className="chapter__slider"
-//               wrapperClass="chapter__wrapper"
-//               modules={[Navigation]}
-//               slidesPerView="auto"
-//               slidesPerGroup={1}
-//               speed={800}
-//               breakpoints={{
-//                 0: {
-//                   spaceBetween: 12,
-//                 },
-//                 480: {
-//                   spaceBetween: 15,
-//                 },
-//                 1024: {
-//                   spaceBetween: 20,
-//                 },
-//               }}
-//               navigation={{ prevEl: '.chapter__button--prev', nextEl: '.chapter__button--next' }}>
-//               {isLoading ? renderSkeletons() : renderItems()}
-//               <button type="button" className="chapter__button chapter__button--prev">
-//                 <img src={arrowIcon} alt="Prev slides" />
-//               </button>
-//               <button type="button" className="chapter__button chapter__button--next">
-//                 <img src={arrowIcon} alt="Next slides" />
-//               </button>
-//             </Swiper>
-//           ) : (
-//             renderEmpty()
-//           )}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default MediaBlock;
 
 interface MediaBlockProps<T extends Anime | Manga> {
   type: T extends Anime ? 'anime' : 'manga';
-  header: ISectionHeaderProps;
-  subtitle?: null | string;
-  selectFunction: (state: RootState) => { items: T[]; status: FetchStatus };
+  header: SectionHeaderProps;
+  subtitle?: string;
+  selector: (state: RootState) => { items: T[]; status: FetchStatus | null };
   renderCard: (item: T) => React.ReactNode;
-  actionCreator?: AsyncThunk<T[], any, any>;
+  fetchAction?: AsyncThunk<T[], any, any>;
 }
 
 function MediaBlock<T extends Anime | Manga>({
   type,
   header,
   subtitle,
-  selectFunction,
+  selector,
+  fetchAction,
   renderCard,
-  actionCreator,
 }: MediaBlockProps<T>) {
   const abortableDispatch = useAbortableDispatch();
-  const { items, status } = useAppSelector(selectFunction);
+  const { items, status } = useAppSelector(selector);
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
 
   React.useEffect(() => {
-    if (actionCreator) abortableDispatch(actionCreator);
+    if (fetchAction && items.length === 0) abortableDispatch(fetchAction);
   }, []);
 
   return (
@@ -137,6 +52,7 @@ function MediaBlock<T extends Anime | Manga>({
           link={header.link}
         />
         <div className="chapter__body">
+          <h3 className="chapter__sub-title title title--fz-24 title--main-color">{subtitle}</h3>
           {isLoading || (isSuccess && items.length > 0) ? (
             <Swiper
               tag="section"
@@ -161,7 +77,7 @@ function MediaBlock<T extends Anime | Manga>({
                       <Skeleton className="chapter__card _skeleton border-opacity" />
                     </SwiperSlide>
                   ))
-                : uniqueItems(items).map((item, i) => (
+                : getUniqueItems(items).map((item, i) => (
                     <SwiperSlide key={i} className="chapter__slide">
                       {renderCard(item)}
                     </SwiperSlide>

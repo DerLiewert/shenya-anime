@@ -7,19 +7,19 @@ import {
   CharacterVoicesTab,
   CharacterAboutTab,
 } from '@/components';
-import { getCharacterPaths } from '@/utils';
 import { CharacterFull } from '@/models';
 import { fetchCharacterFullById } from '@/store/character/characterFullByIdSlice';
 import './CharacterPage.scss';
 import EntityPageLayout from '@/components/Layout/EntityPageLayout/EntityPageLayout';
+import { characterPaths } from '@/variables';
 
 const CharacterPage = () => {
   return (
     <EntityPageLayout<CharacterFull>
-      actionCreator={fetchCharacterFullById}
+      fetchAction={fetchCharacterFullById}
       selector={(state) => state.characterFullById.item}
       status={(state) => state.characterFullById.status.item}
-      getBasePath={(id) => getCharacterPaths(id).characterFull}
+      getBasePath={(id) => characterPaths.full(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.name,
@@ -27,7 +27,11 @@ const CharacterPage = () => {
         resources: item && <AdditionalInfo item={item} />,
         breadcrumbs: item
           ? [
-              { label: 'Top', url: '#' },
+              ...(item.anime[0]
+                ? [{ label: item.anime[0].anime.title, url: '#' }]
+                : item.manga[0]
+                ? [{ label: item.manga[0].manga.title, url: '#' }]
+                : []),
               { label: 'Character', url: '#' },
               { label: item.name, url: '#' },
             ]

@@ -19,12 +19,12 @@ export const fetchIntroAnime = createAsyncThunk<Anime[], undefined>(
 
 interface IntroAnimeState {
   items: Anime[];
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: IntroAnimeState = {
   items: [],
-  status: FetchStatus.LOADING,
+  status: null,
 };
 
 export const introAnimeSlice = createSlice({

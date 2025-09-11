@@ -1,8 +1,6 @@
-import React from 'react';
 import { mangaEmptyValueMessages } from '@/variables';
 import { fetchMangaRecommendations } from '@/store/manga/mangaFullByIdSlice';
-import { RecommendationsTab } from '../../CommonTabsContent';
-import { MangaRecommendationCard } from '@/components/Common';
+import { MangaRecommendationCard, RecommendationsTab } from '@/components';
 import './RecommendationsTab.scss';
 
 const MangaRecommendationsTab = () => {
@@ -10,8 +8,8 @@ const MangaRecommendationsTab = () => {
     <RecommendationsTab
       selector={(state) => state.mangaFullById.recommendations}
       status={(state) => state.mangaFullById.status.recommendations}
-      actionCreator={fetchMangaRecommendations}
-      entityItem={(item => <MangaRecommendationCard item={item.entry} key={item.entry.mal_id}/>)}
+      fetchAction={fetchMangaRecommendations}
+      entityItem={(item) => <MangaRecommendationCard item={item.entry} key={item.entry.mal_id} />}
       emptyValueMessage={mangaEmptyValueMessages.recommendations}
     />
   );

@@ -3,8 +3,9 @@ import { useForm, Controller } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
-import { uniqueItems } from '@/utils';
+import { scrollToTop, getUniqueItems } from '@/utils';
 import {
+  animeEmptyValueMessages,
   animeOrderByOptions,
   animeRatingOptions,
   animeStatusOptions,
@@ -21,13 +22,12 @@ import {
   AnimeSearchType,
   animeSearchType,
   Genre,
-  JikanPaginationPlus,
   SortOptions,
 } from '@/models';
 import { FetchStatus } from '@/typescript';
 import { fetchAnimeByParams } from '@/store/anime/animeCatalogSlice';
 import { fetchAnimeGenres } from '@/store/genres/animeGenresSlice';
-import { AnimeCard, CommonIntro, FilterIcon, Pagination } from '@/components';
+import { AnimeCard, CommonIntro, EmptyValueMessage, FilterIcon, Pagination } from '@/components';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
 import clsx from 'clsx';
@@ -179,7 +179,7 @@ const AnimeCatalogPage: React.FC = () => {
 
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.animeGenres);
   const { items, pagination, status } = useAppSelector((state) => state.animeCatalog);
-  const { isLoading } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const isTablet = useMatchMedia('max', MEDIA_QUERY.tablet);
   const [isShowFilters, setIsShowFilters] = React.useState(false);
@@ -200,6 +200,7 @@ const AnimeCatalogPage: React.FC = () => {
   });
 
   const cardsRef = React.useRef<HTMLDivElement>(null);
+  const filterRef = React.useRef<HTMLFormElement>(null);
   const isFirstRender = useRef(true);
 
   // Получить жанры аниме, если их нет
@@ -217,6 +218,7 @@ const AnimeCatalogPage: React.FC = () => {
   // Получение даных об аниме за указанными параметрами
   const fetchAnimeController = useRef<AbortController | null>(null);
   React.useEffect(() => {
+    reset(getFormDefaulValues());
     if (genresStatus === FetchStatus.LOADING) return;
 
     fetchAnimeController.current?.abort();
@@ -335,8 +337,8 @@ const AnimeCatalogPage: React.FC = () => {
             onChange={field.onChange}
             placeholder={placeholder}
             menuPortalTarget={isTablet ? null : document.body}
-            isSearchable={false}
             closeMenuOnSelect={!isMulti}
+            isSearchable={false}
             isMulti={isMulti}
             isClearable
             unstyled
@@ -354,7 +356,10 @@ const AnimeCatalogPage: React.FC = () => {
           <div className="catalog-sidebar__title">Filters</div>
           <button className="catalog-sidebar__close-btn" onClick={closeFilters}></button>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="catalog-sidebar__filters">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="catalog-sidebar__filters"
+          ref={filterRef}>
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">Type</div>
             {renderSelect('type', animeTypeOptions, 'Select anime type...')}
@@ -449,7 +454,10 @@ const AnimeCatalogPage: React.FC = () => {
         title="Anime Catalog"
         subtitle={
           <>
-            Search anime results: <span>{(pagination && pagination.items.total) || '*****'}</span>
+            Search anime results:{' '}
+            <span>
+              {pagination ? (pagination.items.total ? pagination.items.total : 0) : '*****'}
+            </span>
           </>
         }
       />
@@ -467,7 +475,6 @@ const AnimeCatalogPage: React.FC = () => {
               <Select
                 className="catalog-sorting__select select"
                 classNamePrefix="select"
-                placeholder=""
                 defaultValue={animeOrderByOptions[0]}
                 value={animeOrderByOptions.find(
                   (obj) => obj.value === parseSearchParams(location.search).order_by,
@@ -486,18 +493,32 @@ const AnimeCatalogPage: React.FC = () => {
             {renderCatalogSidebar()}
             <div className="catalog-cards__content">
               <div className="catalog-cards__items">
-                {isLoading
-                  ? Array.from({ length: 24 }).map((_, i) => (
-                      <Skeleton
-                        key={i}
-                        containerClassName="catalog-cards__card _skeleton-container border-opacity"
-                        className=" _skeleton "
-                      />
-                    ))
-                  : uniqueItems(items).map((item) => (
-                      <AnimeCard key={item.mal_id} item={item} className="catalog-cards__card" />
-                    ))}
+                {isLoading &&
+                  Array.from({ length: 24 }).map((_, i) => (
+                    <Skeleton
+                      key={i}
+                      containerClassName="catalog-cards__card _skeleton-container border-opacity"
+                      className=" _skeleton "
+                    />
+                  ))}
+                {isSuccess &&
+                  items.length > 0 &&
+                  getUniqueItems(items).map((item) => (
+                    <AnimeCard key={item.mal_id} item={item} className="catalog-cards__card" />
+                  ))}
               </div>
+              {isSuccess && items.length === 0 && (
+                <EmptyValueMessage
+                  message={animeEmptyValueMessages.items}
+                  className="catalog-cards__message"
+                />
+              )}
+              {isError && (
+                <EmptyValueMessage
+                  message="Something went wrong!"
+                  className="catalog-cards__message"
+                />
+              )}
               {pagination && (
                 <Pagination
                   currentPage={pagination.current_page}
@@ -506,16 +527,7 @@ const AnimeCatalogPage: React.FC = () => {
                   className="catalog-cards__pagination"
                   onChangePage={(page) => {
                     appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
-
-                    if (!cardsRef.current) return;
-
-                    const tabsTop = cardsRef.current.getBoundingClientRect().top;
-                    if (tabsTop >= 0) return;
-
-                    window.scrollTo({
-                      top: tabsTop + window.scrollY - 10,
-                      behavior: 'smooth',
-                    });
+                    scrollToTop(cardsRef);
                   }}
                 />
               )}

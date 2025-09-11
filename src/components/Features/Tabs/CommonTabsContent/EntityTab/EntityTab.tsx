@@ -1,17 +1,19 @@
 import React from 'react';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useAbortableDispatch, useShowMore } from '@/hooks';
+import { useAppSelector } from '@/app/hooks';
+import { useAbortableDispatch, useShowMore, useFetchStatus } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
-import { useFetchStatus } from '@/hooks/useFetchStatus';
-import { RootState } from '@/app/store';
-import { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
-import { AsyncThunk } from '@reduxjs/toolkit';
+import { commonMessages } from '@/variables';
+
+import type { AsyncThunk } from '@reduxjs/toolkit';
+import type { RootState } from '@/app/store';
+import type { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
+
 import './EntityTab.scss';
 
 interface EntityTabProps<T> {
   selector: (state: RootState) => T[];
   status: StatusSelector | FetchStatus | undefined;
-  actionCreator?: AsyncThunk<T[], any, AsyncThunkConfig>;
+  fetchAction?: AsyncThunk<T[], any, AsyncThunkConfig>;
   entityItem: (item: T, index: number) => React.ReactNode;
   visibleItemCount?: number;
   emptyValueMessage: string;
@@ -21,7 +23,7 @@ const EntityTab = <T,>(props: EntityTabProps<T>) => {
   const {
     selector,
     status,
-    actionCreator,
+    fetchAction,
     emptyValueMessage,
     visibleItemCount = 12,
     entityItem,
@@ -29,12 +31,14 @@ const EntityTab = <T,>(props: EntityTabProps<T>) => {
 
   const abortableDispatch = useAbortableDispatch();
   const items = useAppSelector(selector);
-  const { isLoading, isSuccess } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
   const { visibleCount, showMore } = useShowMore(visibleItemCount);
 
   React.useEffect(() => {
-    if (actionCreator && items.length === 0 && !isSuccess) abortableDispatch(actionCreator);
-  }, [actionCreator]);
+    if (fetchAction && items.length === 0 && (!isSuccess || !isLoading)) {
+      abortableDispatch(fetchAction);
+    }
+  }, [fetchAction]);
 
   if (isLoading) return <Loading />;
 
@@ -45,7 +49,7 @@ const EntityTab = <T,>(props: EntityTabProps<T>) => {
           {items.slice(0, visibleCount).map(entityItem)}
         </div>
       ) : (
-        <EmptyValueMessage message={emptyValueMessage} />
+        <EmptyValueMessage message={isError ? commonMessages.error : emptyValueMessage} />
       )}
       {items.length > 0 && items.length > visibleCount && (
         <div className="entity-tab__show-more-wrapper bnts-wrapper">

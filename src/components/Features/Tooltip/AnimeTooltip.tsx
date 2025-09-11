@@ -2,7 +2,13 @@
 import React from 'react';
 import { Anime } from '@/models';
 import { getShortAnimeRating } from '@/utils';
-import { SpecialStatus } from '@/variables';
+import {
+  animePaths,
+  animeRatingOptions,
+  animeTypeOptions,
+  producerPaths,
+  SpecialStatus,
+} from '@/variables';
 
 import { EmptyValueMessage, FormatDate, Loading, Score, Status } from '../../UI';
 import { InfoRow, InfoValue } from '../../Common/InfoRowWithValue';
@@ -97,12 +103,22 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
           {(item.type || item.rating) && (
             <InfoRow name={item.type ? 'Type' : 'Rating'}>
               {item.type && (
-                <InfoValue isLink to="#">
+                <InfoValue
+                  isLink
+                  to={animePaths.catalogWithParams({
+                    type: animeTypeOptions.find((obj) => obj.label === item.type)?.value,
+                  })}>
                   {item.type}
                 </InfoValue>
               )}
               {item.rating && (
-                <InfoValue isLink to="#" isLinkPrimary title={item.rating}>
+                <InfoValue
+                  to={animePaths.catalogWithParams({
+                    rating: animeRatingOptions.find((obj) => obj.label === item.rating)?.value,
+                  })}
+                  isLink
+                  isLinkPrimary
+                  title={item.rating}>
                   {getShortAnimeRating(item.rating)}
                 </InfoValue>
               )}
@@ -144,7 +160,10 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
           {item.demographics.length > 0 && (
             <InfoRow name={item.demographics.length > 1 ? 'Demographics' : 'Demographic'}>
               {item.demographics.map((demographic) => (
-                <InfoValue key={demographic.mal_id} isLink to="#">
+                <InfoValue
+                  key={demographic.mal_id}
+                  isLink
+                  to={animePaths.catalogWithParams({ genres: demographic.mal_id.toString() })}>
                   {demographic.name}
                 </InfoValue>
               ))}
@@ -154,7 +173,10 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
           {item.genres.length > 0 && (
             <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
               {item.genres.map((genre) => (
-                <InfoValue key={genre.mal_id} isLink to={`/anime?genres=${genre.mal_id}`}>
+                <InfoValue
+                  key={genre.mal_id}
+                  isLink
+                  to={animePaths.catalogWithParams({ genres: genre.mal_id.toString() })}>
                   {genre.name}
                 </InfoValue>
               ))}
@@ -164,7 +186,10 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
           {item.themes.length > 0 && (
             <InfoRow name={item.themes.length > 1 ? 'Themes' : 'Theme'}>
               {item.themes.map((theme) => (
-                <InfoValue key={theme.mal_id} isLink to="#">
+                <InfoValue
+                  key={theme.mal_id}
+                  isLink
+                  to={animePaths.catalogWithParams({ genres: theme.mal_id.toString() })}>
                   {theme.name}
                 </InfoValue>
               ))}
@@ -174,7 +199,7 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
           {item.studios.length > 0 && (
             <InfoRow name={item.studios.length > 1 ? 'Studios' : 'Studio'}>
               {item.studios.map((studio) => (
-                <InfoValue key={studio.mal_id} isLink to="#">
+                <InfoValue key={studio.mal_id} isLink to={producerPaths.full(studio.mal_id)}>
                   {studio.name}
                 </InfoValue>
               ))}

@@ -9,13 +9,13 @@ import { randomInteger } from '../../utils';
 interface randomAnimeState {
   item: Anime | null;
   minScore: number;
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: randomAnimeState = {
   item: null,
   minScore: 8,
-  status: FetchStatus.LOADING,
+  status: null,
 };
 
 export const randomAnimeSlice = createSlice({

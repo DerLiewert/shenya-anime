@@ -6,9 +6,9 @@ import {
   useYoutubeTrailerImage,
   useFetchStatus,
 } from '@/hooks';
-import { fetchAnimeVideos } from '@/store/anime/animeFullByIdSlice';
 import { SectionHeader, EmptyValueMessage, Loading, PlayCircleIcon } from '@/components';
-import { animeEmptyValueMessages } from '@/variables/emptyValueMessages';
+import { animeEmptyValueMessages, commonMessages } from '@/variables';
+import { fetchAnimeVideos } from '@/store/anime/animeFullByIdSlice';
 import { AnimeYoutubeVideo } from '@/models';
 
 import LightGallery from 'lightgallery/react';
@@ -21,15 +21,15 @@ import './VideosTab.scss';
 const VideosTab: React.FC = () => {
   const abortableDispatch = useAbortableDispatch();
   const { videos, status } = useAppSelector((state) => state.animeFullById);
-  const { isLoading, isSuccess } = useFetchStatus(status.videos);
-  const { visibleCounts, init, showMore } = useShowMoreMap(6);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status.videos);
+  const { visibleCounts, initShowMore, showMore } = useShowMoreMap(6);
 
   React.useEffect(() => {
-    if (!videos && !isSuccess) abortableDispatch(fetchAnimeVideos);
+    if (!videos && (!isSuccess || !isLoading)) abortableDispatch(fetchAnimeVideos);
   }, []);
 
   React.useEffect(() => {
-    if (videos) init(Object.keys(videos));
+    if (videos) initShowMore(Object.keys(videos));
   }, [videos]);
 
   if (isLoading) return <Loading />;
@@ -38,105 +38,100 @@ const VideosTab: React.FC = () => {
     <div className="anime-videos">
       <div className="anime-videos__section">
         <SectionHeader title="Promo Videos" className="anime-videos__section-header" />
-        {isSuccess && videos && videos.promo.length > 0 ? (
-          <LightGallery
-            addClass="anime-video-gallery"
-            elementClassNames="anime-videos__items"
-            licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
-            plugins={[lgVideo]}
-            speed={300}
-            download={false}
-            youTubePlayerParams={{
-              rel: 0,
-              autoplay: 1,
-              mute: 0,
-            }}
-            mobileSettings={{
-              showCloseIcon: true,
-              download: false,
-              controls: false,
-            }}>
-            {videos &&
-              videos.promo
-                .slice(0, visibleCounts.promo)
-                .map((item) => (
-                  <YoutubeVideo
-                    key={item.trailer.youtube_id}
-                    ytVideoideoItem={item.trailer}
-                    title={item.title}
-                  />
-                ))}
-          </LightGallery>
+        {videos && videos.promo.length > 0 ? (
+          <>
+            <LightGallery
+              addClass="anime-video-gallery"
+              elementClassNames="anime-videos__items"
+              licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
+              plugins={[lgVideo]}
+              speed={300}
+              download={false}
+              youTubePlayerParams={{
+                rel: 0,
+                autoplay: 1,
+                mute: 0,
+              }}
+              mobileSettings={{
+                showCloseIcon: true,
+                download: false,
+                controls: false,
+              }}>
+              {videos.promo.slice(0, visibleCounts.promo).map((item) => (
+                <YoutubeVideo
+                  key={item.trailer.youtube_id}
+                  ytVideoideoItem={item.trailer}
+                  title={item.title}
+                />
+              ))}
+            </LightGallery>
+            {videos.promo.length > visibleCounts.promo && (
+              <div className="anime-videos__show-more-wrapper bnts-wrapper">
+                <button
+                  className="anime-videos__show-more show-more-btn btn btn--upper btn--outline"
+                  onClick={() => showMore('promo')}
+                  disabled={isLoading}>
+                  Show more
+                </button>
+              </div>
+            )}
+          </>
         ) : (
-          <EmptyValueMessage message={animeEmptyValueMessages.videos.promotion} />
+          <EmptyValueMessage
+            message={isError ? commonMessages.error : animeEmptyValueMessages.videos.promotion}
+          />
         )}
-        {isSuccess &&
-          videos &&
-          videos.promo.length > 0 &&
-          videos.promo.length > visibleCounts.promo && (
-            <div className="anime-videos__show-more-wrapper bnts-wrapper">
-              <button
-                className="anime-videos__show-more show-more-btn btn btn--upper btn--outline"
-                onClick={() => showMore('promo')}
-                disabled={isLoading}>
-                Show more
-              </button>
-            </div>
-          )}
       </div>
+
       <div className="anime-videos__section">
         <SectionHeader title="Music Videos" className="anime-videos__section-header" />
         {videos && videos.music_videos.length > 0 ? (
-          <LightGallery
-            addClass="anime-video-gallery"
-            elementClassNames="anime-videos__items"
-            licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
-            plugins={[lgVideo]}
-            speed={300}
-            download={false}
-            youTubePlayerParams={{
-              rel: 0,
-              autoplay: 1,
-              mute: 0,
-            }}
-            mobileSettings={{
-              showCloseIcon: true,
-              download: false,
-              controls: false,
-            }}>
-            {videos &&
-              videos.music_videos
-                .slice(0, visibleCounts.music_videos)
-                .map((item) => (
-                  <YoutubeVideo
-                    key={item.video.youtube_id}
-                    ytVideoideoItem={item.video}
-                    title={item.title}
-                  />
-                ))}
-          </LightGallery>
+          <>
+            <LightGallery
+              addClass="anime-video-gallery"
+              elementClassNames="anime-videos__items"
+              licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
+              plugins={[lgVideo]}
+              speed={300}
+              download={false}
+              youTubePlayerParams={{
+                rel: 0,
+                autoplay: 1,
+                mute: 0,
+              }}
+              mobileSettings={{
+                showCloseIcon: true,
+                download: false,
+                controls: false,
+              }}>
+              {videos.music_videos.slice(0, visibleCounts.music_videos).map((item) => (
+                <YoutubeVideo
+                  key={item.video.youtube_id}
+                  ytVideoideoItem={item.video}
+                  title={item.title}
+                />
+              ))}
+            </LightGallery>
+            {videos.music_videos.length > visibleCounts.music_videos && (
+              <div className="anime-videos__show-more-wrapper bnts-wrapper">
+                <button
+                  className="anime-videos__show-more show-more-btn btn btn--upper btn--outline"
+                  onClick={() => showMore('music_videos')}
+                  disabled={isLoading}>
+                  Show more
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <EmptyValueMessage message={animeEmptyValueMessages.videos.music} />
         )}
-        {videos &&
-          videos.music_videos.length > 0 &&
-          videos.music_videos.length > visibleCounts.music_videos && (
-            <div className="anime-videos__show-more-wrapper bnts-wrapper">
-              <button
-                className="anime-videos__show-more show-more-btn btn btn--upper btn--outline"
-                onClick={() => showMore('music_videos')}
-                disabled={isLoading}>
-                Show more
-              </button>
-            </div>
-          )}
       </div>
     </div>
   );
 };
 
 export default VideosTab;
-
 
 /* ========================
 ====== YoutubeVideo ======

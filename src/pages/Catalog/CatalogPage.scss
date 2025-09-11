@@ -55,6 +55,11 @@
     flex: 1 1 auto;
   }
 
+  &__message {
+    margin-top: 5px;
+    justify-content: center;
+  }
+
   &__items {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -300,9 +305,6 @@
   }
 
   &__select {
-    @include media-max($tablet) {
-      z-index: 800 !important;
-    }
   }
 
   &__input {

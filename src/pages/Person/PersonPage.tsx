@@ -7,19 +7,19 @@ import {
   PersonVoicesTab,
   PersonAboutTab,
 } from '@/components';
-import { getPersonPaths } from '@/utils';
 import { fetchPersonFullById } from '@/store/person/personFullByIdSlice';
 import EntityPageLayout from '@/components/Layout/EntityPageLayout/EntityPageLayout';
 import { PersonFull } from '@/models';
 import './PersonPage.scss';
+import { personPaths } from '@/variables';
 
 const PersonPage = () => {
   return (
     <EntityPageLayout<PersonFull>
-      actionCreator={fetchPersonFullById}
+      fetchAction={fetchPersonFullById}
       selector={(state) => state.personFullById.item}
       status={(state) => state.personFullById.status.item}
-      getBasePath={(id) => getPersonPaths(id).personFull}
+      getBasePath={(id) => personPaths.full(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.name,
@@ -31,13 +31,13 @@ const PersonPage = () => {
             ].filter((str) => Boolean(str.trim()))
           : [],
         resources: item && <AdditionalInfo item={item} />,
-        breadcrumbs: item
-          ? [
-              { label: 'Top', url: '#' },
-              { label: 'People', url: '#' },
-              { label: item.name, url: '#' },
-            ]
-          : [],
+        // breadcrumbs: item
+        //   ? [
+        //       { label: 'Top', url: '#' },
+        //       { label: 'People', url: '#' },
+        //       { label: item.name, url: '#' },
+        //     ]
+        //   : [],
 
         tabs: item
           ? [

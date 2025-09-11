@@ -1,8 +1,7 @@
 import React from 'react';
-import { EntityTabItem } from '@/components/Common';
 import { PersonAnime } from '@/models';
 import { personEmptyValueMessages } from '@/variables';
-import EntityTab from '../CommonTabsContent/EntityTab/EntityTab';
+import { EntityTabItem, EntityTab } from '@/components';
 
 const PersonAnimeTab: React.FC = () => {
   return (

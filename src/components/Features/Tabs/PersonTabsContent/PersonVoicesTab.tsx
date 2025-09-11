@@ -1,8 +1,7 @@
 import React from 'react';
 import { PersonVoices } from '@/models';
 import { personEmptyValueMessages } from '@/variables';
-import { EntityTabItem } from '@/components';
-import { EntityTab } from '../CommonTabsContent';
+import { EntityTabItem, EntityTab } from '@/components';
 
 const PersonVoicesTab: React.FC = () => {
   return (

@@ -3,7 +3,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
-import { uniqueItems } from '@/utils';
+import { getUniqueItems } from '@/utils';
 import {
   mangaOrderByOptions,
   mangaStatusOptions,
@@ -12,7 +12,6 @@ import {
 } from '@/variables';
 import {
   Genre,
-  JikanPaginationPlus,
   MangaSearchOrder,
   MangaSearchParams,
   mangaSearchStatus,
@@ -29,125 +28,6 @@ import clsx from 'clsx';
 import './CatalogPage.scss';
 import { fetchMangaGenres } from '@/store/genres/mangaGenresSlice';
 import { fetchMangaByParams } from '@/store/manga/mangaCatalogSlice';
-
-type OrderBy = Extract<MangaSearchOrder, 'mal_id' | 'score' | 'popularity' | 'favorites'>;
-const allowedOrderBy: OrderBy[] = ['mal_id', 'score', 'popularity', 'favorites'];
-
-function parseSearchParams(search: string): Partial<MangaSearchParams> {
-  const params = new URLSearchParams(search);
-  const result: Partial<MangaSearchParams> = {};
-
-  for (const [key, value] of params.entries()) {
-    switch (key) {
-      case 'order_by':
-        if (allowedOrderBy.includes(value as OrderBy)) {
-          result.order_by = value as OrderBy;
-        }
-        break;
-      case 'type':
-        if (mangaSearchType.includes(value as MangaSearchType)) {
-          result.type = value as MangaSearchType;
-        }
-        break;
-      case 'status':
-        if (mangaSearchStatus.includes(value as MangaSearchStatus)) {
-          result.status = value as MangaSearchStatus;
-        }
-        break;
-      case 'min_score':
-      case 'max_score':
-      case 'score':
-        const score = Number(value);
-        if (!isNaN(score) && score >= 1 && score < 10) {
-          (result as any)[key] = score;
-        }
-        break;
-      case 'genres':
-      case 'genres_exclude':
-        if (value) {
-          result[key] = value
-            .split(',')
-            .filter((v) => /^\d+$/.test(v))
-            .join(','); // в формате "1,2,3"
-        }
-        break;
-      case 'page':
-      case 'limit':
-        const page = parseInt(value, 10);
-        if (!isNaN(page)) {
-          (result as any)[key] = page;
-        }
-        break;
-      case 'sort':
-      case 'magazines':
-      case 'letter':
-      case 'start_date':
-      case 'end_date':
-      case 'q':
-        result[key as keyof MangaSearchParams] = value;
-        break;
-      case 'unapproved':
-      case 'sfw':
-        result[key as keyof MangaSearchParams] = value === 'true';
-        break;
-      default:
-        break;
-    }
-  }
-
-  const availableParams: Array<keyof MangaSearchParams> = [
-    'type',
-    'status',
-    'min_score',
-    'max_score',
-    'genres',
-    'order_by',
-    'page',
-  ];
-
-  for (const key in result) {
-    if (!availableParams.includes(key)) delete result[key];
-  }
-  if (result.min_score && result.max_score && result.min_score > result.max_score)
-    delete result.max_score;
-
-  return result;
-}
-
-type SelectOption<T, L = string> = {
-  value: T;
-  label: L;
-};
-
-type SelectValues = {
-  type: SelectOption<MangaSearchType> | null;
-  status: SelectOption<MangaSearchStatus> | null;
-  genres: SelectOption<number>[];
-};
-type FormValues = SelectValues & {
-  min_score: number | null;
-  max_score: number | null;
-};
-
-type ExtractOptionValue<T> = T extends SelectOption<infer U>
-  ? U
-  : T extends SelectOption<infer U>[]
-  ? U
-  : never;
-
-const setSortForOrderBy = (
-  param: keyof MangaSearchParams | undefined | null,
-): SortOptions | undefined => {
-  if (!param) return undefined;
-
-  const sort: Record<keyof MangaSearchParams, SortOptions> = {
-    score: 'desc',
-    popularity: 'asc',
-    favorites: 'desc',
-    mal_id: 'asc',
-  };
-  return sort[param];
-};
 
 const MangaCatalogPage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -176,7 +56,7 @@ const MangaCatalogPage: React.FC = () => {
 
   const mangaGenresOptions = React.useMemo(() => {
     return genres.length > 0
-      ? uniqueItems(genres).map((obj: Genre) => ({
+      ? getUniqueItems(genres).map((obj: Genre) => ({
           value: obj.mal_id,
           label: obj.name,
         }))
@@ -199,12 +79,13 @@ const MangaCatalogPage: React.FC = () => {
 
   // Обновить данные в форме после получения жанров и формирования mangaGenresOptions
   React.useEffect(() => {
-    if (mangaGenresOptions.length > 0) reset(getFormDefaulValues());
+    // if (mangaGenresOptions.length > 0) reset(getFormDefaulValues());
   }, [mangaGenresOptions]);
 
   // Получение даных об аниме за указанными параметрами
   const fetchMangaController = useRef<AbortController | null>(null);
   React.useEffect(() => {
+    reset(getFormDefaulValues());
     if (genresStatus === FetchStatus.LOADING) return;
 
     fetchMangaController.current?.abort();
@@ -462,7 +343,7 @@ const MangaCatalogPage: React.FC = () => {
                         className=" _skeleton "
                       />
                     ))
-                  : uniqueItems(items).map((item) => (
+                  : getUniqueItems(items).map((item) => (
                       <MangaCard key={item.mal_id} item={item} className="catalog-cards__card" />
                     ))}
               </div>
@@ -496,3 +377,122 @@ const MangaCatalogPage: React.FC = () => {
 };
 
 export default MangaCatalogPage;
+
+type OrderBy = Extract<MangaSearchOrder, 'mal_id' | 'score' | 'popularity' | 'favorites'>;
+const allowedOrderBy: OrderBy[] = ['mal_id', 'score', 'popularity', 'favorites'];
+
+function parseSearchParams(search: string): Partial<MangaSearchParams> {
+  const params = new URLSearchParams(search);
+  const result: Partial<MangaSearchParams> = {};
+
+  for (const [key, value] of params.entries()) {
+    switch (key) {
+      case 'order_by':
+        if (allowedOrderBy.includes(value as OrderBy)) {
+          result.order_by = value as OrderBy;
+        }
+        break;
+      case 'type':
+        if (mangaSearchType.includes(value as MangaSearchType)) {
+          result.type = value as MangaSearchType;
+        }
+        break;
+      case 'status':
+        if (mangaSearchStatus.includes(value as MangaSearchStatus)) {
+          result.status = value as MangaSearchStatus;
+        }
+        break;
+      case 'min_score':
+      case 'max_score':
+      case 'score':
+        const score = Number(value);
+        if (!isNaN(score) && score >= 1 && score < 10) {
+          (result as any)[key] = score;
+        }
+        break;
+      case 'genres':
+      case 'genres_exclude':
+        if (value) {
+          result[key] = value
+            .split(',')
+            .filter((v) => /^\d+$/.test(v))
+            .join(','); // в формате "1,2,3"
+        }
+        break;
+      case 'page':
+      case 'limit':
+        const page = parseInt(value, 10);
+        if (!isNaN(page)) {
+          (result as any)[key] = page;
+        }
+        break;
+      case 'sort':
+      case 'magazines':
+      case 'letter':
+      case 'start_date':
+      case 'end_date':
+      case 'q':
+        result[key as keyof MangaSearchParams] = value;
+        break;
+      case 'unapproved':
+      case 'sfw':
+        result[key as keyof MangaSearchParams] = value === 'true';
+        break;
+      default:
+        break;
+    }
+  }
+
+  const availableParams: Array<keyof MangaSearchParams> = [
+    'type',
+    'status',
+    'min_score',
+    'max_score',
+    'genres',
+    'order_by',
+    'page',
+  ];
+
+  for (const key in result) {
+    if (!availableParams.includes(key)) delete result[key];
+  }
+  if (result.min_score && result.max_score && result.min_score > result.max_score)
+    delete result.max_score;
+
+  return result;
+}
+
+type SelectOption<T, L = string> = {
+  value: T;
+  label: L;
+};
+
+type SelectValues = {
+  type: SelectOption<MangaSearchType> | null;
+  status: SelectOption<MangaSearchStatus> | null;
+  genres: SelectOption<number>[];
+};
+type FormValues = SelectValues & {
+  min_score: number | null;
+  max_score: number | null;
+};
+
+type ExtractOptionValue<T> = T extends SelectOption<infer U>
+  ? U
+  : T extends SelectOption<infer U>[]
+  ? U
+  : never;
+
+const setSortForOrderBy = (
+  param: keyof MangaSearchParams | undefined | null,
+): SortOptions | undefined => {
+  if (!param) return undefined;
+
+  const sort: Record<keyof MangaSearchParams, SortOptions> = {
+    score: 'desc',
+    popularity: 'asc',
+    favorites: 'desc',
+    mal_id: 'asc',
+  };
+  return sort[param];
+};

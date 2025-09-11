@@ -19,12 +19,12 @@ export const fetchSeasonalAnime = createAsyncThunk<Anime[]>(
 
 interface SeasonalAnimeState {
   items: Anime[];
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: SeasonalAnimeState = {
   items: [],
-  status: FetchStatus.LOADING,
+  status: null,
 };
 
 export const seasonalAnimeSlice = createSlice({

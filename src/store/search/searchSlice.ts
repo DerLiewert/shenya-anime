@@ -10,8 +10,7 @@ import {
   MangaSearchParams,
 } from '@/models';
 import { FetchStatus } from '@/typescript';
-import { isEmpty } from '@/utils';
-import { AsyncThunk, createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export type SearchTypeMap = {
   anime: Anime;
@@ -21,26 +20,31 @@ export type SearchTypeMap = {
 
 type SearchSlice = {
   [K in keyof SearchTypeMap]: {
-    type: K;
+    type: K | null;
     items: SearchTypeMap[K][];
   } & {
     pagination: JikanPaginationPlus | null;
     status: FetchStatus | null;
+    value: string | null;
   };
 }[keyof SearchTypeMap];
 
 const initialState = {
-  type: 'anime',
+  type: null,
   items: [],
   pagination: null,
   status: null,
+  value: null,
 } as SearchSlice;
 
 const searchSlice = createSlice({
   name: 'search',
   initialState,
   reducers: {
-    resetState() {
+    setSearchValue(state, action: PayloadAction<string>) {
+      state.value = action.payload;
+    },
+    resetSearchState() {
       return initialState;
     },
   },
@@ -59,14 +63,21 @@ const searchSlice = createSlice({
         const isShowMore = page && page > 1;
 
         s.type = type;
-        // s.items = action.payload.data as typeof s.items;
-
-        s.items = (isShowMore ? [...state.items, ...action.payload.data] : action.payload.data) as typeof s.items;
+        s.items = (
+          isShowMore ? [...state.items, ...action.payload.data] : action.payload.data
+        ) as typeof s.items;
         s.pagination = action.payload.pagination ? action.payload.pagination : null;
         s.status = FetchStatus.SUCCESS;
       });
       builder.addCase(thunk.rejected, (state, action) => {
-        if (action.meta.aborted) return;
+        if (action.meta.aborted) {
+          if (state.items.length > 0) {
+            state.status = FetchStatus.SUCCESS;
+          } else {
+            state.status = null;
+          }
+          return;
+        }
         state.status = FetchStatus.ERROR;
       });
     }
@@ -97,5 +108,5 @@ export const fetchSearchCharacter = createAsyncThunk<
   return await getCharacterSearch(qearyParams);
 });
 
-export const { resetState } = searchSlice.actions;
+export const { setSearchValue, resetSearchState } = searchSlice.actions;
 export default searchSlice.reducer;

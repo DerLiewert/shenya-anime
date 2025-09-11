@@ -4,16 +4,10 @@ import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
 import { AnimeCard, Pagination } from '@/components';
-import {
-  AnimeSeason,
-  animeSeasons,
-  JikanSeasonsPlusParams,
-  seasonAnimeType,
-  SeasonAnimeType,
-} from '@/models';
+import { AnimeSeason, animeSeasons, JikanSeasonsPlusParams } from '@/models';
 import { fetchSeasonsList } from '@/store/season/seasonListSlice';
 import { fetchSeasonsAnime } from '@/store/season/seasonsAnimeSlice';
-import { getSeasonName, scrollToTop, uniqueItems } from '@/utils';
+import { getSeasonName, getUniqueItems, scrollToTop } from '@/utils';
 import Select from 'react-select';
 import isEqual from 'lodash.isequal';
 import './Seasonal.scss';
@@ -34,53 +28,33 @@ function parseSearchParams(search: string): Partial<JikanSeasonsPlusParams> {
           result.season = value as AnimeSeason;
         }
         break;
-      case 'filter':
-        if (seasonAnimeType.includes(value as SeasonAnimeType)) {
-          result.filter = value as SeasonAnimeType;
-        }
-        break;
       case 'page':
-      case 'limit':
         const page = parseInt(value, 10);
         if (!isNaN(page)) {
           (result as any)[key] = page;
         }
-        break;
-      case 'continuing':
-      case 'unapproved':
-      case 'sfw':
-        result[key] = value === 'true';
         break;
       default:
         break;
     }
   }
 
-  const availableParams: Array<keyof JikanSeasonsPlusParams> = ['year', 'season', 'page'];
-
-  for (const key in result) {
-    if (!availableParams.includes(key as keyof JikanSeasonsPlusParams))
-      delete result[key as keyof JikanSeasonsPlusParams];
-  }
-
   return result;
 }
 
-const getDefaultParams = () => ({
-  year: new Date().getFullYear(),
-  season: getSeasonName(),
-  page: 1,
-});
-
 // ===== Seasonal ===== //
 function Seasonal() {
+  const seasonalRef = React.useRef<HTMLDivElement>(null);
+
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
   const appNavigate = useAppNavigate(parseSearchParams);
 
-  const seasonsList = useAppSelector((state) => state.seasonsList.items);
-  const { isSuccess: isSuccessSeasons } = useFetchStatus((state) => state.seasonsList.status);
+  const { items: seasonsList, status: seasonsStatus } = useAppSelector(
+    (state) => state.seasonsList,
+  );
+  const { isSuccess: isSuccessSeasons } = useFetchStatus(seasonsStatus);
 
   const { items, pagination, status } = useAppSelector((state) => state.seasonsAnime);
   const { isLoading: isLoadingItems } = useFetchStatus(status);
@@ -90,30 +64,35 @@ function Seasonal() {
     [seasonsList],
   );
 
-  const searchParams = React.useMemo<JikanSeasonsPlusParams>(() => {
+  const [searchParams, setSearchParams] = React.useState(getSearchParams());
+
+  function getSearchParams() {
     const urlParams = parseSearchParams(location.search);
-    const defaultParams = getDefaultParams();
+    const defaultParams = {
+      year: new Date().getFullYear(),
+      season: getSeasonName(),
+      page: undefined,
+    };
     return { ...defaultParams, ...urlParams };
-  }, [location.search]);
+  }
 
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
-    if (isSuccessSeasons) return;
-    dispatch(fetchSeasonsList());
+    abortableDispatch(fetchSeasonsAnime, searchParams);
+
+    if (!isSuccessSeasons) dispatch(fetchSeasonsList());
   }, []);
 
-  const prevParamsRef = React.useRef<JikanSeasonsPlusParams | null>(null);
   React.useEffect(() => {
-    if (!prevParamsRef.current || !isEqual(prevParamsRef.current, searchParams)) {
-      prevParamsRef.current = searchParams;
-      abortableDispatch(fetchSeasonsAnime, searchParams);
+    const newParams = getSearchParams();
+    if (!isEqual(searchParams, newParams)) {
+      setSearchParams(newParams);
+      abortableDispatch(fetchSeasonsAnime, newParams);
     }
-  }, [abortableDispatch, searchParams]);
-
-  const cardsRef = React.useRef<HTMLDivElement>(null);
+  }, [abortableDispatch, location.search]);
 
   return (
-    <div className="seasonal" ref={cardsRef}>
+    <div className="seasonal" ref={seasonalRef}>
       <div className="seasonal__filter">
         {isSuccessSeasons ? (
           <Select
@@ -124,7 +103,6 @@ function Seasonal() {
             value={yearOptions.find((obj) => obj.value === searchParams.year)}
             options={yearOptions}
             onChange={(selected) => {
-              // if (selected && selected.value !== searchParams.year)
               if (selected) appNavigate({ ...searchParams, year: selected.value, page: undefined });
             }}
             menuPortalTarget={document.body}
@@ -162,7 +140,7 @@ function Seasonal() {
                 className=" _skeleton "
               />
             ))
-          : uniqueItems(items).map((item) => <AnimeCard item={item} key={item.mal_id} />)}
+          : getUniqueItems(items).map((item) => <AnimeCard item={item} key={item.mal_id} />)}
       </div>
       {pagination && (
         <Pagination
@@ -172,7 +150,7 @@ function Seasonal() {
           itemsPerPage={pagination.items.per_page}
           onChangePage={(page) => {
             appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
-            scrollToTop(cardsRef);
+            scrollToTop(seasonalRef);
           }}
         />
       )}

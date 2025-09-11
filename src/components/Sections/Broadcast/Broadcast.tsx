@@ -3,7 +3,7 @@ import { BroadcastItem, EmptyValueMessage, Pagination } from '@/components';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
 import { schedulesFilter, SchedulesFilter, SchedulesParams } from '@/models';
 import { fetchSchedulesAnime } from '@/store/anime/schedulesAnimeSlice';
-import { scrollToTop, uniqueItems } from '@/utils';
+import { scrollToTop, getUniqueItems } from '@/utils';
 import { animeEmptyValueMessages, commonMessages, weekDaysOptions } from '@/variables';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
@@ -11,8 +11,6 @@ import { useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import isEqual from 'lodash.isequal';
 import './Broadcast.scss';
-
-type WithRequired<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 
 function parseSearchParams(search: string): Partial<SchedulesParams> {
   const params = new URLSearchParams(search);
@@ -26,61 +24,51 @@ function parseSearchParams(search: string): Partial<SchedulesParams> {
         }
         break;
       case 'page':
-      case 'limit':
         const page = parseInt(value, 10);
         if (!isNaN(page)) {
           (result as any)[key] = page;
         }
-        break;
-      case 'unapproved':
-      case 'kids':
-      case 'sfw':
-        result[key] = value === 'true';
         break;
       default:
         break;
     }
   }
 
-  const availableParams: Array<keyof SchedulesParams> = ['filter', 'page'];
-
-  for (const key in result) {
-    if (!availableParams.includes(key as keyof SchedulesParams))
-      delete result[key as keyof SchedulesParams];
-  }
-
   return result;
 }
 
 function Broadcast() {
+  const broadcastRef = React.useRef<HTMLDivElement>(null);
+
   const abortableDispatch = useAbortableDispatch();
   const appNavigate = useAppNavigate(parseSearchParams);
   const location = useLocation();
   const { items, status, pagination } = useAppSelector((state) => state.schedulesAnime);
   const { isError, isLoading, isSuccess } = useFetchStatus(status);
 
-  const searchParams = React.useMemo<WithRequired<SchedulesParams, 'filter'>>(() => {
+  const [searchParams, setSearchParams] = React.useState(getSearchParams());
+
+  function getSearchParams() {
     const urlParams = parseSearchParams(location.search);
     const day = weekDaysOptions.find((obj) => obj.value === schedulesFilter[new Date().getDay()]);
     return { filter: day ? day.value : weekDaysOptions[0].value, ...urlParams };
-  }, [location.search]);
+  }
 
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
+    abortableDispatch(fetchSchedulesAnime, searchParams);
   }, []);
 
-  const prevParamsRef = React.useRef<SchedulesParams | null>(null);
   React.useEffect(() => {
-    if (!prevParamsRef.current || !isEqual(prevParamsRef.current, searchParams)) {
-      prevParamsRef.current = searchParams;
-      abortableDispatch(fetchSchedulesAnime, searchParams);
+    const newParams = getSearchParams();
+    if (!isEqual(searchParams, newParams)) {
+      setSearchParams(newParams);
+      abortableDispatch(fetchSchedulesAnime, newParams);
     }
   }, [location.search]);
 
-  const cardsRef = React.useRef<HTMLDivElement>(null);
-
   return (
-    <div className="broadcast" ref={cardsRef}>
+    <div className="broadcast" ref={broadcastRef}>
       <div className="broadcast__filter">
         <Select
           className="broadcast__select select"
@@ -98,15 +86,15 @@ function Broadcast() {
         />
       </div>
       <div className="broadcast__items">
-        {isLoading &&
+        {isLoading ? (
           Array.from({ length: 12 }).map((_, i) => (
             <Skeleton key={i} className="broadcast__item border-opacity _skeleton" />
-          ))}
-        {isSuccess &&
-          uniqueItems(items).map((item) => (
+          ))
+        ) : isSuccess ? (
+          getUniqueItems(items).map((item) => (
             <BroadcastItem key={item.mal_id} className="broadcast__item" item={item} />
-          ))}
-        {isError && (
+          ))
+        ) : (
           <EmptyValueMessage
             message={isError ? commonMessages.error : animeEmptyValueMessages.newEpisodes}
           />
@@ -120,7 +108,7 @@ function Broadcast() {
           className="catalog-cards__pagination"
           onChangePage={(page) => {
             appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
-            scrollToTop(cardsRef);
+            scrollToTop(broadcastRef);
           }}
         />
       )}

@@ -1,7 +1,7 @@
-export const scrollToTop = (cardsRef: React.RefObject<HTMLElement | null>, smooth: boolean = false) => {
-  if (!cardsRef.current) return;
+export const scrollToTop = (ref: React.RefObject<HTMLElement | null>, smooth: boolean = false) => {
+  if (!ref.current) return;
 
-  const tabsTop = cardsRef.current.getBoundingClientRect().top;
+  const tabsTop = ref.current.getBoundingClientRect().top;
   if (tabsTop >= 0) return;
 
   window.scrollTo({

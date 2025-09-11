@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './SectionHeader.scss';
 
-export interface ISectionHeaderProps {
+export interface SectionHeaderProps {
   title: string;
   link?: {
     url: string;
@@ -12,7 +12,7 @@ export interface ISectionHeaderProps {
   className?: string;
 }
 
-const SectionHeader: React.FC<ISectionHeaderProps> = ({ className = '', title, link }) => {
+const SectionHeader: React.FC<SectionHeaderProps> = ({ className = '', title, link }) => {
   return (
     <div className={`${className} section-header`}>
       <h2 className="section-header__title title title--fz-36 title--main-color">{title}</h2>

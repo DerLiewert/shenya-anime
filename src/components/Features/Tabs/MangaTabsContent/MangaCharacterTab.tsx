@@ -1,16 +1,15 @@
 import React from 'react';
-import { EntityTabItem } from '@/components/Common';
 import { CommonCharacter } from '@/models';
 import { mangaEmptyValueMessages } from '@/variables';
-import EntityTab from '../CommonTabsContent/EntityTab/EntityTab';
 import { fetchMangaCharacters } from '@/store/manga/mangaFullByIdSlice';
+import { EntityTab, EntityTabItem } from '@/components';
 
 const MangaCharacterTab: React.FC = () => {
   return (
     <EntityTab<CommonCharacter>
       status={(state) => state.mangaFullById.status.characters}
       selector={(state) => state.mangaFullById.characters}
-      actionCreator={fetchMangaCharacters}
+      fetchAction={fetchMangaCharacters}
       emptyValueMessage={mangaEmptyValueMessages.characters}
       entityItem={(item, index) => {
         return (

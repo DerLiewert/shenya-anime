@@ -8,14 +8,14 @@ interface SchedulesAnimeState {
   items: Anime[];
   filter: SchedulesFilter | null;
   pagination: JikanPaginationPlus | null;
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: SchedulesAnimeState = {
   items: [],
   filter: null,
   pagination: null,
-  status: FetchStatus.LOADING,
+  status: null,
 };
 
 export const schedulesAnimeSlice = createSlice({

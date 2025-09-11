@@ -11,7 +11,7 @@ const StaffTab: React.FC = () => {
       status={(state) => state.animeFullById.status.staff}
       emptyValueMessage={animeEmptyValueMessages.staff}
       selector={(state) => state.animeFullById.staff}
-      actionCreator={fetchAnimeStaff}
+      fetchAction={fetchAnimeStaff}
       visibleItemCount={18}
       entityItem={(item) => {
         return (

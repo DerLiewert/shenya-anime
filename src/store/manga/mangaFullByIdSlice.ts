@@ -23,7 +23,7 @@ import { createHandle, createMangaThunkWithId, toDataWithExtendedBasicPagination
 
 type DataKeys = Exclude<keyof MangaFullState, 'status'>;
 
-interface MangaFullState {
+export interface MangaFullState {
   item: MangaFull | null;
   scoreStats: StatisticsScore[];
   characters: CommonCharacter[];

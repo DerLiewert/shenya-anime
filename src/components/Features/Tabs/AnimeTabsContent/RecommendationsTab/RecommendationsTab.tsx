@@ -1,4 +1,3 @@
-import React from 'react';
 import { fetchAnimeRecommendations } from '@/store/anime/animeFullByIdSlice';
 import { AnimeRecommendationCard, RecommendationsTab } from '@/components';
 import { animeEmptyValueMessages } from '@/variables';
@@ -9,7 +8,7 @@ const AnimeRecommendationsTab = () => {
     <RecommendationsTab
       selector={(state) => state.animeFullById.recommendations}
       status={(state) => state.animeFullById.status.recommendations}
-      actionCreator={fetchAnimeRecommendations}
+      fetchAction={fetchAnimeRecommendations}
       entityItem={(item) => <AnimeRecommendationCard item={item.entry} key={item.entry.mal_id} />}
       emptyValueMessage={animeEmptyValueMessages.recommendations}
     />

@@ -11,7 +11,6 @@ export function useAppNavigate<T>(
   return (paramsObject: Record<string, any>, options?: { replace?: boolean }) => {
     // const validated = parseSearchParams(searchParamsToString(defaultParams ? {...defaultParams, ...paramsObject} : paramsObject));
 
-    console.log('paramsObject', paramsObject);
     if (defaultParams) {
       for (const param in defaultParams as any) {
         if (paramsObject[param] === defaultParams[param]) delete paramsObject[param];

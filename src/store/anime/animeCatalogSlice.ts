@@ -7,13 +7,13 @@ import axios from 'axios';
 interface InitialState {
   items: Anime[];
   pagination: JikanPaginationPlus | null;
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: InitialState = {
   items: [],
   pagination: null,
-  status: FetchStatus.LOADING,
+  status: null,
 };
 
 const animeCatalogSlice = createSlice({
@@ -38,12 +38,6 @@ const animeCatalogSlice = createSlice({
 
 export default animeCatalogSlice.reducer;
 
-// export const fetchAnimeByParams = createAsyncThunk(
-//   'anime-catalog/fetchAnimeByParams',
-//   async (queryParams: AnimeSearchParams, { signal }) => {
-//     return await getAnimeSearch(queryParams, signal);
-//   },
-// );
 
 export const fetchAnimeByParams = createAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,

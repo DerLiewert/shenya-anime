@@ -1,6 +1,4 @@
 import React from 'react';
-import { useAbortableDispatch } from '@/hooks';
-import { fetchSeasonalAnime } from '../../store/anime/seasonalAnimeSlice';
 import {
   AnimeCard,
   MainIntro,
@@ -9,46 +7,52 @@ import {
   NewEpisodes,
   RandomAnime,
 } from '@/components';
-import './Home.scss';
-import { Anime, Manga } from '@/models';
+import { Anime, animeSeasons, Manga } from '@/models';
+import { fetchSeasonalAnime } from '@/store/anime/seasonalAnimeSlice';
 import { fetchTopManga } from '@/store/manga/mangaTopSlice';
+import './Home.scss';
+import { getSeasonName, toFirstUppercase } from '@/utils';
+import { commonPaths } from '@/variables';
+import { fetchIntroAnime } from '@/store/anime/introAnimeSlice';
 
 const Home: React.FC = () => {
   return (
-    <React.Fragment>
+    <>
       <MainIntro />
       <MediaBlock<Anime>
-        type='anime'
+        type="anime"
         header={{
           title: 'Top Anime',
-          link: { url: '/anime', text: 'View all' },
+          link: { url: commonPaths.anime, text: 'View all' },
         }}
-        selectFunction={(state) => state.introAnime}
+        selector={(state) => state.introAnime}
         renderCard={(item) => <AnimeCard item={item} />}
+        fetchAction={fetchIntroAnime}
       />
       <MediaBlock<Manga>
-        type='manga'
+        type="manga"
         header={{
           title: 'Top Manga',
-          link: { url: '/manga', text: 'View all' },
+          link: { url: commonPaths.manga, text: 'View all' },
         }}
-        selectFunction={(state) => state.mangaTop}
+        selector={(state) => state.mangaTop}
         renderCard={(item) => <MangaCard item={item} />}
-        actionCreator={fetchTopManga}
+        fetchAction={fetchTopManga}
       />
       <MediaBlock<Anime>
-        type='anime'
+        type="anime"
         header={{
           title: 'Seasonal anime',
-          link: { url: '/schedules/seasonal', text: 'View all' },
+          link: { url: commonPaths.seasonal, text: 'View all' },
         }}
-        selectFunction={(state) => state.seasonalAnime}
+        subtitle={`${toFirstUppercase(getSeasonName())} ${new Date().getFullYear()}`}
+        selector={(state) => state.seasonalAnime}
         renderCard={(item) => <AnimeCard item={item} />}
-        actionCreator={fetchSeasonalAnime}
+        fetchAction={fetchSeasonalAnime}
       />
       <NewEpisodes />
       <RandomAnime />
-    </React.Fragment>
+    </>
   );
 };
 

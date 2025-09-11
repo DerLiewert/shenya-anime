@@ -8,7 +8,7 @@ import './Breadcrumbs.scss';
 interface BreadcrumbsProps {
   className?: string;
   items: Array<{
-    label: string;
+    label: string | number;
     url: string;
   }>;
   isCurrentLast?: boolean;

@@ -8,13 +8,14 @@ import { Anime } from '@/models';
 
 import clsx from 'clsx';
 import './MainIntro.scss';
+import { animePaths, animeRatingOptions } from '@/variables';
 
-interface IntroSlideProps {
+interface MainIntroSlide {
   item: Anime;
   shouldRenderImage?: boolean;
 }
 
-const MainIntroSlide: React.FC<IntroSlideProps> = ({ item, shouldRenderImage = true }) => {
+const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = true }) => {
   const { src, onLoad, isFallback, isLoading } = useYoutubeTrailerImage(item.trailer.images);
 
   return (
@@ -30,13 +31,9 @@ const MainIntroSlide: React.FC<IntroSlideProps> = ({ item, shouldRenderImage = t
       )}
 
       <div className="main-slide__body">
-        {
-          <div className="main-slide__poster bg bodrer">
-            {shouldRenderImage && (
-              <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" />
-            )}
-          </div>
-        }
+        <div className="main-slide__poster bg bodrer">
+          {shouldRenderImage && <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" />}
+        </div>
         <div className="main-slide__content">
           <h2 className="main-slide__title title title--fz-48">
             <Link to={`/anime/${item.mal_id}`}>{item.title}</Link>
@@ -48,17 +45,26 @@ const MainIntroSlide: React.FC<IntroSlideProps> = ({ item, shouldRenderImage = t
                 <StarIcon />
                 <span>{formattedScore(item.score)}</span>
               </div>
-              {item.scored_by && <div className="main-slide__score-users">{item.scored_by} ratings</div>}
+              {item.scored_by && (
+                <div className="main-slide__score-users">{item.scored_by} ratings</div>
+              )}
             </div>
             <div className="main-slide__details">
               <Link
                 className="main-slide__link main-slide__link--rating"
                 title={item.rating + (item.rating ? '' : ' rating')}
-                to="#">
+                to={animePaths.catalogWithParams({
+                  rating: animeRatingOptions.find((obj) => obj.label === item.rating)?.value,
+                })}>
                 {getShortAnimeRating(item.rating)}
               </Link>
               {item.genres.map((genre) => (
-                <Link key={genre.mal_id} className="main-slide__link" to="#">
+                <Link
+                  key={genre.mal_id}
+                  className="main-slide__link"
+                  to={animePaths.catalogWithParams({
+                    genres: genre.mal_id.toString(),
+                  })}>
                   {genre.name}
                 </Link>
               ))}
@@ -93,14 +99,14 @@ export const MainIntroSkeleton = () => {
             <Skeleton className="img" />
           </div>
           <div className="main-slide__content">
-            <h2 className="main-slide__title title">
+            <h2 className="main-slide__title title title--fz-48">
               <Skeleton />
             </h2>
-            <div className="main-slide__text">
+            <div className="main-slide__text fz-20">
               <Skeleton />
               <Skeleton />
               <Skeleton />
-              <Skeleton containerClassName="_skeleton-last" />
+              <Skeleton />
             </div>
             <div className="main-slide__info">
               <div className="main-slide__score-wrapper">

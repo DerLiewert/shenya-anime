@@ -17,9 +17,9 @@ export const mangaSearchType = [
   'doujin',
   'manhwa',
   'manhua',
-];
+] as const;
 
-export type MangaSearchType = (typeof mangaSearchType)[number];
+export type MangaSearchType = (typeof mangaSearchType)[number] ;
 
 export const mangaSearchStatus = [
   'publishing',

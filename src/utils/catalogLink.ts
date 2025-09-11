@@ -1,15 +1,16 @@
-type CatalogParams = {
-  genres?: number;
-  type?: string;
-  rating?: string;
-  [key: string]: string | number | undefined;
-};
+import { AnimeSearchParams, MangaSearchParams } from '@/models';
+import { commonPaths } from '@/variables';
+
+export type MangaCatalogParams = Pick<
+  MangaSearchParams,
+  'type' | 'status' | 'min_score' | 'max_score' | 'genres' | 'order_by' | 'page'
+>;
 
 const DEFAULT_PARAMS = {
-  order_by: 'score',
+  //order_by: 'score',
 };
 
-export function buildCatalogUrl(params: CatalogParams): string {
+export function buildMangaCatalogUrl(params: MangaCatalogParams): string {
   const allParams = { ...DEFAULT_PARAMS, ...params };
   const search = new URLSearchParams();
 
@@ -17,5 +18,21 @@ export function buildCatalogUrl(params: CatalogParams): string {
     if (value != null) search.set(key, String(value));
   }
 
-  return `/catalog?${search.toString()}`;
+  return `${commonPaths.manga}?${search.toString()}`;
+}
+
+export type AnimeCatalogParams = Pick<
+  AnimeSearchParams,
+  'type' | 'status' | 'min_score' | 'max_score' | 'rating' | 'genres' | 'order_by' | 'page'
+>;
+
+export function buildAnimeCatalogUrl(params: AnimeCatalogParams): string {
+  const allParams = { ...DEFAULT_PARAMS, ...params };
+  const search = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(allParams)) {
+    if (value != null) search.set(key, String(value));
+  }
+
+  return `${commonPaths.anime}?${search.toString()}`;
 }

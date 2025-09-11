@@ -191,7 +191,8 @@
     @include media-max($mobileSmall) {
       -webkit-line-clamp: 4;
     }
-    & ._skeleton-last {
+
+    & > *:last-child {
       @include media-min($mobileSmall) {
         display: none;
       }

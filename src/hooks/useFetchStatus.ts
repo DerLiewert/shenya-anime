@@ -9,7 +9,7 @@ export function useFetchStatus(statusOrSelector:  StatusSelector | Status) {
   const selectedStatus = useAppSelector((state) =>
     typeof statusOrSelector === 'function' ? statusOrSelector(state) : undefined,
   );
-
+  
   const status = typeof statusOrSelector === 'function' ? selectedStatus : statusOrSelector;
 
   return {

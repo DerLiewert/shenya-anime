@@ -9,7 +9,7 @@ const CharacterPicturesTab: React.FC = () => {
       selector={(state) => state.characterFullById.pictures}
       status={(state) => state.characterFullById.status.pictures}
       emptyValueMessage={characterEmptyValueMessages.pictures}
-      actionCreator={fetchCharacterPictures}
+      fetchAction={fetchCharacterPictures}
     />
   );
 };

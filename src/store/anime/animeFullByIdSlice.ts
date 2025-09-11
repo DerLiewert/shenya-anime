@@ -27,7 +27,7 @@ import { createAnimeThunkWithId, createHandle, toDataWithExtendedBasicPagination
 
 type DataKeys = Exclude<keyof AnimeFullState, 'status'>;
 
-interface AnimeFullState {
+export interface AnimeFullState {
   item: AnimeFull | null;
   scoreStats: StatisticsScore[];
   episodes: DataWithExtendedBasicPagination<AnimeEpisode>;

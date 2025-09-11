@@ -1,8 +1,8 @@
 import React from 'react';
 import { CharacterFull } from '@/models';
 import { splitText } from '@/utils';
-import './AboutTab.scss';
 import clsx from 'clsx';
+import './AboutTab.scss';
 
 const AboutTab = ({ item }: { item: CharacterFull }) => {
   return (

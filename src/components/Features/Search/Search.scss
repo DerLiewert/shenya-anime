@@ -7,14 +7,39 @@
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(5px);
-  padding: 50px;
   overflow: auto;
 
   &__inner {
-    // display: flex;
-    // align-items: center;
-    // justify-content: center;
     min-height: 100%;
+    padding: 15px 15px 50px;
+  }
+
+  &__close {
+    position: sticky;
+    top: 15px;
+    z-index: 900;
+    width: 26px;
+    height: 26px;
+    margin: 0 15px 10px calc(100% - 26px);
+    border-radius: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      width: 86%;
+      height: 2px;
+      top: calc(50% - 1px);
+      left: 7%;
+      background-color: #fff;
+    }
+    &::before {
+      transform: rotate(45deg);
+    }
+    &::after {
+      transform: rotate(-45deg);
+    }
   }
 
   &__body {
@@ -27,7 +52,7 @@
     display: flex;
     background-color: #fff;
     border-radius: 5px;
-    overflow: hidden;
+    // overflow: hidden;
     &:not(:last-child) {
       margin-bottom: 10px;
     }
@@ -37,16 +62,30 @@
     flex: 0 0 150px;
     color: #000;
     background-color: #fff;
+    border-radius: inherit;
+    // border-top-right-radius: 0;
+    // border-bottom-right-radius: 0;
+    @include media-max($mobile) {
+      flex-basis: 120px;
+    }
+    @include media-max($mobileSmall) {
+      flex-basis: 100px;
+    }
+
     .select {
       &__control {
         min-height: 34px;
-        font-size: 14px;
         line-height: 1.2;
         cursor: pointer;
         padding: 5px 7px;
-        border: 1px solid #000;
-        border-radius: 5px;
+        border: none;
+        border-right: 1px solid #000;
+        border-radius: inherit;
         transition: border-color 0.3s ease 0s;
+
+        @include media-max($mobileSmall) {
+          min-height: 30px;
+        }
 
         @media (any-hover: hover) {
           &:hover {
@@ -61,6 +100,7 @@
 
       &__menu,
       &__menu-portal &__menu {
+        min-width: 120px;
         background-color: #fff;
         // box-shadow: 0px 0px 5px 5px rgba(var(--main-color-rgb), 0.3);
         border: 1px solid var(--primary-color);
@@ -82,12 +122,50 @@
       path {
         stroke-width: 2px;
       }
+
+      @include media-max($mobileSmall) {
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 
   &__input {
     color: #000;
-    padding: 0 5px 0 35px;
+    padding: 0 35px;
+    @include media-max($mobileSmall) {
+      padding: 0 30px;
+    }
+  }
+
+  &__close-btn {
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 50%;
+    right: 5px;
+    transform: translateY(-50%);
+    &::before,
+    &::after {
+      content: '';
+      width: 100%;
+      height: 1px;
+      background-color: #000;
+      position: absolute;
+      top: calc(50% - 1px);
+      left: 0;
+    }
+    &::before {
+      transform: rotate(45deg);
+    }
+    &::after {
+      transform: rotate(-45deg);
+    }
+
+    @include media-max($mobileSmall) {
+      width: 16px;
+      height: 16px;
+    }
   }
 
   &__btn {
@@ -102,12 +180,18 @@
   }
 
   &__message {
-    padding: 10px 5px;
+    padding: 15px 5px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-align: center;
     min-height: 100px;
+    @include media-max($mobile) {
+      min-height: 90px;
+    }
+    @include media-max($mobileSmall) {
+      min-height: 80px;
+    }
   }
 
   &__content {
@@ -141,10 +225,13 @@
   border-bottom: 1px solid var(--primary-color);
   display: flex;
   &__image {
-    flex-shrink: 07;
+    flex-shrink: 0;
     width: 80px;
     height: 120px;
     margin-right: 10px;
+    @include media-max($mobileSmall) {
+      width: 76px;
+    }
   }
 
   &__content {
@@ -170,7 +257,7 @@
   }
 
   &__title {
-    font-size: 14px;
+    margin-bottom: 3px;
     & + & {
       margin-top: 8px;
     }
@@ -184,6 +271,9 @@
     // color: #000;
     .info-row {
       font-size: 13px;
+      @include media-max($mobile) {
+        font-size: 12px;
+      }
     }
     .info-row + .info-row {
       margin-top: 2px;

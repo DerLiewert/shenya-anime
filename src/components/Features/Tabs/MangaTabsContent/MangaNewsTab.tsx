@@ -7,7 +7,7 @@ const MangaNewsTab: React.FC = () => {
     <NewsTab
       newsSelector={(state) => state.mangaFullById.news}
       status={(state) => state.mangaFullById.status.news}
-      actionCreator={fetchMangaNews}
+      fetchAction={fetchMangaNews}
     />
   );
 };

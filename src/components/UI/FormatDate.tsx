@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { getMonthName } from '../../utils/getMonthName';
 
 interface FormatDateProps {
@@ -14,11 +13,7 @@ export const FormatDate = ({ date }: FormatDateProps) => {
 
   const dayPart = date.day ? `${date.day} ` : '';
   const monthPart = date.month ? `${getMonthName(date.month)} ` : '';
-  const yearPart = (
-    <Link to="#" className="link">
-      {date.year}
-    </Link>
-  );
+  const yearPart = date.year ? date.year : '';
 
   return (
     <>

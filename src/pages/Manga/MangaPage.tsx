@@ -1,5 +1,8 @@
 import React from 'react';
 import BG from '@/assets/manga-bg.jpeg';
+import { fetchFullMangaById } from '@/store/manga/mangaFullByIdSlice';
+import { JikanNamedResource, MangaFull } from '@/models';
+import { mangaPaths } from '@/variables';
 import {
   EntityPageLayout,
   MangaCharacterTab,
@@ -8,18 +11,15 @@ import {
   MangaDetailsTab,
   MangaRecommendationsTab,
 } from '@/components';
-import { getMangaPaths } from '@/utils';
-import { fetchFullMangaById } from '@/store/manga/mangaFullByIdSlice';
-import { JikanNamedResource, MangaFull } from '@/models';
 import './MangaPage.scss';
 
 const MangaPage = () => {
   return (
     <EntityPageLayout<MangaFull>
-      actionCreator={fetchFullMangaById}
+      fetchAction={fetchFullMangaById}
       selector={(state) => state.mangaFullById.item}
       status={(state) => state.mangaFullById.status.item}
-      getBasePath={(id) => getMangaPaths(id).mangaFull}
+      getBasePath={(id) => mangaPaths.full(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.title,
@@ -31,6 +31,10 @@ const MangaPage = () => {
           ? [
               { label: 'Top', url: '#' },
               { label: 'Manga', url: '#' },
+              ...(item.published.prop.from.year
+                ? [{ label: item.published.prop.from.year, url: '#' }]
+                : []),
+              ...(item.type ? [{ label: item.type, url: '#' }] : []),
               { label: item.title, url: '#' },
             ]
           : [],

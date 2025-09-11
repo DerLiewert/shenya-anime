@@ -1,9 +1,14 @@
 import React from 'react';
-import { useAbortableDispatch, useShowMore } from '@/hooks';
+import { useAppSelector } from '@/app/hooks';
+import { useAbortableDispatch, useShowMore, useFetchStatus } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
-import { useFetchStatus } from '@/hooks/useFetchStatus';
-import { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
 import { JikanImages } from '@/models';
+import { getImageUrl } from '@/utils';
+import { commonMessages } from '@/variables';
+
+import type { RootState } from '@/app/store';
+import type { AsyncThunk } from '@reduxjs/toolkit';
+import type { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
 
 import LightGallery from 'lightgallery/react';
 import lgThumbnail from 'lightgallery/plugins/thumbnail';
@@ -12,37 +17,33 @@ import 'lightgallery/scss/lg-thumbnail.scss';
 import 'lightgallery/scss/lg-zoom.scss';
 
 import './PicturesTab.scss';
-import { RootState } from '@/app/store';
-import { useAppSelector } from '@/app/hooks';
-import { AsyncThunk } from '@reduxjs/toolkit';
-import { getImageUrl } from '@/utils';
 
 interface ImagesTabProps {
-  status: StatusSelector | FetchStatus | undefined;
   visibleCount?: number;
   emptyValueMessage: string;
   selector: (state: RootState) => JikanImages[];
-  actionCreator: AsyncThunk<JikanImages[], any, AsyncThunkConfig>;
+  status: StatusSelector | FetchStatus | undefined;
+  fetchAction: AsyncThunk<JikanImages[], any, AsyncThunkConfig>;
 }
 
 const PicturesTab: React.FC<ImagesTabProps> = ({
   selector,
-  actionCreator,
+  fetchAction,
   status,
   emptyValueMessage,
   visibleCount: visibleImagesCount = 12,
 }) => {
   const abortableDispatch = useAbortableDispatch();
   const pictures = useAppSelector(selector);
-  const { isLoading, isSuccess } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
   const { visibleCount, showMore } = useShowMore(visibleImagesCount);
 
   React.useEffect(() => {
-    if (pictures.length === 0 && !isSuccess) abortableDispatch(actionCreator);
+    if (pictures.length === 0 && (!isSuccess || !isLoading)) abortableDispatch(fetchAction);
   }, []);
 
   if (isLoading) return <Loading />;
-  
+
   return (
     <div className="pictures-tab">
       {isSuccess && pictures.length > 0 ? (
@@ -69,8 +70,9 @@ const PicturesTab: React.FC<ImagesTabProps> = ({
           ))}
         </LightGallery>
       ) : (
-        <EmptyValueMessage message={emptyValueMessage} />
+        <EmptyValueMessage message={isError ? commonMessages.error : emptyValueMessage} />
       )}
+
       {pictures.length > 0 && pictures.length > visibleCount && (
         <div className="pictures-tab__show-more-wrapper bnts-wrapper">
           <button

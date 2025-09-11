@@ -7,7 +7,7 @@ const AnimeNewsTab: React.FC = () => {
     <NewsTab
       newsSelector={(state) => state.animeFullById.news}
       status={(state) => state.animeFullById.status.news}
-      actionCreator={fetchAnimeNews}
+      fetchAction={fetchAnimeNews}
     />
   );
 };

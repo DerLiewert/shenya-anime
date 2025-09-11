@@ -1,43 +1,35 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { SearchIcon } from '@/components';
-import logo from '@/assets/logo.svg';
-import './Header.scss';
-import clsx from 'clsx';
 import { useMatchMedia } from '@/hooks';
-import { MEDIA_QUERY } from '@/variables';
+import { SearchIcon } from '@/components';
+import { commonPaths, MEDIA_QUERY } from '@/variables';
+import logo from '@/assets/logo.svg';
+import clsx from 'clsx';
+import './Header.scss';
 
 const links = [
-  { path: '/', label: 'Home' },
-  { path: '/anime', label: 'Anime' },
-  { path: '/manga', label: 'Manga' },
-  { path: '/schedules', label: 'Schedules' },
+  { path: commonPaths.home, label: 'Home' },
+  { path: commonPaths.anime, label: 'Anime' },
+  { path: commonPaths.manga, label: 'Manga' },
+  { path: commonPaths.schedules, label: 'Schedules' },
 ];
 
-const Header: React.FC<{ setIsSearchOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({
-  setIsSearchOpen,
-}) => {
+const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
   const location = useLocation();
-  const segments = location.pathname.split('/').filter(Boolean);
-
-  const currentPage: number =
-    segments.length > 0 ? links.findIndex((link) => segments.includes(link.path.slice(1))) : 0;
-
-  const activeLink = React.useMemo(
-    () => (currentPage >= 0 ? currentPage : undefined),
-    [currentPage],
+  const currentPage = links.findIndex(
+    (link) => location.pathname === link.path || location.pathname.startsWith(link.path + '/'),
   );
+  const activeLink = currentPage >= 0 ? currentPage : undefined;
 
   const isTablet = useMatchMedia('max', MEDIA_QUERY.tablet);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
     if (!isTablet && isMenuOpen) setIsMenuOpen(false);
-  }, [isTablet]);
+  }, [isTablet, isMenuOpen]);
 
   React.useEffect(() => {
     document.body.classList.toggle('menu-open', isMenuOpen);
-
     return () => {
       document.body.classList.remove('menu-open');
     };
@@ -69,16 +61,13 @@ const Header: React.FC<{ setIsSearchOpen: React.Dispatch<React.SetStateAction<bo
             </nav>
           </div>
           <div className="actions">
-            <button
-              className="search-btn"
-              aria-label="Search"
-              onClick={() => setIsSearchOpen(true)}>
+            <button className="search-btn" aria-label="Search" onClick={onSearchOpen}>
               <SearchIcon />
             </button>
             <button
               className="burger"
-              aria-label="menu"
-              aria-expanded="false"
+              aria-label="Menu"
+              aria-expanded={isMenuOpen}
               onClick={() => setIsMenuOpen((prev) => !prev)}>
               <span></span>
             </button>

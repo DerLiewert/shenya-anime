@@ -19,35 +19,39 @@ import { getImageUrl } from '@/utils';
 interface NewsTabProps {
   status: StatusSelector | FetchStatus | undefined;
   newsSelector: (state: RootState) => DataWithExtendedBasicPagination<JikanNews>;
-  actionCreator: AsyncThunk<
+  fetchAction: AsyncThunk<
     DataWithExtendedBasicPagination<JikanNews>,
     { page?: number },
     AsyncThunkConfig
   >;
   visibleNewsCount?: number;
 }
-const NewsTab = (props: NewsTabProps) => {
-  const { newsSelector, status, actionCreator, visibleNewsCount = 6 } = props;
-
+const NewsTab: React.FC<NewsTabProps> = ({
+  newsSelector,
+  status,
+  fetchAction,
+  visibleNewsCount = 6,
+}) => {
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const { data: news, pagination } = useAppSelector(newsSelector);
   const { isLoading, isSuccess } = useFetchStatus(status);
-  const { visibleCount, showMore, reset } = useShowMore(visibleNewsCount);
+  const { visibleCount, showMore } = useShowMore(visibleNewsCount);
 
   React.useEffect(() => {
-    if (news.length === 0 && !isSuccess) abortableDispatch(actionCreator, { page: 1 });
+    if (news.length === 0 && (!isSuccess || !isLoading)) {
+      abortableDispatch(fetchAction, { page: 1 });
+    }
   }, []);
 
   React.useEffect(() => {
     if (pagination && news.length < visibleCount && pagination.has_next_page) {
       dispatch(
-        actionCreator({
+        fetchAction({
           page: pagination.current_page ? pagination.current_page + 1 : undefined,
         }),
       );
     }
-    return () => reset();
   }, [visibleCount]);
 
   if (isLoading && news.length === 0) return <Loading />;

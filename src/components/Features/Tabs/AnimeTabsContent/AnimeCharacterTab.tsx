@@ -1,9 +1,8 @@
 import React from 'react';
-import { EntityTabItem } from '@/components/Common';
-import { AnimeCharacter } from '@/models';
 import { fetchAnimeCharacters } from '@/store/anime/animeFullByIdSlice';
+import { AnimeCharacter } from '@/models';
 import { animeEmptyValueMessages, SpecialStatus } from '@/variables';
-import EntityTab from '../CommonTabsContent/EntityTab/EntityTab';
+import { EntityTabItem, EntityTab } from '@/components';
 
 const AnimeCharacterTab: React.FC = () => {
   return (
@@ -11,8 +10,8 @@ const AnimeCharacterTab: React.FC = () => {
       status={(state) => state.animeFullById.status.characters}
       emptyValueMessage={animeEmptyValueMessages.characters}
       selector={(state) => state.animeFullById.characters}
-      actionCreator={fetchAnimeCharacters}
-      entityItem={(item, index) => {
+      fetchAction={fetchAnimeCharacters}
+      entityItem={(item) => {
         return (
           <EntityTabItem
             key={item.character.mal_id}

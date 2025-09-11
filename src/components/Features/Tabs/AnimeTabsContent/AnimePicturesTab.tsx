@@ -1,6 +1,6 @@
 import React from 'react';
+import { PicturesTab } from '@/components';
 import { fetchAnimePictures } from '@/store/anime/animeFullByIdSlice';
-import { PicturesTab } from '../CommonTabsContent/PicturesTab';
 import { animeEmptyValueMessages } from '@/variables';
 
 const AnimePicturesTab: React.FC = () => {
@@ -9,7 +9,7 @@ const AnimePicturesTab: React.FC = () => {
       selector={(state) => state.animeFullById.pictures}
       status={(state) => state.animeFullById.status.pictures}
       emptyValueMessage={animeEmptyValueMessages.pictures}
-      actionCreator={fetchAnimePictures}
+      fetchAction={fetchAnimePictures}
     />
   );
 };

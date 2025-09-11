@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { JikanImages } from '@/models';
-import './EntityTabItem.scss';
 import { getImageUrl } from '@/utils';
+
+import type { JikanImages } from '@/models';
+
+import './EntityTabItem.scss';
 
 type TextWithPrefix = {
   prefix: string;

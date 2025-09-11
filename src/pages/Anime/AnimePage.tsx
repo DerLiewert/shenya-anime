@@ -1,12 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { fetchFullAnimeById } from '@/store/anime/animeFullByIdSlice';
 import { AnimeFull, JikanNamedResource } from '@/models';
 import {
   AnimeCharacterTab,
   AnimeNewsTab,
   AnimePicturesTab,
-  LongArrowIcon,
   AnimeRecommendationsTab,
   AnimeDetailsTab,
   AnimeEpisodesTab,
@@ -15,16 +13,17 @@ import {
   EntityPageLayout,
   ReturnBack,
 } from '@/components';
-import { getAnimePaths } from '@/utils';
+import { animePaths, animeTypeOptions } from '@/variables';
 import './AnimePage.scss';
+import { toFirstUppercase } from '@/utils';
 
 const AnimePage = () => {
   return (
     <EntityPageLayout<AnimeFull>
-      actionCreator={fetchFullAnimeById}
+      fetchAction={fetchFullAnimeById}
       selector={(state) => state.animeFullById.item}
       status={(state) => state.animeFullById.status.item}
-      getBasePath={(id) => getAnimePaths(id).animeFull}
+      getBasePath={(id) => animePaths.full(id)}
       render={(item) => ({
         title: item && item.title,
         subtitles: item
@@ -34,8 +33,29 @@ const AnimePage = () => {
         trailer: item && item.trailer,
         breadcrumbs: item
           ? [
-              { label: 'Top', url: '#' },
-              { label: 'Anime', url: '#' },
+              { label: 'Anime', url: animePaths.catalog },
+              ...(item.season && item.year
+                ? [
+                    {
+                      label: toFirstUppercase(item.season),
+                      url: animePaths.seasonalWithParams({ year: item.year, season: item.season }),
+                    },
+                    {
+                      label: item.year,
+                      url: animePaths.seasonalWithParams({ year: item.year, season: item.season }),
+                    },
+                  ]
+                : []),
+              ...(item.type
+                ? [
+                    {
+                      label: item.type,
+                      url: animePaths.catalogWithParams({
+                        type: animeTypeOptions.find((obj) => obj.label === item.type)?.value,
+                      }),
+                    },
+                  ]
+                : []),
               { label: item.title, url: '#' },
             ]
           : [],
@@ -51,7 +71,7 @@ const AnimePage = () => {
                 label: 'Staff',
                 element: (
                   <>
-                    <ReturnBack textBackTo="Details" className='anime-tabs__back-link'/>
+                    <ReturnBack textBackTo="Details" className="anime-tabs__back-link" />
                     <AnimeStaffTab />
                   </>
                 ),

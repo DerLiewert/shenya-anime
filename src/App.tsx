@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { Header, Footer, Broadcast, Seasonal, Search } from './components';
 import {
   FullAnimePage,
@@ -18,10 +18,16 @@ import {
 // const VideosTab = lazy(() => import('./tabs/VideosTab'));
 
 function App() {
+  const location = useLocation();
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    window.scrollTo({ top: 0 });
+  }, [location.pathname]);
+
   return (
     <div className="wrapper">
-      <Header setIsSearchOpen={setIsSearchOpen}/>
+      <Header onSearchOpen={() => setIsSearchOpen(true)} />
       <main className="main">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -34,19 +40,15 @@ function App() {
 
           <Route path="/character/:id/*" element={<CharacterPage />} />
           <Route path="/people/:id/*" element={<PersonPage />} />
+          <Route path="/producer/:id/*" element={<>Producer </>} />
 
           <Route path="/schedules/*" element={<Schedules />} />
-          {/* <Route path="/schedules" element={<Schedules />}>
-            <Route index element={<Broadcast />} />
-            <Route path="broadcast" element={<Broadcast />} />
-            <Route path="seasonal" element={<Seasonal />} />
-          </Route> */}
 
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>
       </main>
       <Footer />
-      {isSearchOpen && <Search setIsSearchOpen={setIsSearchOpen}/>}
+      {isSearchOpen && <Search onSearchClose={() => setIsSearchOpen(false)} />}
     </div>
   );
 }

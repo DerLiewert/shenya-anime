@@ -350,7 +350,7 @@ export const useAbortableDispatch = () => {
     [dispatch],
   );
 
-  // 🔹 Добавляем метод abort вручную
+  // Добавляем метод abort вручную
   (abortableDispatch as any).abort = (keyOrThunk?: string | Function) => {
     let resolvedKey: string | undefined;
 

@@ -4,7 +4,7 @@ import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
 import { animeSeasons } from '@/models';
 import { fetchSeasonsList } from '@/store/season/seasonListSlice';
 import { fetchSeasonsAnime } from '@/store/season/seasonsAnimeSlice';
-import { getImageUrl, uniqueItems, valueOrDefault } from '@/utils';
+import { getImageUrl, getUniqueItems, valueOrDefault } from '@/utils';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Select from 'react-select';
@@ -112,7 +112,7 @@ type SelectOption<T, L = string> = {
 //             )}
 //           </div>
 //           <div className="seasonal__items ">
-//             {uniqueItems(items).map((item) => (
+//             {getUniqueItems(items).map((item) => (
 //               <AnimeCard item={item} />
 //             ))}
 //           </div>

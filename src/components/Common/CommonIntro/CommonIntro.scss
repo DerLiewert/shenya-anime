@@ -43,20 +43,27 @@
 
   &__title {
     font-size: 64px;
-    margin-bottom: 25px;
     @include media-max($pc) {
       font-size: 56px;
-      margin-bottom: 20px;
     }
     @include media-max($tablet) {
       font-size: 48px;
     }
     @include media-max($mobile) {
       font-size: 36px;
-      margin-bottom: 15px;
     }
     @include media-max($mobileSmall) {
       font-size: 32px;
+    }
+
+    &:not(:last-child) {
+      margin-bottom: 25px;
+      @include media-max($pc) {
+        margin-bottom: 20px;
+      }
+      @include media-max($mobile) {
+        margin-bottom: 15px;
+      }
     }
   }
 

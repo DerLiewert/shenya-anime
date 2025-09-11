@@ -6,12 +6,12 @@ import { WEEK_DAYS } from '../../variables';
 
 interface TodaySchedulesAnimeState {
   items: Anime[];
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: TodaySchedulesAnimeState = {
   items: [],
-  status: FetchStatus.LOADING,
+  status: null,
 };
 
 export const todaySchedulesAnimeSlice = createSlice({

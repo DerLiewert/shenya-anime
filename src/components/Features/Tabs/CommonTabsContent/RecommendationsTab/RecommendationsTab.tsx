@@ -1,18 +1,20 @@
 import React from 'react';
-import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus, useShowMore } from '@/hooks';
-import { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
-import { AsyncThunk } from '@reduxjs/toolkit';
-import { Recommendation } from '@/models';
-
 import { EmptyValueMessage, Loading } from '@/components/UI';
+import { commonMessages } from '@/variables';
+
+import type { RootState } from '@/app/store';
+import type { AsyncThunk } from '@reduxjs/toolkit';
+import type { Recommendation } from '@/models';
+import type { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
+
 import './RecommendationsTab.scss';
 
 interface RecommendationsTabProps {
   selector: (state: RootState) => Recommendation[];
   status: StatusSelector | FetchStatus | undefined;
-  actionCreator: AsyncThunk<Recommendation[], any, AsyncThunkConfig>;
+  fetchAction: AsyncThunk<Recommendation[], any, AsyncThunkConfig>;
   entityItem: (item: Recommendation, index: number) => React.ReactNode;
   visibleItemCount?: number;
   emptyValueMessage: string;
@@ -22,7 +24,7 @@ const RecommendationsTab = (props: RecommendationsTabProps) => {
   const {
     selector,
     status,
-    actionCreator,
+    fetchAction,
     emptyValueMessage,
     visibleItemCount = 12,
     entityItem,
@@ -30,11 +32,11 @@ const RecommendationsTab = (props: RecommendationsTabProps) => {
 
   const abortableDispatch = useAbortableDispatch();
   const recommendations = useAppSelector(selector);
-  const { isLoading, isSuccess } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
   const { visibleCount, showMore } = useShowMore(visibleItemCount);
 
   React.useEffect(() => {
-    if (recommendations.length === 0 && !isSuccess) abortableDispatch(actionCreator);
+    if (recommendations.length === 0 && (!isSuccess || !isLoading)) abortableDispatch(fetchAction);
   }, []);
 
   if (isLoading) return <Loading />;
@@ -46,7 +48,7 @@ const RecommendationsTab = (props: RecommendationsTabProps) => {
           {recommendations.slice(0, visibleCount).map(entityItem)}
         </div>
       ) : (
-        <EmptyValueMessage message={emptyValueMessage} />
+        <EmptyValueMessage message={isError ? commonMessages.error : emptyValueMessage} />
       )}
       {recommendations.length > 0 && recommendations.length > visibleCount && (
         <div className="anime-recommendations__show-more-wrapper bnts-wrapper">

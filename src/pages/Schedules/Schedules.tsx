@@ -14,18 +14,12 @@ function Schedules() {
   const location = useLocation();
   const segments = location.pathname.split('/').filter(Boolean);
 
-  // React.useEffect(() => {
-  //   if (segments.length === 1) {
-  //     navigate({ pathname: `/${segments[0]}/${routeItems[0].path}` }, { replace: true });
-  //   }
-  // }, [location.pathname]);
-
   if (
     (segments.length > 1 && !routeItems.find((obj) => obj.path === segments[1])) ||
     segments.length > 2
   )
     return <NotFound />;
-    
+
   return (
     <div className="schedules">
       <CommonIntro bgPrefix="schedules" title="Schedules Anime" />

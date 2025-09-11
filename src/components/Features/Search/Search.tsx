@@ -1,66 +1,45 @@
 import React from 'react';
 import Select from 'react-select';
 import debounce from 'lodash.debounce';
-import { getImageUrl, getShortAnimeRating, isEmpty } from '@/utils';
-import { InfoRow, InfoValue, SearchIcon, Score, Status, Loading } from '@/components';
-import { SpecialStatus } from '@/variables';
-import './Search.scss';
-import { Link } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useAbortableDispatch, useFetchStatus } from '@/hooks';
+import { SearchIcon, Loading } from '@/components';
+import { isEmpty } from '@/utils';
 import {
   fetchSearchAnime,
   fetchSearchCharacter,
   fetchSearchManga,
-  resetState,
+  resetSearchState,
   SearchTypeMap,
+  setSearchValue,
 } from '@/store/search/searchSlice';
-import { useAbortableDispatch, useFetchStatus } from '@/hooks';
-import { useInView } from 'react-intersection-observer';
-
-const searchTypeOptions = [
-  { value: 'anime', label: 'Anime' },
-  { value: 'manga', label: 'Manga' },
-  { value: 'character', label: 'Character' },
-] as const;
+import { SearchAnimeItem, SearchCharacterItem, SearchMangaItem } from './Items';
+import { commonMessages, searchTypeOptions } from '@/variables';
+import './Search.scss';
 
 type SearchTypeOption = (typeof searchTypeOptions)[number];
 
-const Search: React.FC<{ setIsSearchOpen: React.Dispatch<React.SetStateAction<boolean>> }> = ({
-  setIsSearchOpen,
-}) => {
+const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
-  const search = useAppSelector((state) => state.search);
-  const { isLoading, isSuccess } = useFetchStatus(search.status);
+  const { items, pagination, status, type, value } = useAppSelector((state) => state.search);
+  const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const [inputValue, setInputValue] = React.useState('');
   const [selectedType, setSelectedType] = React.useState<SearchTypeOption>(searchTypeOptions[0]);
 
   const modalRef = React.useRef<HTMLDivElement>(null);
   const modalInnerRef = React.useRef<HTMLDivElement>(null);
-  const [portalTarget, setPortalTarget] = React.useState<HTMLElement | null>(null);
 
   const { ref, inView } = useInView({
     root: modalRef.current,
     threshold: 0,
-    rootMargin: '0px 0px 150px 0px',
+    rootMargin: '0px 0px 200px 0px',
   });
 
-  React.useEffect(() => {
-    if (inView && search.pagination?.has_next_page) {
-      updateSearchValue(
-        {
-          q: inputValue,
-          page: search.pagination && search.pagination.current_page + 1,
-        },
-        selectedType.value,
-        true,
-      );
-    }
-  }, [inView]);
-
-  const updateSearchValue = React.useCallback(
-    debounce((params, type: keyof SearchTypeMap, isMore = false) => {
+  const fetchItems = React.useCallback(
+    debounce((type: keyof SearchTypeMap, params) => {
       switch (type) {
         case 'anime':
           abortableDispatch(fetchSearchAnime, params);
@@ -76,38 +55,55 @@ const Search: React.FC<{ setIsSearchOpen: React.Dispatch<React.SetStateAction<bo
     [selectedType],
   );
 
+  // Закрытие модального окна
   React.useEffect(() => {
-    if (modalInnerRef.current) setPortalTarget(modalInnerRef.current);
-
     const closeModal = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target === modalInnerRef.current || target.closest('.search-item'))
-        setIsSearchOpen(false);
+      if (target === modalInnerRef.current || target.closest('.search-item')) onSearchClose();
     };
 
     document.addEventListener('click', closeModal);
     return () => {
+      dispatch(resetSearchState());
       document.removeEventListener('click', closeModal);
     };
   }, []);
 
+  // Подгружаем ещё партию айтемов если доскролили вниз (если они есть)
   React.useEffect(() => {
+    if (inView && pagination?.has_next_page) {
+      dispatch(setSearchValue(inputValue));
+      fetchItems(selectedType.value, {
+        q: inputValue,
+        page: pagination && pagination.current_page + 1,
+      });
+    }
+  }, [inView]);
+
+  // Получение данных или очистка state при пустом значении
+  React.useEffect(() => {
+    onSearchDataChange();
+  }, [selectedType, inputValue]);
+
+  const onSearchDataChange = () => {
     if (isEmpty(inputValue)) {
-      updateSearchValue.cancel();
+      fetchItems.cancel();
       abortableDispatch.abort();
-      dispatch(resetState());
+      dispatch(resetSearchState());
       return;
     }
-    updateSearchValue({ q: inputValue }, selectedType.value);
-  }, [selectedType, inputValue]);
+    if (selectedType.value !== type) abortableDispatch.abort();
+    fetchItems(selectedType.value, { q: inputValue });
+  };
 
   return (
     <div className="search-modal" ref={modalRef}>
       <div className="search-modal__inner" ref={modalInnerRef}>
-        <div className="search-modal__body">
+        <button className="search-modal__close" onClick={onSearchClose}></button>
+        <div className="search-modal__body ">
           <div className="search-modal__top">
             <Select
-              className="search-modal__select select"
+              className="search-modal__select select fz-16"
               classNamePrefix="select"
               placeholder="Select type..."
               defaultValue={searchTypeOptions[0]}
@@ -116,179 +112,63 @@ const Search: React.FC<{ setIsSearchOpen: React.Dispatch<React.SetStateAction<bo
               onChange={(selected) => {
                 if (selected) setSelectedType(selected);
               }}
-              menuPortalTarget={portalTarget}
               isSearchable={false}
               unstyled
             />
             <label className="search-modal__field">
               <SearchIcon />
               <input
-                className="search-modal__input"
+                className="search-modal__input fz-16"
                 type="text"
                 placeholder="Search..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && isError) onSearchDataChange();
+                }}
               />
+              {inputValue && (
+                <button
+                  className="search-modal__close-btn"
+                  onClick={() => setInputValue('')}></button>
+              )}
             </label>
           </div>
           <div className="search-modal__content">
-            {
-              // isLoading ? (
-              //   <div className="search-modal__message">
-              //     <Loading />
-              //   </div>
-              // ) :
-              isSuccess ? (
-                search.items.length === 0 ? (
-                  <div className="search-modal__message">No results found</div>
-                ) : (
-                  <div className="search-modal__items">
-                    {search.type === 'anime' &&
-                      search.items.map((item, index, items) => (
-                        <Link
-                          to={`anime/${item.mal_id}`}
-                          key={item.mal_id}
-                          className="search-modal__item search-item">
-                          <div className="search-item__image bg">
-                            <img src={getImageUrl(item.images)} alt="Poster" aria-hidden />
-                          </div>
-                          <div className="search-item__content">
-                            <div className="search-item__labels">
-                              <Score
-                                className="search-item__label search-item__label--score"
-                                score={item.score}
-                              />
-                              <Status
-                                className="search-item__label search-item__label--status"
-                                status={item.status}
-                              />
-                            </div>
-                            <div className="search-item__top">
-                              <div className="search-item__title title">{item.title}</div>
-                            </div>
-                            <div className="search-item__info">
-                              <InfoRow name="Type">
-                                <InfoValue>
-                                  {item.type ? item.type : SpecialStatus.Unknown}
-                                </InfoValue>
-                                {item.rating && (
-                                  <InfoValue isLinkPrimary>
-                                    {getShortAnimeRating(item.rating)}
-                                  </InfoValue>
-                                )}
-                                {item.aired.prop.from.year && item.aired.prop.from.year}
-                              </InfoRow>
-                              {item.episodes && (
-                                <InfoRow name="Episodes">
-                                  <InfoValue>
-                                    {item.episodes}
-                                    {item.duration && item.duration !== SpecialStatus.Unknown && (
-                                      <>
-                                        &nbsp;&nbsp; {/* 2 spaces */}
-                                        <span>( {item.duration} )</span>
-                                      </>
-                                    )}
-                                  </InfoValue>
-                                </InfoRow>
-                              )}
-                              {item.genres.length > 0 && (
-                                <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
-                                  {item.genres.map((genre) => (
-                                    <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>
-                                  ))}
-                                </InfoRow>
-                              )}
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
+            {isIdle ? (
+              <div className="search-modal__message fz-16">
+                Enter a search term to find {selectedType.value}.
+              </div>
+            ) : isError ? (
+              <div className="search-modal__message fz-16">{commonMessages.error}</div>
+            ) : isSuccess && items.length === 0 ? (
+              <div className="search-modal__message fz-16">No results found.</div>
+            ) : isLoading && inputValue !== value ? (
+              <div className="search-modal__message fz-16">
+                <Loading />
+              </div>
+            ) : (
+              <>
+                <div className="search-modal__items">
+                  {type === 'anime' &&
+                    items.map((item) => <SearchAnimeItem key={item.mal_id} item={item} />)}
 
-                    {search.type === 'manga' &&
-                      search.items.map((item) => (
-                        <Link
-                          to={`manga/${item.mal_id}`}
-                          key={item.mal_id}
-                          className="search-modal__item search-item">
-                          <div className="search-item__image bg">
-                            <img src={getImageUrl(item.images)} alt="Poster" aria-hidden />
-                          </div>
-                          <div className="search-item__content">
-                            <div className="search-item__labels">
-                              <Score
-                                className="search-item__label search-item__label--score"
-                                score={item.score}
-                              />
-                              <Status
-                                className="search-item__label search-item__label--status"
-                                status={item.status}
-                              />
-                            </div>
-                            <div className="search-item__top">
-                              <div className="search-item__title title">{item.title}</div>
-                            </div>
-                            <div className="search-item__info">
-                              <InfoRow name="Type">
-                                <InfoValue>
-                                  {item.type ? item.type : SpecialStatus.Unknown}
-                                </InfoValue>
-                                {item.published.prop.from.year && item.published.prop.from.year}
-                              </InfoRow>
-                              {item.chapters && (
-                                <InfoRow name="Chapters">
-                                  <InfoValue>{item.chapters}</InfoValue>
-                                </InfoRow>
-                              )}
-                              {item.genres.length > 0 && (
-                                <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
-                                  {item.genres.map((genre) => (
-                                    <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>
-                                  ))}
-                                </InfoRow>
-                              )}
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
+                  {type === 'manga' &&
+                    items.map((item) => <SearchMangaItem key={item.mal_id} item={item} />)}
 
-                    {search.type === 'character' &&
-                      search.items.map((item) => (
-                        <Link
-                          to={`character/${item.mal_id}`}
-                          key={item.mal_id}
-                          className="search-modal__item search-item">
-                          <div className="search-item__image bg">
-                            <img src={getImageUrl(item.images)} alt="Poster" aria-hidden />
-                          </div>
-                          <div className="search-item__content">
-                            <div className="search-item__top">
-                              <div className="search-item__title title">{item.name}</div>
-                              <div className="search-item__title">{item.name_kanji}</div>
-                            </div>
-                          </div>
-                        </Link>
-                      ))}
-                    <div ref={ref} style={{ height: 1 }} />
+                  {type === 'character' &&
+                    items.map((item) => <SearchCharacterItem key={item.mal_id} item={item} />)}
+
+                  <div ref={ref} style={{ height: 1 }} />
+                </div>
+                {isLoading && (
+                  <div className="search-modal__message">
+                    <Loading />
                   </div>
-                )
-              ) : (
-                <div className="search-modal__message">{`Enter a search term to find ${selectedType.value}.`}</div>
-              )
-            }
+                )}
+              </>
+            )}
           </div>
-          <button
-            className="btn"
-            onClick={() =>
-              updateSearchValue(
-                {
-                  q: inputValue,
-                  page: search.pagination && search.pagination.current_page + 1,
-                },
-                selectedType.value,
-                true,
-              )
-            }>
-            Show more
-          </button>
         </div>
       </div>
     </div>

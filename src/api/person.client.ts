@@ -1,7 +1,6 @@
 import { getResource } from './api.client';
 import { PersonEndpoints } from './endpoints/person.endpoints';
-import { PersonFull, JikanImages, Person } from '@/models';
-import { PersonSearchParams } from '@/models/Params/person-params.model';
+import { PersonFull, JikanImages, Person, PersonSearchParams } from '@/models';
 
 export const getPersonFullById = (id: number, signal?: AbortSignal) => {
   return getResource<PersonFull>({
