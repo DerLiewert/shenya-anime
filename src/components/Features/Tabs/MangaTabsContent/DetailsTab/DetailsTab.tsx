@@ -2,14 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useShowMoreMap } from '@/hooks';
 import { formattedScore, splitText } from '@/utils';
-import {
-  SpecialStatus,
-  mangaEmptyValueMessages,
-  mangaPaths,
-  mangaTypeOptions,
-  personPaths,
-  producerPaths,
-} from '@/variables';
+import { appPaths, mangaTypeOptions } from '@/resources';
+import { mangaEmptyValueMessages, specialStatus } from '@/constants';
 import { AnimeStatus, MangaFull } from '@/models';
 import {
   AnimeTooltip,
@@ -53,7 +47,7 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
                 className="anime-details__info-label anime-details__info-label--status"
               />
               <p className="anime-details__info-label">
-                Ranked {item.rank ? '# ' + item.rank : SpecialStatus.NotAvailable}
+                Ranked {item.rank ? '# ' + item.rank : specialStatus.notAvailable}
               </p>
             </div>
           </div>
@@ -62,7 +56,7 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
               <InfoRow name={'Type'}>
                 <InfoValue
                   isLink
-                  to={mangaPaths.catalogWithParams({
+                  to={appPaths.mangaWithParams({
                     type: mangaTypeOptions.find((obj) => obj.label === item.type)?.value,
                   })}>
                   {item.type}
@@ -70,10 +64,10 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
               </InfoRow>
             )}
             <InfoRow name="Chapters">
-              <InfoValue>{item.chapters ? item.chapters : SpecialStatus.QuestionMark}</InfoValue>
+              <InfoValue>{item.chapters ? item.chapters : specialStatus.mark}</InfoValue>
             </InfoRow>
             <InfoRow name="Volumes">
-              <InfoValue>{item.volumes ? item.volumes : SpecialStatus.QuestionMark}</InfoValue>
+              <InfoValue>{item.volumes ? item.volumes : specialStatus.mark}</InfoValue>
             </InfoRow>
             <InfoRow name="Published">
               <InfoValue>
@@ -96,24 +90,20 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
             <InfoRow name={item.authors.length > 1 ? 'Authors' : 'Author'}>
               {item.authors.length > 0 ? (
                 item.authors.map((author) => (
-                  <InfoValue key={author.mal_id} isLink to={personPaths.full(author.mal_id)}>
+                  <InfoValue key={author.mal_id} isLink to={appPaths.personFull(author.mal_id)}>
                     {author.name}
                   </InfoValue>
                 ))
               ) : (
-                <InfoValue>{SpecialStatus.Unknown}</InfoValue>
+                <InfoValue>{specialStatus.unknown}</InfoValue>
               )}
             </InfoRow>
 
             <InfoRow name={item.serializations.length > 1 ? 'Serializations' : 'Serialization'}>
               {item.serializations.length > 0 ? (
-                item.serializations.map((obj) => (
-                  <InfoValue key={obj.mal_id} isLink to={producerPaths.full(obj.mal_id)}>
-                    {obj.name}
-                  </InfoValue>
-                ))
+                item.serializations.map((obj) => <InfoValue key={obj.mal_id}>{obj.name}</InfoValue>)
               ) : (
-                <InfoValue>{SpecialStatus.Unknown}</InfoValue>
+                <InfoValue>{specialStatus.unknown}</InfoValue>
               )}
             </InfoRow>
 
@@ -123,7 +113,7 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
                   <InfoValue
                     key={demographic.mal_id}
                     isLink
-                    to={mangaPaths.catalogWithParams({ genres: demographic.mal_id.toString() })}>
+                    to={appPaths.mangaWithParams({ genres: demographic.mal_id.toString() })}>
                     {demographic.name}
                   </InfoValue>
                 ))}
@@ -133,19 +123,25 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
             <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
               {item.genres.length > 0 ? (
                 item.genres.map((genre) => (
-                  <InfoValue key={genre.mal_id} isLink to={mangaPaths.catalogWithParams({ genres: genre.mal_id.toString() })}>
+                  <InfoValue
+                    key={genre.mal_id}
+                    isLink
+                    to={appPaths.mangaWithParams({ genres: genre.mal_id.toString() })}>
                     {genre.name}
                   </InfoValue>
                 ))
               ) : (
-                <InfoValue>{SpecialStatus.Unknown}</InfoValue>
+                <InfoValue>{specialStatus.unknown}</InfoValue>
               )}
             </InfoRow>
 
             {item.themes.length > 0 && (
               <InfoRow name={item.themes.length > 1 ? 'Themes' : 'Theme'}>
                 {item.themes.map((theme) => (
-                  <InfoValue key={theme.mal_id} isLink to={mangaPaths.catalogWithParams({ genres: theme.mal_id.toString() })}>
+                  <InfoValue
+                    key={theme.mal_id}
+                    isLink
+                    to={appPaths.mangaWithParams({ genres: theme.mal_id.toString() })}>
                     {theme.name}
                   </InfoValue>
                 ))}
@@ -191,7 +187,7 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
                       <AnimeTooltip key={item.mal_id} id={item.mal_id}>
                         <Link
                           className="anime-details__related-item related-item border fz-16"
-                          to={`/anime/${item.mal_id}`}>
+                          to={appPaths.animeFull(item.mal_id)}>
                           <p className="related-item__name visible-line visible-line--1">
                             {item.name}
                           </p>
@@ -205,7 +201,7 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
                     <Link
                       key={item.mal_id}
                       className="anime-details__related-item related-item border fz-16"
-                      to={`/manga/${item.mal_id}`}
+                      to={appPaths.mangaFull(item.mal_id)}
                       title={item.name}>
                       <p className="related-item__name visible-line visible-line--1">{item.name}</p>
                       <p className="related-item__type fz-14">{item.type}</p>

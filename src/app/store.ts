@@ -1,48 +1,68 @@
 import { configureStore } from '@reduxjs/toolkit';
-import introAnimeSlice from '../store/anime/introAnimeSlice';
-import randomAnimeSlice from '../store/anime/randomAnimeSlice';
-import seasonalAnimeSlice from '../store/anime/seasonalAnimeSlice';
-import todaySchedulesAnimeSlice from '../store/anime/todaySchedulesAnimeSlice';
-import animeFullByIdSlice from '@/store/anime/animeFullByIdSlice';
-import animeCatalogSlice from '@/store/anime/animeCatalogSlice';
-import animeGenresSlice from '@/store/genres/animeGenresSlice';
-import mangaFullByIdSlice from '@/store/manga/mangaFullByIdSlice';
-import characterFullByIdSlice from '@/store/character/characterFullByIdSlice';
-import personFullByIdSlice from '@/store/person/personFullByIdSlice';
-import mangaCatalogSlice from '@/store/manga/mangaCatalogSlice';
-import mangaGenresSlice from '@/store/genres/mangaGenresSlice';
-import schedulesAnimeSlice from '@/store/anime/schedulesAnimeSlice';
-import seasonsListSlice from '@/store/season/seasonListSlice';
-import seasonsAnimeSlice from '@/store/season/seasonsAnimeSlice';
-import mangaTopSlice from '@/store/manga/mangaTopSlice';
-import searchSlice from '@/store/search/searchSlice';
+import {
+  animeCatalogReducer,
+  animeFullByIdReducer,
+  animeGenresReducer,
+  bookmarkReducer,
+  characterFullByIdReducer,
+  introAnimeReducer,
+  mangaCatalogReducer,
+  mangaFullByIdReducer,
+  mangaGenresReducer,
+  mangaTopReducer,
+  personFullByIdReducer,
+  producerFullByIdReducer,
+  randomAnimeReducer,
+  schedulesAnimeReducer,
+  searchReducer,
+  seasonalAnimeReducer,
+  seasonListReducer,
+  seasonsAnimeReducer,
+  settingsReducer,
+  todaySchedulesAnimeReducer,
+} from '@/store';
 
 export const store = configureStore({
   reducer: {
-    introAnime: introAnimeSlice,
-    todaySchedulesAnime: todaySchedulesAnimeSlice,
-    seasonalAnime: seasonalAnimeSlice,
-    randomAnime: randomAnimeSlice,
-    animeFullById: animeFullByIdSlice,
-    animeCatalog: animeCatalogSlice,
-    animeGenres: animeGenresSlice,
+    introAnime: introAnimeReducer,
+    todaySchedulesAnime: todaySchedulesAnimeReducer,
+    seasonalAnime: seasonalAnimeReducer,
+    randomAnime: randomAnimeReducer,
+    animeFullById: animeFullByIdReducer,
+    animeCatalog: animeCatalogReducer,
+    animeGenres: animeGenresReducer,
 
-    schedulesAnime: schedulesAnimeSlice,
-    seasonsList: seasonsListSlice,
-    seasonsAnime: seasonsAnimeSlice,
+    schedulesAnime: schedulesAnimeReducer,
+    seasonsList: seasonListReducer,
+    seasonsAnime: seasonsAnimeReducer,
 
-    mangaTop: mangaTopSlice,
-    mangaFullById: mangaFullByIdSlice,
-    mangaCatalog: mangaCatalogSlice,
-    mangaGenres: mangaGenresSlice,
+    mangaTop: mangaTopReducer,
+    mangaFullById: mangaFullByIdReducer,
+    mangaCatalog: mangaCatalogReducer,
+    mangaGenres: mangaGenresReducer,
 
-    characterFullById: characterFullByIdSlice,
-    personFullById: personFullByIdSlice,
-    
-    search: searchSlice,
+    characterFullById: characterFullByIdReducer,
+    personFullById: personFullByIdReducer,
+    producerFullById: producerFullByIdReducer,
+
+    bookmark: bookmarkReducer,
+    search: searchReducer,
+
+    settings: settingsReducer,
   },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
-
 export type AppDispatch = typeof store.dispatch;
+
+//======================= Save to localStorage ==============================//
+let previousBookmark = store.getState().bookmark;
+
+store.subscribe(() => {
+  const currentBookmark = store.getState().bookmark;
+
+  if (currentBookmark !== previousBookmark) {
+    previousBookmark = currentBookmark;
+    localStorage.setItem('bookmark', JSON.stringify(currentBookmark));
+  }
+});

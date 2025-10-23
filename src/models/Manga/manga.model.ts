@@ -64,10 +64,3 @@ export const mangaStatus = [
   'Not yet published',
 ] as const;
 export type MangaStatus = (typeof mangaStatus)[number];
-
-// export type MangaStatus =
-// 	| 'Publishing'
-// 	| 'Complete'
-// 	| 'On Hiatus'
-// 	| 'Discontinued'
-// 	| 'Upcoming'

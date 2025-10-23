@@ -1,10 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { InfoRow, InfoValue } from '../InfoRowWithValue';
-import { Anime } from '@/models';
+import { InfoRow, InfoValue } from '@/components';
 import { getImageUrl, valueOrDefault } from '@/utils';
-import './BroadcastItem.scss';
+import { specialStatus } from '@/constants';
+import { appPaths } from '@/resources';
+import { Anime } from '@/models';
 import clsx from 'clsx';
+import './BroadcastItem.scss';
 
 interface BroadcastItemProps {
   item: Anime;
@@ -14,9 +16,9 @@ interface BroadcastItemProps {
 const BroadcastItem: React.FC<BroadcastItemProps> = ({ item, className }) => {
   return (
     <Link
-      to={`/anime/${item.mal_id}`}
+      to={appPaths.animeFull(item.mal_id)}
       key={item.mal_id}
-      className={clsx('broadcast-item border-opacity', className)}>
+      className={clsx(className, 'broadcast-item border-opacity')}>
       <div className="broadcast-item__inner _title-parent">
         <div className="broadcast-item__image bg">
           <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" />
@@ -27,25 +29,29 @@ const BroadcastItem: React.FC<BroadcastItemProps> = ({ item, className }) => {
           </h4>
           <ul className="broadcast-item__list">
             <InfoRow name="Episodes" className="broadcast-item__list-item fz-13">
-              <InfoValue>{valueOrDefault(item.episodes)}</InfoValue>
+              <InfoValue>{valueOrDefault(item.episodes, specialStatus.mark)}</InfoValue>
             </InfoRow>
+
             <InfoRow name="Type" className="broadcast-item__list-item fz-13">
-              <InfoValue>{item.type}</InfoValue>
+              <InfoValue>{valueOrDefault(item.type)}</InfoValue>
             </InfoRow>
+
             <InfoRow name="Genres" className="broadcast-item__list-item fz-13">
-              {item.genres.map((genre, index, arr) => (
-                <InfoValue key={genre.mal_id}>
-                  {genre.name}
-                  {index < arr.length - 1 && ','}
-                </InfoValue>
-              ))}
+              {item.genres.length > 0
+                ? item.genres.map((genre, index, arr) => (
+                    <InfoValue key={genre.mal_id}>
+                      {genre.name}
+                      {index < arr.length - 1 && ','}
+                    </InfoValue>
+                  ))
+                : specialStatus.unknown}
             </InfoRow>
 
             <InfoRow name="Broadcast" className="broadcast-item__list-item fz-13 _broadcast">
               <InfoValue>
                 {item.broadcast.time
                   ? `${item.broadcast.time}, ${item.broadcast.timezone}`
-                  : 'Unknown'}
+                  : specialStatus.unknown}
               </InfoValue>
             </InfoRow>
           </ul>

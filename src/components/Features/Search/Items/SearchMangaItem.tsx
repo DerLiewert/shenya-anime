@@ -1,15 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { InfoRow, InfoValue, Score, Status } from '@/components';
+import { specialStatus } from '@/constants';
+import { getImageUrl, valueOrDefault } from '@/utils';
+import { appPaths } from '@/resources';
 import { Manga } from '@/models';
-import { getImageUrl } from '@/utils';
-import { SpecialStatus } from '@/variables';
+import './SearchItem.scss';
 
 const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
   return (
-    <Link to={`manga/${item.mal_id}`} className="search-modal__item search-item">
+    <Link to={appPaths.mangaFull(item.mal_id)} className="search-modal__item search-item">
       <div className="search-item__image bg">
-        <img src={getImageUrl(item.images)} alt="Poster" aria-hidden />
+        <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" aria-hidden />
       </div>
       <div className="search-item__content">
         <div className="search-item__labels">
@@ -21,21 +23,23 @@ const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
         </div>
         <div className="search-item__info">
           <InfoRow name="Type">
-            <InfoValue>{item.type ? item.type : SpecialStatus.Unknown}</InfoValue>
-            {item.published.prop.from.year && item.published.prop.from.year}
+            <InfoValue>{valueOrDefault(item.type)}</InfoValue>
+            {item.published.prop.from.year && (
+              <InfoValue>{item.published.prop.from.year}</InfoValue>
+            )}
           </InfoRow>
-          {item.chapters && (
-            <InfoRow name="Chapters">
-              <InfoValue>{item.chapters}</InfoValue>
-            </InfoRow>
-          )}
-          {item.genres.length > 0 && (
-            <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
-              {item.genres.map((genre) => (
-                <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>
-              ))}
-            </InfoRow>
-          )}
+
+          <InfoRow name="Chapters">
+            <InfoValue>{valueOrDefault(item.chapters, specialStatus.mark)}</InfoValue>
+          </InfoRow>
+
+          <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
+            {item.genres.length > 0 ? (
+              item.genres.map((genre) => <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>)
+            ) : (
+              <InfoValue>{specialStatus.unknown}</InfoValue>
+            )}
+          </InfoRow>
         </div>
       </div>
     </Link>

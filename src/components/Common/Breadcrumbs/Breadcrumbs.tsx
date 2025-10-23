@@ -1,8 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import { FreeMode, Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css/free-mode';
+
+import clsx from 'clsx';
 import './Breadcrumbs.scss';
 
 interface BreadcrumbsProps {
@@ -19,14 +22,12 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
   items,
   isCurrentLast = true,
 }) => {
-  const containerRef = React.useRef<HTMLUListElement>(null);
-
+  if (items.length === 0) return null;
   return (
     <Swiper
-      ref={containerRef}
       wrapperTag="ul"
       wrapperClass="breadcrumbs__wrapper"
-      className={`${className} breadcrumbs`}
+      className={clsx(className, 'breadcrumbs')}
       modules={[FreeMode, Scrollbar]}
       slidesPerView="auto"
       freeMode={true}
@@ -34,17 +35,11 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
       scrollbar={{
         draggable: true,
         className: '_draggable',
-        // hide: true,
       }}>
       {items.map((item, index, arr) => (
-        <SwiperSlide tag="li" className="breadcrumbs__item" key={item.label}>
+        <SwiperSlide className="breadcrumbs__item" tag="li" key={item.label}>
           {isCurrentLast && index === arr.length - 1 ? (
-            <p
-              className={`breadcrumbs__text ${
-                index === arr.length - 1 ? 'breadcrumbs__text--current' : ''
-              }`}>
-              {item.label}
-            </p>
+            <p className="breadcrumbs__text breadcrumbs__text--current">{item.label}</p>
           ) : (
             <Link to={item.url} className="breadcrumbs__text">
               {item.label}
@@ -55,5 +50,3 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
     </Swiper>
   );
 };
-
-export default Breadcrumbs;

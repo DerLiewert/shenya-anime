@@ -13,13 +13,11 @@ import App from './App';
 import { SkeletonTheme } from 'react-loading-skeleton';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-window.addEventListener('error', (e) => {
-  console.error('GLOBAL ERROR', e.error);
-});
+
 root.render(
   // <React.StrictMode>
   // <Router basename="/shenya-anime/">
-  <Router basename="/shenya-anime/">
+  <Router>
     <Provider store={store}>
       <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
         <App />

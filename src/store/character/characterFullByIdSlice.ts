@@ -1,4 +1,4 @@
-import { getCharacterFullById, getCharacterPictures } from '@/api/character.client';
+import { getCharacterFullById, getCharacterPictures } from '@/api/client/character.client';
 import { CharacterFull, JikanImages } from '@/models';
 import { FetchStatus } from '@/typescript';
 import { createCharacterThunkWithId, createHandle } from '@/utils';

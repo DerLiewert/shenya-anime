@@ -1,7 +1,4 @@
-import {
-  createAsyncThunk,
-  createSlice,
-} from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import {
   CommonCharacter,
   JikanImages,
@@ -18,7 +15,7 @@ import {
   getMangaPictures,
   getMangaRecommendations,
   getMangaStatistics,
-} from '@/api/manga.client';
+} from '@/api/client/manga.client';
 import { createHandle, createMangaThunkWithId, toDataWithExtendedBasicPagination } from '@/utils';
 
 type DataKeys = Exclude<keyof MangaFullState, 'status'>;

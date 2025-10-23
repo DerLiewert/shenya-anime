@@ -1,5 +1,5 @@
 import React from 'react';
-import { fetchFullAnimeById } from '@/store/anime/animeFullByIdSlice';
+import { fetchFullAnimeById } from '@/store';
 import { AnimeFull, JikanNamedResource } from '@/models';
 import {
   AnimeCharacterTab,
@@ -13,9 +13,9 @@ import {
   EntityPageLayout,
   ReturnBack,
 } from '@/components';
-import { animePaths, animeTypeOptions } from '@/variables';
-import './AnimePage.scss';
+import { appPaths, animeTypeOptions } from '@/resources';
 import { toFirstUppercase } from '@/utils';
+import './AnimePage.scss';
 
 const AnimePage = () => {
   return (
@@ -23,7 +23,7 @@ const AnimePage = () => {
       fetchAction={fetchFullAnimeById}
       selector={(state) => state.animeFullById.item}
       status={(state) => state.animeFullById.status.item}
-      getBasePath={(id) => animePaths.full(id)}
+      getBasePath={(id) => appPaths.animeFull(id)}
       render={(item) => ({
         title: item && item.title,
         subtitles: item
@@ -31,18 +31,19 @@ const AnimePage = () => {
           : [],
         resources: item && <AnimeResources item={item} />,
         trailer: item && item.trailer,
+        bookmark: 'anime',
         breadcrumbs: item
           ? [
-              { label: 'Anime', url: animePaths.catalog },
+              { label: 'Anime', url: appPaths.anime },
               ...(item.season && item.year
                 ? [
                     {
                       label: toFirstUppercase(item.season),
-                      url: animePaths.seasonalWithParams({ year: item.year, season: item.season }),
+                      url: appPaths.seasonalWithParams({ year: item.year, season: item.season }),
                     },
                     {
                       label: item.year,
-                      url: animePaths.seasonalWithParams({ year: item.year, season: item.season }),
+                      url: appPaths.seasonalWithParams({ year: item.year, season: item.season }),
                     },
                   ]
                 : []),
@@ -50,7 +51,7 @@ const AnimePage = () => {
                 ? [
                     {
                       label: item.type,
-                      url: animePaths.catalogWithParams({
+                      url: appPaths.animeWithParams({
                         type: animeTypeOptions.find((obj) => obj.label === item.type)?.value,
                       }),
                     },
@@ -137,7 +138,7 @@ const AnimeResources: React.FC<{ item: AnimeFull }> = ({ item }) => {
       <ul className="anime-leftside__list leftside-list">
         {resources.length > 0 ? (
           resources.map((resource) => (
-            <li key={resource.url} className="leftside-list__item">
+            <li key={resource.url} className="leftside-list__item leftside-list__item--icon">
               <a
                 href={resource.url}
                 className="leftside-list__link"
@@ -148,7 +149,7 @@ const AnimeResources: React.FC<{ item: AnimeFull }> = ({ item }) => {
             </li>
           ))
         ) : (
-          <li className="leftside-list__empry">{emptyMessage}</li>
+          <li className="leftside-list__empty">{emptyMessage}</li>
         )}
       </ul>
     </div>

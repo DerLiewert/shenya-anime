@@ -1,6 +1,6 @@
 import React from 'react';
 import { FreeMode, Scrollbar } from 'swiper/modules';
-import { Swiper, SwiperProps, SwiperSlide } from 'swiper/react';
+import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as ISwiper } from 'swiper';
 import clsx from 'clsx';
 import './TabList.scss';
@@ -11,6 +11,7 @@ interface TabListProps {
   activeTab: string;
   className?: string;
   onTabTrigger: (value: string) => void;
+  gap?: number;
 }
 
 const updateSwiper = (wrapper: HTMLElement, swiper: ISwiper, left: number) => {
@@ -27,7 +28,7 @@ const updateSwiper = (wrapper: HTMLElement, swiper: ISwiper, left: number) => {
   swiper.emit('slideChangeTransitionStart');
 };
 
-const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, className }) => {
+const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, className, gap = 0 }) => {
   const tabRefs = React.useRef<Array<HTMLDivElement | null>>([]);
   const swiperRef = React.useRef<ISwiper | null>(null);
 
@@ -92,11 +93,14 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
 
   return (
     <Swiper
-      className={clsx('tab-list', className)}
+      className={clsx('swiper-tab-list', className)}
       role="tablist"
       aria-orientation="horizontal"
       modules={[FreeMode, Scrollbar]}
+      spaceBetween={gap}
       slidesPerView="auto"
+      observeParents={true}
+      observeSlideChildren={true}
       scrollbar={{ draggable: true }}
       onSwiper={(swiper: ISwiper) => {
         swiperRef.current = swiper;
@@ -105,14 +109,12 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
       {tabs.map((tab, index) => (
         <SwiperSlide
           key={tab.value}
-          className={clsx('tab-list__trigger-wrapper', {
-            'tab-list__trigger-wrapper--active': activeTab === tab.value,
-          })}>
+          className='swiper-tab-list__trigger-wrapper'>
           <div
             ref={(el) => {
               tabRefs.current[index] = el;
             }}
-            className="tab-list__trigger"
+            className="swiper-tab-list__trigger"
             role="tab"
             tabIndex={activeTab === tab.value ? 0 : -1}
             aria-selected={activeTab === tab.value}

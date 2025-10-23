@@ -11,13 +11,15 @@ export function useAppNavigate<T>(
   return (paramsObject: Record<string, any>, options?: { replace?: boolean }) => {
     // const validated = parseSearchParams(searchParamsToString(defaultParams ? {...defaultParams, ...paramsObject} : paramsObject));
 
+    const validated = parseSearchParams(searchParamsToString(paramsObject));
+
     if (defaultParams) {
-      for (const param in defaultParams as any) {
-        if (paramsObject[param] === defaultParams[param]) delete paramsObject[param];
+      for (const param in defaultParams) {
+        if ((validated as any)[param] === defaultParams[param]) delete (validated as any)[param];
       }
     }
 
-    const validated = parseSearchParams(searchParamsToString(paramsObject));
+    // const validated = parseSearchParams(searchParamsToString(paramsObject));
     const nextSearch = searchParamsToString(validated);
     const currentSearch = location.search.startsWith('?')
       ? location.search.slice(1)

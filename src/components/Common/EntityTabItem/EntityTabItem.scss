@@ -11,11 +11,13 @@
     position: relative;
     overflow: hidden;
     margin-right: 5px;
+
     img {
       position: absolute;
       top: 0;
       left: 0;
     }
+
     @include media-max($mobile) {
       width: 66px;
       min-height: 90px;
@@ -30,9 +32,11 @@
   &__title {
     font-size: 15px;
     line-height: 1.4;
+
     @include media-max($mobile) {
       font-size: 14px;
     }
+    
     &:not(:last-child) {
       margin-bottom: 3px;
     }
@@ -43,6 +47,7 @@
     font-size: 14px;
     line-height: math.div(16, 12);
     color: rgba(var(--main-color-rgb), 0.7);
+    
     @include media-max($mobile) {
       font-size: 12px;
     }

@@ -1,9 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { getImageUrl } from '@/utils';
-
 import type { JikanImages } from '@/models';
-
 import './EntityTabItem.scss';
 
 type TextWithPrefix = {
@@ -26,44 +24,34 @@ const EntityTabItem: React.FC<EntityTabItemProps> = ({
   bottomText,
   linkUrl,
 }) => {
+  const renderEntityText = (items: Array<string | TextWithPrefix>) => {
+    return items.map((item, index) => (
+      <p key={index}>
+        {typeof item === 'string' ? (
+          item
+        ) : (
+          <>
+            {item.prefix}: <span>{item.text}</span>
+          </>
+        )}
+      </p>
+    ));
+  };
+
   const renderItemContent = () => (
     <>
       <div className="entity-item__image bg bg--dark">
-        <img src={getImageUrl(images)} alt="*" loading="lazy" aria-hidden />
+        <img src={getImageUrl(images)} alt="Poster" loading="lazy" aria-hidden />
       </div>
       <div className="entity-item__content">
         <h3 className="entity-item__title title visible-line">{title}</h3>
 
-        {subtitles && subtitles?.length > 0 && (
-          <div className="entity-item__subtitle">
-            {subtitles.map((item, index) => (
-              <p key={index}>
-                {typeof item === 'string' ? (
-                  item
-                ) : (
-                  <>
-                    {item.prefix}: <span>{item.text}</span>
-                  </>
-                )}
-              </p>
-            ))}
-          </div>
+        {subtitles && subtitles.length > 0 && (
+          <div className="entity-item__subtitle">{renderEntityText(subtitles)}</div>
         )}
 
-        {bottomText && bottomText?.length > 0 && (
-          <div className="entity-item__bottom-text">
-            {bottomText.map((item, index) => (
-              <p key={index}>
-                {typeof item === 'string' ? (
-                  item
-                ) : (
-                  <>
-                    {item.prefix}: <span>{item.text}</span>
-                  </>
-                )}
-              </p>
-            ))}
-          </div>
+        {bottomText && bottomText.length > 0 && (
+          <div className="entity-item__bottom-text">{renderEntityText(bottomText)}</div>
         )}
       </div>
     </>
@@ -75,6 +63,7 @@ const EntityTabItem: React.FC<EntityTabItemProps> = ({
         {renderItemContent()}
       </Link>
     );
+
   return <div className="entity-item border">{renderItemContent()}</div>;
 };
 

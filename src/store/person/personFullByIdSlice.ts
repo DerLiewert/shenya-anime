@@ -1,4 +1,4 @@
-import { getPersonFullById, getPersonPictures } from '@/api/person.client';
+import { getPersonFullById, getPersonPictures } from '@/api/client/person.client';
 import { JikanImages, PersonFull } from '@/models';
 import { FetchStatus } from '@/typescript';
 import { createHandle, createPersonThunkWithId } from '@/utils';

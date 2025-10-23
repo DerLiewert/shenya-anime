@@ -1,0 +1,25 @@
+.score {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 5px;
+  background-color: var(--primary-color);
+  padding: 4px 5px 4px 2px;
+}
+.score::before {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: url("/assets/star.svg") center/contain no-repeat;
+  margin-right: 3px;
+}
+.score--shadow {
+  -webkit-box-shadow: 0px 0px 4px 2px var(--shadow-color);
+          box-shadow: 0px 0px 4px 2px var(--shadow-color);
+}

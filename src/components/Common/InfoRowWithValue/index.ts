@@ -1,1 +1,2 @@
-export * from './InfoRowWithValue';
+export * from './InfoRow';
+export * from './InfoValue';

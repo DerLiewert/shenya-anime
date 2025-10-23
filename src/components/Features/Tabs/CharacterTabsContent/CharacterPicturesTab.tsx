@@ -1,7 +1,7 @@
 import React from 'react';
-import { PicturesTab } from '../CommonTabsContent/PicturesTab';
-import { characterEmptyValueMessages } from '@/variables';
-import { fetchCharacterPictures } from '@/store/character/characterFullByIdSlice';
+import { PicturesTab } from '@/components';
+import { characterEmptyValueMessages } from '@/constants';
+import { fetchCharacterPictures } from '@/store';
 
 const CharacterPicturesTab: React.FC = () => {
   return (

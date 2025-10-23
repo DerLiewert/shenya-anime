@@ -6,12 +6,12 @@ import {
   PersonPicturesTab,
   PersonVoicesTab,
   PersonAboutTab,
+  EntityPageLayout,
 } from '@/components';
-import { fetchPersonFullById } from '@/store/person/personFullByIdSlice';
-import EntityPageLayout from '@/components/Layout/EntityPageLayout/EntityPageLayout';
 import { PersonFull } from '@/models';
+import { appPaths } from '@/resources';
+import { fetchPersonFullById } from '@/store';
 import './PersonPage.scss';
-import { personPaths } from '@/variables';
 
 const PersonPage = () => {
   return (
@@ -19,7 +19,7 @@ const PersonPage = () => {
       fetchAction={fetchPersonFullById}
       selector={(state) => state.personFullById.item}
       status={(state) => state.personFullById.status.item}
-      getBasePath={(id) => personPaths.full(id)}
+      getBasePath={(id) => appPaths.personFull(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.name,
@@ -91,7 +91,7 @@ const AdditionalInfo: React.FC<{ item: PersonFull }> = ({ item }) => {
               </li>
             ))
           ) : (
-            <li className="leftside-list__empry">Not other names</li>
+            <li className="leftside-list__empty">Not other names</li>
           )}
         </ul>
       </div>

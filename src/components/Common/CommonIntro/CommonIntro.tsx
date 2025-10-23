@@ -4,7 +4,7 @@ import './CommonIntro.scss';
 type CommonIntroProps = {
   title: string;
   subtitle?: React.ReactNode;
-  bgPrefix?: 'anime' | 'manga' | 'schedules';
+  bgPrefix?: 'anime' | 'manga' | 'schedules' | 'bookmark';
 };
 
 const CommonIntro: React.FC<CommonIntroProps> = ({ title, subtitle, bgPrefix }) => {

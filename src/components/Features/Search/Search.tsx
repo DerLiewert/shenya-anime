@@ -3,31 +3,35 @@ import Select from 'react-select';
 import debounce from 'lodash.debounce';
 import { useInView } from 'react-intersection-observer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useAbortableDispatch, useFetchStatus } from '@/hooks';
+import { useAbortableDispatch, useFetchStatus, useShowMore } from '@/hooks';
 import { SearchIcon, Loading } from '@/components';
-import { isEmpty } from '@/utils';
+import { getUniqueItems, isEmpty } from '@/utils';
 import {
   fetchSearchAnime,
   fetchSearchCharacter,
   fetchSearchManga,
   resetSearchState,
-  SearchTypeMap,
-  setSearchValue,
-} from '@/store/search/searchSlice';
+  SearchMap,
+} from '@/store';
 import { SearchAnimeItem, SearchCharacterItem, SearchMangaItem } from './Items';
-import { commonMessages, searchTypeOptions } from '@/variables';
+import { searchTypeOptions } from '@/resources';
+import { commonMessages } from '@/constants';
 import './Search.scss';
 
-type SearchTypeOption = (typeof searchTypeOptions)[number];
-
 const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
+  const isFirstRender = React.useRef(true);
+
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const { items, pagination, status, type, value } = useAppSelector((state) => state.search);
   const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status);
 
-  const [inputValue, setInputValue] = React.useState('');
-  const [selectedType, setSelectedType] = React.useState<SearchTypeOption>(searchTypeOptions[0]);
+  const { visibleCount, showMore } = useShowMore(25);
+
+  const [inputValue, setInputValue] = React.useState(value);
+  const [selectedType, setSelectedType] = React.useState(
+    searchTypeOptions.find((obj) => obj.value === type) || searchTypeOptions[0],
+  );
 
   const modalRef = React.useRef<HTMLDivElement>(null);
   const modalInnerRef = React.useRef<HTMLDivElement>(null);
@@ -39,7 +43,7 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
   });
 
   const fetchItems = React.useCallback(
-    debounce((type: keyof SearchTypeMap, params) => {
+    debounce((type: keyof SearchMap, params) => {
       switch (type) {
         case 'anime':
           abortableDispatch(fetchSearchAnime, params);
@@ -64,15 +68,16 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
 
     document.addEventListener('click', closeModal);
     return () => {
-      dispatch(resetSearchState());
       document.removeEventListener('click', closeModal);
     };
   }, []);
 
   // Подгружаем ещё партию айтемов если доскролили вниз (если они есть)
   React.useEffect(() => {
-    if (inView && pagination?.has_next_page) {
-      dispatch(setSearchValue(inputValue));
+    if (!inView) return;
+
+    showMore();
+    if (pagination?.has_next_page) {
       fetchItems(selectedType.value, {
         q: inputValue,
         page: pagination && pagination.current_page + 1,
@@ -82,7 +87,11 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
 
   // Получение данных или очистка state при пустом значении
   React.useEffect(() => {
-    onSearchDataChange();
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+    } else {
+      onSearchDataChange();
+    }
   }, [selectedType, inputValue]);
 
   const onSearchDataChange = () => {
@@ -93,6 +102,7 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
       return;
     }
     if (selectedType.value !== type) abortableDispatch.abort();
+    // if (value === inputValue && selectedType.value === type) return;
     fetchItems(selectedType.value, { q: inputValue });
   };
 
@@ -142,7 +152,7 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
             ) : isError ? (
               <div className="search-modal__message fz-16">{commonMessages.error}</div>
             ) : isSuccess && items.length === 0 ? (
-              <div className="search-modal__message fz-16">No results found.</div>
+              <div className="search-modal__message fz-16">No search results found.</div>
             ) : isLoading && inputValue !== value ? (
               <div className="search-modal__message fz-16">
                 <Loading />
@@ -151,13 +161,19 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
               <>
                 <div className="search-modal__items">
                   {type === 'anime' &&
-                    items.map((item) => <SearchAnimeItem key={item.mal_id} item={item} />)}
+                    getUniqueItems(items)
+                      .slice(0, visibleCount)
+                      .map((item) => <SearchAnimeItem key={item.mal_id} item={item} />)}
 
                   {type === 'manga' &&
-                    items.map((item) => <SearchMangaItem key={item.mal_id} item={item} />)}
+                    getUniqueItems(items)
+                      .slice(0, visibleCount)
+                      .map((item) => <SearchMangaItem key={item.mal_id} item={item} />)}
 
                   {type === 'character' &&
-                    items.map((item) => <SearchCharacterItem key={item.mal_id} item={item} />)}
+                    getUniqueItems(items)
+                      .slice(0, visibleCount)
+                      .map((item) => <SearchCharacterItem key={item.mal_id} item={item} />)}
 
                   <div ref={ref} style={{ height: 1 }} />
                 </div>

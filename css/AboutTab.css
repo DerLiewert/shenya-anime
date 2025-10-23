@@ -1,0 +1,16 @@
+.about-tab__row {
+  font-size: 16px;
+}
+.about-tab__row:not(:last-child):not(:last-child) {
+  margin-bottom: 10px;
+}
+.about-tab__text {
+  min-height: 2px;
+  line-height: 1.5;
+}
+.about-tab__text + .about-tab__text {
+  margin-top: 3px;
+}
+.about-tab__text a {
+  text-decoration: underline;
+}

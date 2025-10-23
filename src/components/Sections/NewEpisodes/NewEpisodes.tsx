@@ -1,19 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
+import { fetchTodaySchedulesAnime } from '@/store';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
-import { fetchTodaySchedulesAnime } from '@/store/anime/todaySchedulesAnimeSlice';
 import { ArrowIcon, BroadcastItem, EmptyValueMessage, SectionHeader } from '@/components';
-import { animeEmptyValueMessages, commonMessages, commonPaths } from '@/variables';
+import { animeEmptyValueMessages, commonMessages } from '@/constants';
 import { getUniqueItems } from '@/utils';
+import { appPaths } from '@/resources';
 import './NewEpisodes.scss';
 
 const NewEpisodes: React.FC = () => {
   const abortableDispatch = useAbortableDispatch();
   const { items, status } = useAppSelector((state) => state.todaySchedulesAnime);
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
-  const uniqueItems = getUniqueItems(items);
+  const uniqueItems = React.useMemo(() => getUniqueItems(items), [items]);
 
   React.useEffect(() => {
     if (items.length === 0) abortableDispatch(fetchTodaySchedulesAnime);
@@ -25,7 +26,7 @@ const NewEpisodes: React.FC = () => {
         <SectionHeader
           className="new-episodes__section-header"
           title="New Episodes"
-          link={{ url: commonPaths.broadcast, text: 'View release calendar' }}
+          link={{ url: appPaths.broadcast, text: 'View release calendar' }}
         />
         <h3 className="new-episodes__sub-title title title--fz-24 title--main-color">Today</h3>
         <div className="new-episodes__body">
@@ -37,7 +38,7 @@ const NewEpisodes: React.FC = () => {
               />
             ))
           ) : isSuccess ? (
-            uniqueItems.splice(0, 6).map((item) => <BroadcastItem item={item} key={item.mal_id} />)
+            uniqueItems.slice(0, 6).map((item) => <BroadcastItem item={item} key={item.mal_id} />)
           ) : (
             <EmptyValueMessage
               message={isError ? commonMessages.error : animeEmptyValueMessages.newEpisodes}
@@ -52,7 +53,7 @@ const NewEpisodes: React.FC = () => {
           uniqueItems.length > 6 && (
             <div className="new-episodes__btn-wrapper">
               <Link
-                to={commonPaths.broadcast}
+                to={appPaths.broadcast}
                 className="new-episodes__btn btn btn--icon btn--upper btn--stroke show-more-btn">
                 View more
                 <ArrowIcon />

@@ -1,6 +1,6 @@
-import { AnimeRating } from '../models';
-import { SpecialStatus } from '../variables';
+import { specialStatus } from '@/constants';
+import type { AnimeRating } from '@/models';
 
 export const getShortAnimeRating = (rating: AnimeRating | null): string => {
-  return rating ? rating.split(' - ')[0] : SpecialStatus.NotAvailable;
+  return rating ? rating.split(' - ')[0] : specialStatus.notAvailable;
 };

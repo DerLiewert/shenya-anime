@@ -1,16 +1,18 @@
 import React from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { Header, Footer, Broadcast, Seasonal, Search } from './components';
+import { Header, Footer,  Search } from './components';
 import {
   FullAnimePage,
   FullMangaPage,
   HomePage,
   CharacterPage,
-  NotFoundPage,
+  NotFound,
   PersonPage,
   AnimeCatalogPage,
   MangaCatalogPage,
   Schedules,
+  ProducerPage,
+  Bookmark,
 } from './pages';
 
 // Ленивый импорт
@@ -40,11 +42,13 @@ function App() {
 
           <Route path="/character/:id/*" element={<CharacterPage />} />
           <Route path="/people/:id/*" element={<PersonPage />} />
-          <Route path="/producer/:id/*" element={<>Producer </>} />
+          <Route path="/producer/:id/*" element={<ProducerPage/>} />
 
           <Route path="/schedules/*" element={<Schedules />} />
 
-          <Route path="/*" element={<NotFoundPage />} />
+          <Route path="/bookmark/*" element={<Bookmark />} />
+
+          <Route path="/*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />

@@ -12,5 +12,5 @@ export interface Producer {
 }
 
 export interface ProducerFull extends Producer {
-  external: JikanNamedResource;
+  external: JikanNamedResource[];
 }

@@ -1,8 +1,9 @@
 import React from 'react';
-import { fetchAnimeCharacters } from '@/store/anime/animeFullByIdSlice';
 import { AnimeCharacter } from '@/models';
-import { animeEmptyValueMessages, SpecialStatus } from '@/variables';
 import { EntityTabItem, EntityTab } from '@/components';
+import { animeEmptyValueMessages, specialStatus } from '@/constants';
+import { fetchAnimeCharacters } from '@/store';
+import { appPaths } from '@/resources';
 
 const AnimeCharacterTab: React.FC = () => {
   return (
@@ -15,7 +16,7 @@ const AnimeCharacterTab: React.FC = () => {
         return (
           <EntityTabItem
             key={item.character.mal_id}
-            linkUrl={`/character/${item.character.mal_id}`}
+            linkUrl={appPaths.characterFull(item.character.mal_id)}
             images={item.character.images}
             title={item.character.name}
             subtitles={[{ prefix: 'Role', text: item.role }]}
@@ -24,7 +25,7 @@ const AnimeCharacterTab: React.FC = () => {
                 prefix: 'V/A',
                 text: item.voice_actors[0]
                   ? item.voice_actors[0]?.person.name
-                  : SpecialStatus.Unknown,
+                  : specialStatus.unknown,
               },
             ]}
           />

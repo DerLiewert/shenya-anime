@@ -1,6 +1,7 @@
-import { LongArrowIcon } from '@/components/Icons';
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { LongArrowIcon } from '@/components';
+import clsx from 'clsx';
 import './SectionHeader.scss';
 
 export interface SectionHeaderProps {
@@ -12,9 +13,9 @@ export interface SectionHeaderProps {
   className?: string;
 }
 
-const SectionHeader: React.FC<SectionHeaderProps> = ({ className = '', title, link }) => {
+const SectionHeader: React.FC<SectionHeaderProps> = ({ title, link, className }) => {
   return (
-    <div className={`${className} section-header`}>
+    <div className={clsx(className, 'section-header')}>
       <h2 className="section-header__title title title--fz-36 title--main-color">{title}</h2>
       {link && (
         <Link to={link.url} className="section-header__link">

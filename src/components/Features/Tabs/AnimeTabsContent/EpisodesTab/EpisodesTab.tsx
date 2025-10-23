@@ -4,9 +4,9 @@ import { useAbortableDispatch, useShowMore, useFetchStatus } from '@/hooks';
 import { fetchAnimeEpisodes } from '@/store/anime/animeFullByIdSlice';
 import { AnimeEpisode } from '@/models';
 import { formattedScore } from '@/utils';
-import { SpecialStatus, animeEmptyValueMessages, commonMessages } from '@/variables';
 import { EmptyValueMessage, Loading, StarIcon } from '@/components';
 import './EpisodesTab.scss';
+import { animeEmptyValueMessages, commonMessages, specialStatus } from '@/constants';
 
 const EpisodesTab: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -92,7 +92,7 @@ const EpisodeItem: React.FC<{ episode: AnimeEpisode }> = ({ episode }) => {
       </div>
       <div className="episode-item__bottom">
         <div className="episode-item__date">
-          {episode.aired ? episode.aired.split('T')[0] : SpecialStatus.Unknown}
+          {episode.aired ? episode.aired.split('T')[0] : specialStatus.unknown}
         </div>
         <div className="episode-item__score">
           <StarIcon />

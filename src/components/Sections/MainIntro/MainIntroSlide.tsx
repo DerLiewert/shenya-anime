@@ -1,21 +1,20 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { formattedScore, getImageUrl, getShortAnimeRating } from '@/utils';
-import { ArrowIcon, BookmarkIcon, StarIcon } from '@/components';
 import { useYoutubeTrailerImage } from '@/hooks';
+import { ArrowIcon, StarIcon, BookmarkButton } from '@/components';
+import { formattedScore, getImageUrl, getShortAnimeRating } from '@/utils';
+import { appPaths, animeRatingOptions } from '@/resources';
 import { Anime } from '@/models';
-
 import clsx from 'clsx';
 import './MainIntro.scss';
-import { animePaths, animeRatingOptions } from '@/variables';
 
 interface MainIntroSlide {
   item: Anime;
   shouldRenderImage?: boolean;
 }
 
-const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = true }) => {
+export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = true }) => {
   const { src, onLoad, isFallback, isLoading } = useYoutubeTrailerImage(item.trailer.images);
 
   return (
@@ -36,9 +35,10 @@ const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = tr
         </div>
         <div className="main-slide__content">
           <h2 className="main-slide__title title title--fz-48">
-            <Link to={`/anime/${item.mal_id}`}>{item.title}</Link>
+            <Link to={appPaths.animeFull(item.mal_id)}>{item.title}</Link>
           </h2>
           <div className="main-slide__text fz-20 visible-line visible-line--3">{item.synopsis}</div>
+          
           <div className="main-slide__info">
             <div className="main-slide__score-wrapper">
               <div className="main-slide__score">
@@ -49,11 +49,12 @@ const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = tr
                 <div className="main-slide__score-users">{item.scored_by} ratings</div>
               )}
             </div>
+
             <div className="main-slide__details">
               <Link
                 className="main-slide__link main-slide__link--rating"
                 title={item.rating + (item.rating ? '' : ' rating')}
-                to={animePaths.catalogWithParams({
+                to={appPaths.animeWithParams({
                   rating: animeRatingOptions.find((obj) => obj.label === item.rating)?.value,
                 })}>
                 {getShortAnimeRating(item.rating)}
@@ -62,7 +63,7 @@ const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = tr
                 <Link
                   key={genre.mal_id}
                   className="main-slide__link"
-                  to={animePaths.catalogWithParams({
+                  to={appPaths.animeWithParams({
                     genres: genre.mal_id.toString(),
                   })}>
                   {genre.name}
@@ -70,17 +71,22 @@ const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = tr
               ))}
             </div>
           </div>
+          
           <div className="main-slide__actions">
             <Link
-              to={`/anime/${item.mal_id}`}
+              to={appPaths.animeFull(item.mal_id)}
               className="main-slide__btn main-slide__btn--details btn btn--icon btn--stroke">
               Show details
               <ArrowIcon />
             </Link>
-            <button className="main-slide__btn main-slide__btn--bookmark btn btn--icon btn--stroke btn--transparent">
-              <BookmarkIcon />
-              <span>Bookmark</span>
-            </button>
+
+            <BookmarkButton
+              item={item}
+              type='anime'
+              className="main-slide__btn main-slide__btn--bookmark btn btn--icon btn--stroke"
+              bookmarkedClassName="btn--white btn--fill"
+              noBookmarkedClassName="btn--transparent"
+            />
           </div>
         </div>
       </div>
@@ -88,7 +94,6 @@ const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = tr
   );
 };
 
-export default MainIntroSlide;
 
 export const MainIntroSkeleton = () => {
   return (

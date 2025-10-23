@@ -3,12 +3,11 @@ import Skeleton from 'react-loading-skeleton';
 import { AsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
-import { Anime, Manga } from '@/models';
-import { FetchStatus } from '@/typescript';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
-import { getUniqueItems } from '@/utils';
 import { EmptyValueMessage, SectionHeader, SectionHeaderProps } from '@/components';
-import { animeEmptyValueMessages, commonMessages, mangaEmptyValueMessages } from '@/variables';
+import { animeEmptyValueMessages, commonMessages, mangaEmptyValueMessages } from '@/constants';
+import { getUniqueItems } from '@/utils';
+import { AnimeAndMangaOf, AnimeAndMangaType, FetchStatus } from '@/typescript';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
@@ -18,16 +17,19 @@ import arrowIcon from '@/assets/arrow.svg';
 import clsx from 'clsx';
 import './MediaBlock.scss';
 
-interface MediaBlockProps<T extends Anime | Manga> {
-  type: T extends Anime ? 'anime' : 'manga';
+interface MediaBlockProps<
+  T extends AnimeAndMangaType,
+  Item extends AnimeAndMangaOf<T> = AnimeAndMangaOf<T>,
+> {
+  type: T;
   header: SectionHeaderProps;
   subtitle?: string;
-  selector: (state: RootState) => { items: T[]; status: FetchStatus | null };
-  renderCard: (item: T) => React.ReactNode;
-  fetchAction?: AsyncThunk<T[], any, any>;
+  selector: (state: RootState) => { items: Item[]; status: FetchStatus | null };
+  renderCard: (item: Item) => React.ReactNode;
+  fetchAction?: AsyncThunk<Item[], any, any>;
 }
 
-function MediaBlock<T extends Anime | Manga>({
+function MediaBlock<T extends AnimeAndMangaType>({
   type,
   header,
   subtitle,
@@ -82,11 +84,17 @@ function MediaBlock<T extends Anime | Manga>({
                       {renderCard(item)}
                     </SwiperSlide>
                   ))}
-              <button type="button" className="chapter__button chapter__button--prev">
-                <img src={arrowIcon} alt="Prev slides" />
+              <button
+                type="button"
+                className="chapter__button chapter__button--prev"
+                aria-label="Prev slides">
+                <img src={arrowIcon} alt="Prev slides" aria-hidden />
               </button>
-              <button type="button" className="chapter__button chapter__button--next">
-                <img src={arrowIcon} alt="Next slides" />
+              <button
+                type="button"
+                className="chapter__button chapter__button--next"
+                aria-label="Next slides">
+                <img src={arrowIcon} alt="Next slides" aria-hidden />
               </button>
             </Swiper>
           ) : (
@@ -94,9 +102,7 @@ function MediaBlock<T extends Anime | Manga>({
               message={
                 isError
                   ? commonMessages.error
-                  : type === 'anime'
-                  ? animeEmptyValueMessages.items
-                  : mangaEmptyValueMessages.items
+                  : (type === 'anime' ? animeEmptyValueMessages : mangaEmptyValueMessages).items
               }
             />
           )}

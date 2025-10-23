@@ -1,7 +1,7 @@
-export const SpecialStatus = {
+export const specialStatus = {
   unknown: 'Unknown',
   notAvailable: 'N/A',
   mark: '?',
 } as const;
 
-export type SpecialStatusType = (typeof SpecialStatus)[keyof typeof SpecialStatus];
+export type SpecialStatusType = (typeof specialStatus)[keyof typeof specialStatus];

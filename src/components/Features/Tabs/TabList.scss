@@ -1,8 +1,8 @@
-.tab-list {
+.swiper-tab-list {
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 0;
+  // margin: 0;
   padding: 3px;
   border-bottom: 2px solid var(--bg-color);
 
@@ -20,8 +20,6 @@
   }
 
   &__trigger-wrapper {
-    &--active {
-    }
   }
 
   &__trigger {
@@ -50,23 +48,4 @@
       }
     }
   }
-
-  &__body {
-    flex: 1 1 auto;
-    padding: 20px 15px;
-    border-radius: 10px;
-    background-color: var(--bg-color-light);
-    @include media-max($mobile) {
-      padding: 15px 10px;
-    }
-  }
-
-  &__content {
-  }
-
-  &__back-link {
-    margin-bottom: 15px;
-  }
 }
-
-

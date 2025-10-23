@@ -1,7 +1,6 @@
-import { fetchAnimeRecommendations } from '@/store/anime/animeFullByIdSlice';
 import { AnimeRecommendationCard, RecommendationsTab } from '@/components';
-import { animeEmptyValueMessages } from '@/variables';
-import './RecommendationsTab.scss';
+import { animeEmptyValueMessages } from '@/constants';
+import { fetchAnimeRecommendations } from '@/store';
 
 const AnimeRecommendationsTab = () => {
   return (

@@ -1,4 +1,4 @@
-import { JikanSearchParams, SearchOrder } from './search-params.model';
+import { JikanSearchParams, searchOrder } from './search-params.model';
 
 export interface AnimeSearchParams extends JikanSearchParams {
   type?: AnimeSearchType;
@@ -8,7 +8,8 @@ export interface AnimeSearchParams extends JikanSearchParams {
   producers?: string;
 }
 
-export type AnimeSearchOrder = 'episodes' | SearchOrder;
+export const animeSearchOrder = ['episodes', ...searchOrder] as const;
+export type AnimeSearchOrder = (typeof animeSearchOrder)[number];
 
 export const animeSearchType = [
   'tv',

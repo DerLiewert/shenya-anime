@@ -4,7 +4,6 @@ import { useAbortableDispatch, useShowMore, useFetchStatus } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
 import { JikanImages } from '@/models';
 import { getImageUrl } from '@/utils';
-import { commonMessages } from '@/variables';
 
 import type { RootState } from '@/app/store';
 import type { AsyncThunk } from '@reduxjs/toolkit';
@@ -17,6 +16,7 @@ import 'lightgallery/scss/lg-thumbnail.scss';
 import 'lightgallery/scss/lg-zoom.scss';
 
 import './PicturesTab.scss';
+import { commonMessages } from '@/constants';
 
 interface ImagesTabProps {
   visibleCount?: number;

@@ -1,4 +1,4 @@
-import { getMonthName } from '../../utils/getMonthName';
+import { getMonthName } from '@/utils';
 
 interface FormatDateProps {
   date: {

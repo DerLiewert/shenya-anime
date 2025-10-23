@@ -1,7 +1,8 @@
 import React from 'react';
 import { PersonManga } from '@/models';
-import { personEmptyValueMessages } from '@/variables';
 import { EntityTabItem, EntityTab } from '@/components';
+import { personEmptyValueMessages } from '@/constants';
+import { appPaths } from '@/resources';
 
 const PersonMangaTab: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const PersonMangaTab: React.FC = () => {
         return (
           <EntityTabItem
             key={item.manga.mal_id}
-            linkUrl={`/manga/${item.manga.mal_id}`}
+            linkUrl={appPaths.mangaFull(item.manga.mal_id)}
             images={item.manga.images}
             title={item.manga.title}
             subtitles={[{ prefix: 'Position', text: item.position }]}

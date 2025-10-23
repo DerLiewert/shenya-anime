@@ -2,16 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '@/app/hooks';
 import { useMatchMedia, useShowMoreMap } from '@/hooks';
-import { buildAnimeCatalogUrl, formattedScore, getShortAnimeRating, splitText } from '@/utils';
-import {
-  SpecialStatus,
-  animeEmptyValueMessages,
-  MEDIA_QUERY,
-  animeRatingOptions,
-  animeTypeOptions,
-  animePaths,
-  producerPaths,
-} from '@/variables';
+import { formattedScore, getShortAnimeRating, splitText } from '@/utils';
+import { appPaths, animeRatingOptions, animeTypeOptions } from '@/resources';
+import { animeEmptyValueMessages, breakpoints, specialStatus } from '@/constants';
 import {
   AnimeTooltip,
   InfoRow,
@@ -27,12 +20,11 @@ import {
   ScoreStats,
 } from '@/components';
 import './DetailsTab.scss';
-import { animeRating } from '@/models';
 
 const DetailsTab: React.FC = () => {
   const item = useAppSelector((state) => state.animeFullById.item);
   const { visibleCounts, initShowMore, showMore } = useShowMoreMap(6);
-  const isNotMobile = useMatchMedia('min', MEDIA_QUERY.mobile);
+  const isNotMobile = useMatchMedia('min', breakpoints.mobile);
 
   React.useEffect(() => {
     if (item && item.relations) {
@@ -59,7 +51,7 @@ const DetailsTab: React.FC = () => {
                 className="anime-details__info-label anime-details__info-label--status"
               />
               <p className="anime-details__info-label">
-                Ranked {item.rank ? '# ' + item.rank : SpecialStatus.NotAvailable}
+                Ranked {item.rank ? '# ' + item.rank : specialStatus.notAvailable}
               </p>
             </div>
           </div>
@@ -68,7 +60,7 @@ const DetailsTab: React.FC = () => {
               {item.type && (
                 <InfoValue
                   isLink
-                  to={animePaths.catalogWithParams({
+                  to={appPaths.animeWithParams({
                     type: animeTypeOptions.find((obj) => obj.label === item.type)?.value,
                   })}>
                   {item.type}
@@ -79,22 +71,22 @@ const DetailsTab: React.FC = () => {
               {item.rating ? (
                 <InfoValue
                   isLink
-                  to={animePaths.catalogWithParams({
+                  to={appPaths.animeWithParams({
                     rating: animeRatingOptions.find((obj) => obj.label === item.rating)?.value,
                   })}
-                  isLinkPrimary
+                  isPrimaryColor
                   title={item.rating}>
                   {getShortAnimeRating(item.rating)}
                 </InfoValue>
               ) : (
-                <InfoValue>{SpecialStatus.Unknown}</InfoValue>
+                <InfoValue>{specialStatus.unknown}</InfoValue>
               )}
             </InfoRow>
             <InfoRow name="Episodes">
-              <InfoValue>{item.episodes ? item.episodes : SpecialStatus.QuestionMark}</InfoValue>
+              <InfoValue>{item.episodes ? item.episodes : specialStatus.mark}</InfoValue>
             </InfoRow>
             <InfoRow name="Episode duration">
-              <InfoValue>{item.duration ? item.duration : SpecialStatus.Unknown}</InfoValue>
+              <InfoValue>{item.duration ? item.duration : specialStatus.unknown}</InfoValue>
             </InfoRow>
             <InfoRow name="Aired">
               <InfoValue>
@@ -118,7 +110,7 @@ const DetailsTab: React.FC = () => {
               <InfoRow name="Season">
                 <InfoValue
                   isLink
-                  to={animePaths.seasonalWithParams({ year: item.year, season: item.season })}
+                  to={appPaths.seasonalWithParams({ year: item.year, season: item.season })}
                   className="_capitalize">
                   {item.season} {item.year}
                 </InfoValue>
@@ -128,12 +120,12 @@ const DetailsTab: React.FC = () => {
             <InfoRow name={item.studios.length > 1 ? 'Studios' : 'Studio'}>
               {item.studios.length > 0 ? (
                 item.studios.map((studio) => (
-                  <InfoValue key={studio.mal_id} isLink to={producerPaths.full(studio.mal_id)}>
+                  <InfoValue key={studio.mal_id} isLink to={appPaths.producerFull(studio.mal_id)}>
                     {studio.name}
                   </InfoValue>
                 ))
               ) : (
-                <InfoValue>{SpecialStatus.Unknown}</InfoValue>
+                <InfoValue>{specialStatus.unknown}</InfoValue>
               )}
             </InfoRow>
 
@@ -143,7 +135,7 @@ const DetailsTab: React.FC = () => {
                   <InfoValue
                     key={demographic.mal_id}
                     isLink
-                    to={animePaths.catalogWithParams({ genres: demographic.mal_id.toString() })}>
+                    to={appPaths.animeWithParams({ genres: demographic.mal_id.toString() })}>
                     {demographic.name}
                   </InfoValue>
                 ))}
@@ -156,12 +148,12 @@ const DetailsTab: React.FC = () => {
                   <InfoValue
                     key={genre.mal_id}
                     isLink
-                    to={animePaths.catalogWithParams({ genres: genre.mal_id.toString() })}>
+                    to={appPaths.animeWithParams({ genres: genre.mal_id.toString() })}>
                     {genre.name}
                   </InfoValue>
                 ))
               ) : (
-                <InfoValue>{SpecialStatus.Unknown}</InfoValue>
+                <InfoValue>{specialStatus.unknown}</InfoValue>
               )}
             </InfoRow>
 
@@ -171,7 +163,7 @@ const DetailsTab: React.FC = () => {
                   <InfoValue
                     key={theme.mal_id}
                     isLink
-                    to={animePaths.catalogWithParams({ genres: theme.mal_id.toString() })}>
+                    to={appPaths.animeWithParams({ genres: theme.mal_id.toString() })}>
                     {theme.name}
                   </InfoValue>
                 ))}
@@ -234,7 +226,10 @@ const DetailsTab: React.FC = () => {
         {item.producers && item.producers.length > 0 ? (
           <div className="anime-details__producers-items">
             {item.producers.map((obj) => (
-              <Link key={obj.mal_id} className="anime-details__producers-item border fz-16" to={producerPaths.full(obj.mal_id)}>
+              <Link
+                key={obj.mal_id}
+                className="anime-details__producers-item border fz-16"
+                to={appPaths.producerFull(obj.mal_id)}>
                 {obj.name}
               </Link>
             ))}
@@ -258,7 +253,7 @@ const DetailsTab: React.FC = () => {
                       <AnimeTooltip key={item.mal_id} id={item.mal_id}>
                         <Link
                           className="anime-details__related-item related-item border fz-16"
-                          to={`/anime/${item.mal_id}`}>
+                          to={appPaths.animeFull(item.mal_id)}>
                           <p className="related-item__name visible-line visible-line--1">
                             {item.name}
                           </p>
@@ -272,7 +267,7 @@ const DetailsTab: React.FC = () => {
                     <MangaTooltip key={item.mal_id} id={item.mal_id}>
                       <Link
                         className="anime-details__related-item related-item border fz-16"
-                        to={`/manga/${item.mal_id}`}
+                        to={appPaths.mangaFull(item.mal_id)}
                         title={item.name}>
                         <p className="related-item__name visible-line visible-line--1">
                           {item.name}

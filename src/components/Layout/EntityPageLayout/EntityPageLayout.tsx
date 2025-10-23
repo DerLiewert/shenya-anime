@@ -8,25 +8,31 @@ import {
   useMatchMedia,
   useYoutubeTrailerImage,
 } from '@/hooks';
+import { NotFound } from '@/pages';
+import { BookmarkButton, Breadcrumbs, PlayCircleIcon, TabList } from '@/components';
 import { getImageUrl, renderTabRoutes, scrollToTop } from '@/utils';
-import { MEDIA_QUERY } from '@/variables';
-
-import NotFound from '@/pages/NotFound/NotFound';
-import { BookmarkIcon, Breadcrumbs, PlayCircleIcon, TabList } from '@/components';
+import { breakpoints } from '@/constants';
 
 import type { AsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '@/app/store';
 import type { FetchStatus, StatusSelector, TabRoute } from '@/typescript';
-import type { AnimeFull, AnimeYoutubeVideo, CharacterFull, MangaFull, PersonFull } from '@/models';
+import type {
+  AnimeFull,
+  AnimeYoutubeVideo,
+  CharacterFull,
+  MangaFull,
+  PersonFull,
+  ProducerFull,
+} from '@/models';
 
 import LightGallery from 'lightgallery/react';
 import lgVideo from 'lightgallery/plugins/video';
 import 'lightgallery/scss/lg-video.scss';
 
 import clsx from 'clsx';
-import './AnimePage.scss';
+import './EntityPageLayout.scss';
 
-type ItemTypes = AnimeFull | MangaFull | PersonFull | CharacterFull;
+type ItemTypes = AnimeFull | MangaFull | PersonFull | CharacterFull | ProducerFull;
 type NullableItemTypes<T> = T | null;
 
 interface EntityRenderResult {
@@ -34,6 +40,7 @@ interface EntityRenderResult {
   subtitles?: string[];
   resources?: React.ReactElement | null;
   trailer?: AnimeYoutubeVideo | null;
+  bookmark?: 'anime' | 'manga';
   breadcrumbs?: { label: string | number; url: string }[];
   tabs: TabRoute[];
 }
@@ -42,7 +49,7 @@ interface EntityPageLayoutProps<T extends ItemTypes> {
   // Redux-related
   fetchAction: AsyncThunk<T, any, any>;
   selector: (state: RootState) => NullableItemTypes<T>;
-  status: StatusSelector | FetchStatus | undefined;
+  status: StatusSelector | FetchStatus | undefined | null;
 
   // Base
   getBasePath: (id: number) => string;
@@ -76,8 +83,8 @@ const EntityPageLayout = <T extends ItemTypes>({
     renderItem.trailer ? renderItem.trailer.images : null,
   );
 
-  const isTablet = useMatchMedia('max', MEDIA_QUERY.tablet);
-  const isMobile = useMatchMedia('max', MEDIA_QUERY.mobile);
+  const isTablet = useMatchMedia('max', breakpoints.tablet);
+  const isMobile = useMatchMedia('max', breakpoints.mobile);
 
   const getTab = () => {
     if (renderItem.tabs.length === 0 || activeTabFromUrl === renderItem.tabs[0].value) return '';
@@ -143,7 +150,6 @@ const EntityPageLayout = <T extends ItemTypes>({
     },
     [basePath, item],
   );
-  // const matchedTab = renderItem.tabs.find((obj) => obj.value === activeTabFromUrl);
 
   const isValidPath = (pathParts: string[], tabs: TabRoute[]): boolean => {
     if (pathParts.length === 0) return true;
@@ -225,44 +231,26 @@ const EntityPageLayout = <T extends ItemTypes>({
           <div className="anime-about__inner">
             <div className="anime-about__left anime-leftside">
               {!isMobile && renderPoster()}
-              {item ? (
+              {(renderItem.trailer || renderItem.bookmark) && (
                 <div className="anime-leftside__buttons">
-                  {renderItem.trailer && (
-                    <LightGallery
-                      addClass="anime-video-trailer"
-                      licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
-                      plugins={[lgVideo]}
-                      download={false}
-                      controls={false}
-                      counter={false}
-                      youTubePlayerParams={{
-                        rel: 0,
-                        autoplay: 1,
-                        mute: 0,
-                      }}
-                      mobileSettings={{
-                        showCloseIcon: true,
-                        download: false,
-                        controls: false,
-                      }}>
-                      <button
-                        className="anime-leftside__btn btn btn--upper btn--icon btn--stroke"
-                        data-src={renderItem.trailer.url}>
-                        <PlayCircleIcon />
-                        watch trailer
-                      </button>
-                    </LightGallery>
-                  )}
-                  <button className="anime-leftside__btn btn btn--upper btn--icon btn--stroke btn--white">
-                    <BookmarkIcon />
-                    bookmark
-                  </button>
-                </div>
-              ) : (
-                <div className="anime-leftside__buttons">
-                  {Array.from({ length: 2 }).map((_, i) => (
-                    <Skeleton key={i} height="40px" className="border-radius" />
-                  ))}
+                  {renderItem.trailer &&
+                    (item ? (
+                      <TrailerButton trailer={renderItem.trailer} />
+                    ) : (
+                      <Skeleton height="40px" className="border-radius" />
+                    ))}
+
+                  {renderItem.bookmark &&
+                    (item ? (
+                      <BookmarkButton
+                        item={item as any}
+                        type={renderItem.bookmark}
+                        className="anime-leftside__btn btn btn--upper btn--icon btn--stroke btn--white"
+                        bookmarkedClassName="btn--fill"
+                      />
+                    ) : (
+                      <Skeleton height="40px" className="border-radius" />
+                    ))}
                 </div>
               )}
               {!isTablet && renderAnimeResources()}
@@ -314,3 +302,34 @@ const EntityPageLayout = <T extends ItemTypes>({
 };
 
 export default EntityPageLayout;
+
+//========================================================================================================================================================
+
+const TrailerButton: React.FC<{ trailer: AnimeYoutubeVideo }> = ({ trailer }) => {
+  return (
+    <LightGallery
+      addClass="anime-video-trailer"
+      licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
+      plugins={[lgVideo]}
+      download={false}
+      controls={false}
+      counter={false}
+      youTubePlayerParams={{
+        rel: 0,
+        autoplay: 1,
+        mute: 0,
+      }}
+      mobileSettings={{
+        showCloseIcon: true,
+        download: false,
+        controls: false,
+      }}>
+      <button
+        className="anime-leftside__btn btn btn--upper btn--icon btn--stroke"
+        data-src={trailer.url}>
+        <PlayCircleIcon />
+        watch trailer
+      </button>
+    </LightGallery>
+  );
+};

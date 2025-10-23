@@ -1,39 +1,38 @@
 import React from 'react';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
-import { fetchAnimeScoreStats } from '@/store/anime/animeFullByIdSlice';
-import { animeEmptyValueMessages, mangaEmptyValueMessages } from '@/variables/emptyValueMessages';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
-import { EmptyValueMessage, Loading } from '../../UI';
-import { fetchMangaScoreStats } from '@/store/manga/mangaFullByIdSlice';
+import { fetchMangaScoreStats, fetchAnimeScoreStats } from '@/store';
+import { animeEmptyValueMessages, mangaEmptyValueMessages } from '@/constants';
+import { EmptyValueMessage, Loading } from '@/components';
+import { AnimeAndMangaType } from '@/typescript';
 import './ScoreStats.scss';
 
-interface ScoreStatsProps {
-  type: 'anime' | 'manga';
-  isShowEmpryMessage?: boolean;
+interface ScoreStatsProps<T extends AnimeAndMangaType> {
+  type: T;
 }
 
-const ScoreStats: React.FC<ScoreStatsProps> = ({ type, isShowEmpryMessage = true }) => {
+const ScoreStats = <T extends AnimeAndMangaType>({ type }: ScoreStatsProps<T>) => {
   const isAnime = type === 'anime';
   const abortableDispatch = useAbortableDispatch();
   const { scoreStats, status } = useAppSelector((state) =>
     isAnime ? state.animeFullById : state.mangaFullById,
   );
-  const { isLoading, isSuccess } = useFetchStatus(status.scoreStats);
+  const { isLoading, isSuccess, isError, isIdle } = useFetchStatus(status.scoreStats);
 
   React.useEffect(() => {
-    if (scoreStats.length === 0 && !isSuccess)
-      abortableDispatch(isAnime ? fetchAnimeScoreStats : fetchMangaScoreStats);
+    if (!isSuccess) abortableDispatch(isAnime ? fetchAnimeScoreStats : fetchMangaScoreStats);
   }, []);
 
-  if (scoreStats.length === 0) {
-    return isLoading ? (
-      <Loading />
-    ) : isShowEmpryMessage ? (
+  if (isIdle) return null;
+  if (isLoading) return <Loading />;
+  if (isError) return <EmptyValueMessage message="Something went wrong" />;
+  if (isSuccess && scoreStats.length === 0) {
+    return (
       <EmptyValueMessage
         message={isAnime ? animeEmptyValueMessages.scoreStats : mangaEmptyValueMessages.scoreStats}
       />
-    ) : null;
+    );
   }
 
   const barHeight = 20;
@@ -80,4 +79,5 @@ const ScoreStats: React.FC<ScoreStatsProps> = ({ type, isShowEmpryMessage = true
     </ResponsiveContainer>
   );
 };
+
 export default ScoreStats;

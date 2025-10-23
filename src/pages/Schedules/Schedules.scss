@@ -4,18 +4,11 @@
 }
 .schedules-tabs {
   &__list {
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    width: 100%;
-    gap: 5px;
-    // margin-bottom: 25px;
     margin-bottom: 15px;
   }
-
   &__trigger {
     cursor: pointer;
-    flex: 1 1 48%;
+    flex: 1 1 auto;
     white-space: nowrap;
     padding: 5px 25px;
     border-radius: 7px;

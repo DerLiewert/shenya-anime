@@ -1,0 +1,28 @@
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--primary-color);
+  border-radius: 2px;
+  padding: 3px;
+
+  &._released {
+    background-color: var(--released-color);
+  }
+  &._ongoing {
+    background-color: var(--ongoing-color);
+  }
+  &._anons {
+    background-color: var(--anons-color);
+  }
+  &._unknown {
+    background-color: var(--anons-unknown);
+  }
+
+  &--shadow {
+    box-shadow: 0px 0px 5px 2px var(--shadow-color);
+  }
+}

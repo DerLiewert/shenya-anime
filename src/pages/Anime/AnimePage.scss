@@ -283,11 +283,11 @@
   }
 
   &__title {
-    font-weight: 500;
-    line-height: math.div(20, 16);
-    text-transform: capitalize;
-    padding-bottom: 1px;
-    border-bottom: 1px solid rgba(var(--main-color-rgb, 0.7));
+    // font-weight: 500;
+    // line-height: math.div(20, 16);
+    // text-transform: capitalize;
+    // padding-bottom: 1px;
+    // border-bottom: 1px solid rgba(var(--main-color-rgb, 0.7));
   }
 
   &__list {
@@ -298,15 +298,17 @@
   padding-top: 10px;
 
   &__item {
-    display: flex;
+    &--icon {
+      display: flex;
 
-    &::before {
-      content: '';
-      width: 15px;
-      height: 15px;
-      background: url('/assets/link.svg') center / contain no-repeat;
-      margin-right: 7px;
-      margin-top: 1px;
+      &--icon::before {
+        content: '';
+        width: 15px;
+        height: 15px;
+        background: url('/assets/link.svg') center / contain no-repeat;
+        margin-right: 7px;
+        margin-top: 1px;
+      }
     }
 
     & + & {

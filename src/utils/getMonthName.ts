@@ -1,8 +1,8 @@
+import { monthNames } from '@/constants';
 import { AnimeSeason, animeSeasons } from '@/models';
-import { MONTH_NAMES } from '../variables';
 
 export const getMonthName = (month: number): string => {
-  return MONTH_NAMES[month - 1];
+  return monthNames[month - 1];
 };
 
 export const getSeasonName = (): AnimeSeason => {

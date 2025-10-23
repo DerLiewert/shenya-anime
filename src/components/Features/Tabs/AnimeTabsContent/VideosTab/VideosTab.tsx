@@ -7,8 +7,6 @@ import {
   useFetchStatus,
 } from '@/hooks';
 import { SectionHeader, EmptyValueMessage, Loading, PlayCircleIcon } from '@/components';
-import { animeEmptyValueMessages, commonMessages } from '@/variables';
-import { fetchAnimeVideos } from '@/store/anime/animeFullByIdSlice';
 import { AnimeYoutubeVideo } from '@/models';
 
 import LightGallery from 'lightgallery/react';
@@ -17,6 +15,8 @@ import 'lightgallery/scss/lg-video.scss';
 
 import clsx from 'clsx';
 import './VideosTab.scss';
+import { fetchAnimeVideos } from '@/store';
+import { animeEmptyValueMessages, commonMessages } from '@/constants';
 
 const VideosTab: React.FC = () => {
   const abortableDispatch = useAbortableDispatch();

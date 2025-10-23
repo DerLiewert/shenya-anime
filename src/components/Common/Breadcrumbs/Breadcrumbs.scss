@@ -7,11 +7,13 @@
     min-height: 0;
     margin-bottom: 3px !important;
   }
+  
   &__item {
     width: auto;
     display: flex;
     align-items: center;
     line-height: math.div(20, 16);
+    
     &:not(:last-child) {
       margin-right: 8px;
       &::after {

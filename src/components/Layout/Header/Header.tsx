@@ -1,27 +1,29 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useMatchMedia } from '@/hooks';
-import { SearchIcon } from '@/components';
-import { commonPaths, MEDIA_QUERY } from '@/variables';
+import { BookmarkIcon, SearchIcon, SfwOffIcon, SfwOnIcon } from '@/components';
+import { breakpoints } from '@/constants';
+import { appPaths } from '@/resources';
 import logo from '@/assets/logo.svg';
 import clsx from 'clsx';
 import './Header.scss';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { toggleSfw } from '@/store';
 
 const links = [
-  { path: commonPaths.home, label: 'Home' },
-  { path: commonPaths.anime, label: 'Anime' },
-  { path: commonPaths.manga, label: 'Manga' },
-  { path: commonPaths.schedules, label: 'Schedules' },
-];
+  { path: appPaths.home, label: 'Home' },
+  { path: appPaths.anime, label: 'Anime' },
+  { path: appPaths.manga, label: 'Manga' },
+  { path: appPaths.schedules, label: 'Schedules' },
+] as const;
 
 const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
   const location = useLocation();
-  const currentPage = links.findIndex(
+  const activeLink = links.findIndex(
     (link) => location.pathname === link.path || location.pathname.startsWith(link.path + '/'),
   );
-  const activeLink = currentPage >= 0 ? currentPage : undefined;
 
-  const isTablet = useMatchMedia('max', MEDIA_QUERY.tablet);
+  const isTablet = useMatchMedia('max', breakpoints.tablet);
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -39,10 +41,12 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
     <header className="header">
       <div className="container">
         <div className="header__body">
-          <Link to="/" className="logo">
+          <Link to={appPaths.home} className="header__logo">
             <img src={logo} alt="Shenya anime logo" />
           </Link>
-          <div className="menu">
+
+          {/* === menu === */}
+          <div className="header__menu menu">
             <nav className="menu__body">
               <ul className="menu__list">
                 {links.map((link, index) => (
@@ -60,12 +64,18 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
               </ul>
             </nav>
           </div>
-          <div className="actions">
-            <button className="search-btn" aria-label="Search" onClick={onSearchOpen}>
+
+          {/* === actions === */}
+          <div className="header__actions">
+            <SfwBtn />
+            <button className="header__action-btn" aria-label="Search" onClick={onSearchOpen}>
               <SearchIcon />
             </button>
+            <Link className="header__action-btn" to={appPaths.bookmark}>
+              <BookmarkIcon />
+            </Link>
             <button
-              className="burger"
+              className="header__burger burger"
               aria-label="Menu"
               aria-expanded={isMenuOpen}
               onClick={() => setIsMenuOpen((prev) => !prev)}>
@@ -79,3 +89,16 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
 };
 
 export default Header;
+
+const SfwBtn = () => {
+  const dispatch = useAppDispatch();
+  const sfw = useAppSelector((state) => state.settings.sfw);
+  return (
+    <button
+      className="header__sfw-btn"
+      onClick={() => dispatch(toggleSfw())}
+      aria-label={sfw ? 'Adult content allowed' : 'Adult content blocked'}>
+      {sfw ? <SfwOnIcon /> : <SfwOffIcon />}
+    </button>
+  );
+};

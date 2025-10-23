@@ -6,12 +6,12 @@ import {
   CharacterPicturesTab,
   CharacterVoicesTab,
   CharacterAboutTab,
+  EntityPageLayout,
 } from '@/components';
 import { CharacterFull } from '@/models';
-import { fetchCharacterFullById } from '@/store/character/characterFullByIdSlice';
+import { fetchCharacterFullById } from '@/store';
+import { appPaths } from '@/resources';
 import './CharacterPage.scss';
-import EntityPageLayout from '@/components/Layout/EntityPageLayout/EntityPageLayout';
-import { characterPaths } from '@/variables';
 
 const CharacterPage = () => {
   return (
@@ -19,7 +19,7 @@ const CharacterPage = () => {
       fetchAction={fetchCharacterFullById}
       selector={(state) => state.characterFullById.item}
       status={(state) => state.characterFullById.status.item}
-      getBasePath={(id) => characterPaths.full(id)}
+      getBasePath={(id) => appPaths.characterFull(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.name,
@@ -90,7 +90,7 @@ const AdditionalInfo: React.FC<{ item: CharacterFull }> = ({ item }) => {
               </li>
             ))
           ) : (
-            <li className="leftside-list__empry">Not any nicknames</li>
+            <li className="leftside-list__empty">Not any nicknames</li>
           )}
         </ul>
       </div>

@@ -1,18 +1,54 @@
 import React from 'react';
 import Tippy from '@tippyjs/react';
-import { useMediaQuery } from 'react-responsive';
+import { getAnimeById, getMangaById } from '@/api';
+import { useMatchMedia } from '@/hooks';
+import { breakpoints } from '@/constants';
+import { AnimeAndMangaMap, AnimeAndMangaType, EntityMap, FetchStatus } from '@/typescript';
 
-interface TooltipWrapperProps {
-  content: React.ReactElement;
+type CommonTooltipProps<T extends AnimeAndMangaType> = {
+  type: T;
   children: React.ReactElement;
-  onShowTippy: () => void
-}
+  tooltipContent: (
+    item: AnimeAndMangaMap[T] | undefined,
+    status: FetchStatus | null,
+  ) => React.ReactElement;
+};
 
-const TooltipWrapper: React.FC<TooltipWrapperProps> = ({ content, children, onShowTippy }) => {
-  const isMobile = useMediaQuery({ query: '(max-width: 767.98px)' });
+type TooltipProps<T extends AnimeAndMangaType> = CommonTooltipProps<T> &
+  ({ id: number; item?: never } | { id?: never; item: AnimeAndMangaMap[T] });
+
+export const Tooltip = <T extends AnimeAndMangaType>({
+  type,
+  children,
+  item,
+  id,
+  tooltipContent,
+}: TooltipProps<T>) => {
+  const [entityItem, setEntityItem] = React.useState(item);
+  const [status, setStatus] = React.useState<FetchStatus | null>(item ? FetchStatus.SUCCESS : null);
+  const isMobile = useMatchMedia('max', breakpoints.mobile);
+
+  const onShowTippy = () => {
+    if (!id || entityItem) return;
+
+    setStatus(FetchStatus.LOADING);
+
+    const getAnime = async () => {
+      try {
+        const { data } = type === 'anime' ? await getAnimeById(id) : await getMangaById(id);
+        setEntityItem(data as AnimeAndMangaMap[T]);
+        setStatus(FetchStatus.SUCCESS);
+      } catch (error) {
+        setStatus(FetchStatus.ERROR);
+      }
+    };
+
+    getAnime();
+  };
+
   return (
     <Tippy
-      content={content}
+      content={tooltipContent(entityItem, status)}
       visible={isMobile ? false : undefined}
       placement="right-start"
       theme="custom"
@@ -37,5 +73,3 @@ const TooltipWrapper: React.FC<TooltipWrapperProps> = ({ content, children, onSh
     </Tippy>
   );
 };
-
-export default TooltipWrapper;

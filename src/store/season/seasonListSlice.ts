@@ -5,12 +5,12 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 
 interface InitialState {
   items: SeasonsListData[];
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: InitialState = {
   items: [],
-  status: FetchStatus.LOADING,
+  status: null,
 };
 const seasonsListSlice = createSlice({
   name: 'seasons-list',
@@ -24,7 +24,8 @@ const seasonsListSlice = createSlice({
       state.items = action.payload;
       state.status = FetchStatus.SUCCESS;
     });
-    builder.addCase(fetchSeasonsList.rejected, (state) => {
+    builder.addCase(fetchSeasonsList.rejected, (state, action) => {
+      if (action.meta.aborted) return;
       state.status = FetchStatus.ERROR;
     });
   },
@@ -32,9 +33,7 @@ const seasonsListSlice = createSlice({
 
 export const fetchSeasonsList = createAsyncThunk<SeasonsListData[]>(
   'seasons-list/fetchSeasonsListData',
-  async () => {
-    return (await getSeasonsList()).data;
-  },
+  async () => (await getSeasonsList()).data,
 );
 
 export default seasonsListSlice.reducer;

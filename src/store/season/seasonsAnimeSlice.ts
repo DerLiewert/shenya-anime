@@ -7,7 +7,7 @@ export const fetchSeasonsAnime = createAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
   { year: number; season: AnimeSeason; page?: number | undefined }
 >('seasons-anime/fetchAnimeItems', async ({ year, season, page = 1 }, { signal }) => {
-  const data = await getSeason({ year, season, page }, signal);
+  const data = await getSeason({ year, season, queryParams: { page, limit: 24 } }, signal);
   return data;
 });
 

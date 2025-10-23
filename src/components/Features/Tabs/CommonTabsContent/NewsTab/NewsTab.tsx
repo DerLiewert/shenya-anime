@@ -2,7 +2,6 @@ import React from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useShowMore } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
-import { mangaEmptyValueMessages } from '@/variables/emptyValueMessages';
 import { useFetchStatus } from '@/hooks/useFetchStatus';
 import type { JikanNews } from '@/models';
 import type { RootState } from '@/app/store';
@@ -15,6 +14,7 @@ import type {
 } from '@/typescript';
 import './NewsTab.scss';
 import { getImageUrl } from '@/utils';
+import { mangaEmptyValueMessages } from '@/constants';
 
 interface NewsTabProps {
   status: StatusSelector | FetchStatus | undefined;

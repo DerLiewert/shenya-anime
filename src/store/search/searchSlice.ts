@@ -9,32 +9,28 @@ import {
   Manga,
   MangaSearchParams,
 } from '@/models';
-import { FetchStatus } from '@/typescript';
+import { EntityMap, FetchStatus } from '@/typescript';
 import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type SearchTypeMap = {
-  anime: Anime;
-  manga: Manga;
-  character: Character;
-};
+export type SearchMap = Pick<EntityMap, 'anime' | 'manga' | 'character'>;
 
 type SearchSlice = {
-  [K in keyof SearchTypeMap]: {
+  [K in keyof SearchMap]: {
     type: K | null;
-    items: SearchTypeMap[K][];
+    items: SearchMap[K][];
   } & {
     pagination: JikanPaginationPlus | null;
     status: FetchStatus | null;
-    value: string | null;
+    value: string;
   };
-}[keyof SearchTypeMap];
+}[keyof SearchMap];
 
 const initialState = {
   type: null,
   items: [],
   pagination: null,
   status: null,
-  value: null,
+  value: '',
 } as SearchSlice;
 
 const searchSlice = createSlice({
@@ -49,9 +45,9 @@ const searchSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    function commonBuilder<T extends keyof SearchTypeMap>(
+    function commonBuilder<T extends keyof SearchMap>(
       type: T,
-      thunk: AsyncThunk<JikanResponse<SearchTypeMap[T][], JikanPaginationPlus>, any, {}>,
+      thunk: AsyncThunk<JikanResponse<SearchMap[T][], JikanPaginationPlus>, any, {}>,
     ) {
       builder.addCase(thunk.pending, (state) => {
         if (state.type !== type) state.items = [];
@@ -62,6 +58,7 @@ const searchSlice = createSlice({
         const page = action.meta.arg.page ? action.meta.arg.page : 1;
         const isShowMore = page && page > 1;
 
+        s.value = action.meta.arg.q ? action.meta.arg.q : '';
         s.type = type;
         s.items = (
           isShowMore ? [...state.items, ...action.payload.data] : action.payload.data

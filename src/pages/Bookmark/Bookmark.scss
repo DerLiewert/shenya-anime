@@ -1,0 +1,142 @@
+.bookmark {
+  &__inner {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 5px;
+    // margin-bottom: 25px;
+    margin-bottom: 15px;
+  }
+
+  &__trigger {
+    cursor: pointer;
+    flex: 1 1 48%;
+    white-space: nowrap;
+    padding: 5px 25px;
+    border-radius: 7px;
+    background-color: var(--bg-color-light);
+    transition-duration: 0.3s;
+    transition-timing-function: ease;
+    transition-property: font-weight, color, background-color;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 40px;
+
+    &[aria-selected='true'] {
+      font-weight: 600;
+      background-color: var(--primary-color);
+      color: var(--main-color);
+    }
+
+    &:focus {
+      background-color: var(--primary-color-dark);
+    }
+    @media (any-hover: hover) {
+      &:hover {
+        background-color: var(--primary-color-dark);
+      }
+    }
+
+    @include media-max($mobile) {
+      min-height: 36px;
+      padding: 5px 20px;
+    }
+    @include media-max($mobileSmall) {
+      min-height: 32px;
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+  }
+
+  &__tab-list {
+    margin-bottom: 15px;
+  }
+
+  &__chapter {
+    margin-bottom: 25px;
+  }
+
+  &__chapter-header {
+    margin-bottom: 25px;
+  }
+
+  &__items {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    @include media-max(1200px) {
+      grid-template-columns: repeat(5, 1fr);
+    }
+    @include media-max($tablet) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    @include media-max($mobile) {
+      gap: 10px;
+    }
+    @include media-max(700px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    @include media-max($mobileSmall) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}
+
+//========================================================================================================================================================
+.tabs-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+.tabs-swiper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+
+  & .swiper-wrapper {
+    min-width: 100%;
+    width: auto !important;
+    // width: 100%;
+    // min-height: 0;
+    // min-width: 0;
+  }
+
+  & .swiper-slide {
+  }
+
+  .tab-slide-wrapper {
+    width: auto;
+    // flex: 1 1 auto;
+  }
+
+  .tab-slide {
+    text-align: center;
+    white-space: nowrap;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    background-color: green;
+  }
+}
+// .tabs-swiper.flex .swiper-wrapper {
+//   display: flex;
+// }
+
+// /* Для табов */
+// .tabs-swiper.flex .tab-slide {
+//   flex: 1 1 auto;
+// }
+
+/* Если нужно, можно добавить скролл */
+.tabs-swiper {
+  // overflow-x: auto;
+}

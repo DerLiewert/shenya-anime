@@ -1,74 +1,55 @@
-// TooltipWrapper.tsx
 import React from 'react';
-import { Anime } from '@/models';
-import { getShortAnimeRating } from '@/utils';
-import {
-  animePaths,
-  animeRatingOptions,
-  animeTypeOptions,
-  producerPaths,
-  SpecialStatus,
-} from '@/variables';
-
-import { EmptyValueMessage, FormatDate, Loading, Score, Status } from '../../UI';
-import { InfoRow, InfoValue } from '../../Common/InfoRowWithValue';
-import { getAnimeById } from '@/api/anime.client';
 import { Link } from 'react-router-dom';
-import { FetchStatus } from '@/typescript';
 import { useFetchStatus } from '@/hooks';
+import { specialStatus } from '@/constants';
+import { getShortAnimeRating, valueOrDefault } from '@/utils';
+import { appPaths, animeRatingOptions, animeTypeOptions } from '@/resources';
+import {
+  InfoRow,
+  InfoValue,
+  EmptyValueMessage,
+  FormatDate,
+  Loading,
+  Score,
+  Status,
+  Tooltip,
+} from '@/components';
+
+import type { Anime } from '@/models';
+import type { FetchStatus } from '@/typescript';
+
 import './Tooltip.scss';
-import TooltipWrapperProps from './Tooltip';
 
 type AnimeTooltipProps = { children: React.ReactElement } & (
   | { id: number; item?: never }
   | { id?: never; item: Anime }
 );
 
-const AnimeTooltip = ({ children, item, id }: AnimeTooltipProps) => {
-  const [animeItem, setAnimeItem] = React.useState(item);
-  const [status, setStatus] = React.useState<FetchStatus>(
-    item ? FetchStatus.SUCCESS : FetchStatus.LOADING,
-  );
-
-  const onShowTippy = () => {
-    if (!id || animeItem) return;
-
-    setStatus(FetchStatus.LOADING);
-
-    const getAnime = async () => {
-      try {
-        const { data } = await getAnimeById(id);
-        setAnimeItem(data);
-        setStatus(FetchStatus.SUCCESS);
-      } catch (error) {
-        setStatus(FetchStatus.ERROR);
-      }
-    };
-
-    getAnime();
-  };
-
+export const AnimeTooltip = (props: AnimeTooltipProps) => {
   return (
-    <TooltipWrapperProps
-      content={<AnimeTooltipContent item={animeItem ? animeItem : null} status={status} />}
-      onShowTippy={onShowTippy}>
-      {children}
-    </TooltipWrapperProps>
+    <Tooltip
+      type="anime"
+      tooltipContent={(item, status) => <AnimeTooltipContent item={item} status={status} />}
+      {...props}
+    />
   );
 };
 
-// type AnimeTooltipContentProps = { id: number; item?: never } | { id?: never; item: Anime };
-const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }> = ({
-  item,
-  status,
-}) => {
-  const { isLoading, isError, isSuccess } = useFetchStatus(status);
+const AnimeTooltipContent: React.FC<{
+  item: Anime | null | undefined;
+  status: FetchStatus | null;
+}> = ({ item, status }) => {
+  const { isLoading, isError, isIdle } = useFetchStatus(status);
+
+  if (isIdle) return null;
+
   if (isLoading)
     return (
       <div className="tooltip">
         <Loading />
       </div>
     );
+
   if (isError)
     return (
       <div className="tooltip">
@@ -82,6 +63,7 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
         <EmptyValueMessage message="No information" />
       </div>
     );
+
   return (
     <div className="tooltip">
       <div className="tooltip__labels">
@@ -90,7 +72,7 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
       </div>
       <div className="tooltip__section">
         <h3 className="tooltip__title title visible-line visible-line--2">
-          <Link to={`/anime/${item.mal_id}`} title={item.title}>
+          <Link to={appPaths.animeFull(item.mal_id)} title={item.title}>
             {item.title}
           </Link>
         </h3>
@@ -100,44 +82,43 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
       </div>
       <div className="tooltip__section">
         <ul className="tooltip__list">
-          {(item.type || item.rating) && (
-            <InfoRow name={item.type ? 'Type' : 'Rating'}>
-              {item.type && (
-                <InfoValue
-                  isLink
-                  to={animePaths.catalogWithParams({
-                    type: animeTypeOptions.find((obj) => obj.label === item.type)?.value,
-                  })}>
-                  {item.type}
-                </InfoValue>
-              )}
-              {item.rating && (
-                <InfoValue
-                  to={animePaths.catalogWithParams({
-                    rating: animeRatingOptions.find((obj) => obj.label === item.rating)?.value,
-                  })}
-                  isLink
-                  isLinkPrimary
-                  title={item.rating}>
-                  {getShortAnimeRating(item.rating)}
-                </InfoValue>
-              )}
-            </InfoRow>
-          )}
-
-          {item.episodes && (
-            <InfoRow name="Episodes">
-              <InfoValue>
-                {item.episodes}
-                {item.duration && item.duration !== SpecialStatus.Unknown && (
-                  <>
-                    &nbsp;&nbsp; {/* 2 spaces */}
-                    <span>( {item.duration} )</span>
-                  </>
-                )}
+          <InfoRow name="Type">
+            {item.type ? (
+              <InfoValue
+                isLink
+                to={appPaths.animeWithParams({
+                  type: animeTypeOptions.find((obj) => obj.label === item.type)?.value,
+                })}>
+                {item.type}
               </InfoValue>
-            </InfoRow>
-          )}
+            ) : (
+              <InfoValue>{specialStatus.unknown}</InfoValue>
+            )}
+
+            {item.rating && (
+              <InfoValue
+                to={appPaths.animeWithParams({
+                  rating: animeRatingOptions.find((obj) => obj.label === item.rating)?.value,
+                })}
+                isLink
+                isPrimaryColor
+                title={item.rating}>
+                {getShortAnimeRating(item.rating)}
+              </InfoValue>
+            )}
+          </InfoRow>
+
+          <InfoRow name="Episodes">
+            <InfoValue>
+              {valueOrDefault(item.episodes, specialStatus.mark)}
+              {item.duration && item.duration !== 'Unknown' && (
+                <>
+                  &nbsp;&nbsp; {/* 2 spaces */}
+                  <span>( {item.duration} )</span>
+                </>
+              )}
+            </InfoValue>
+          </InfoRow>
 
           <InfoRow name="Aired">
             <InfoValue>
@@ -152,7 +133,7 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
                   )}
                 </>
               ) : (
-                SpecialStatus.Unknown
+                specialStatus.unknown
               )}
             </InfoValue>
           </InfoRow>
@@ -162,34 +143,36 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
               {item.demographics.map((demographic) => (
                 <InfoValue
                   key={demographic.mal_id}
-                  isLink
-                  to={animePaths.catalogWithParams({ genres: demographic.mal_id.toString() })}>
+                  to={appPaths.animeWithParams({ genres: demographic.mal_id.toString() })}
+                  isLink>
                   {demographic.name}
                 </InfoValue>
               ))}
             </InfoRow>
           )}
 
-          {item.genres.length > 0 && (
-            <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
-              {item.genres.map((genre) => (
+          <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
+            {item.genres.length > 0 ? (
+              item.genres.map((genre) => (
                 <InfoValue
                   key={genre.mal_id}
-                  isLink
-                  to={animePaths.catalogWithParams({ genres: genre.mal_id.toString() })}>
+                  to={appPaths.animeWithParams({ genres: genre.mal_id.toString() })}
+                  isLink>
                   {genre.name}
                 </InfoValue>
-              ))}
-            </InfoRow>
-          )}
+              ))
+            ) : (
+              <InfoValue>{specialStatus.unknown}</InfoValue>
+            )}
+          </InfoRow>
 
           {item.themes.length > 0 && (
             <InfoRow name={item.themes.length > 1 ? 'Themes' : 'Theme'}>
               {item.themes.map((theme) => (
                 <InfoValue
                   key={theme.mal_id}
-                  isLink
-                  to={animePaths.catalogWithParams({ genres: theme.mal_id.toString() })}>
+                  to={appPaths.animeWithParams({ genres: theme.mal_id.toString() })}
+                  isLink>
                   {theme.name}
                 </InfoValue>
               ))}
@@ -199,7 +182,7 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
           {item.studios.length > 0 && (
             <InfoRow name={item.studios.length > 1 ? 'Studios' : 'Studio'}>
               {item.studios.map((studio) => (
-                <InfoValue key={studio.mal_id} isLink to={producerPaths.full(studio.mal_id)}>
+                <InfoValue key={studio.mal_id} to={appPaths.producerFull(studio.mal_id)} isLink>
                   {studio.name}
                 </InfoValue>
               ))}
@@ -211,4 +194,3 @@ const AnimeTooltipContent: React.FC<{ item: Anime | null; status: FetchStatus }>
   );
 };
 
-export default AnimeTooltip;

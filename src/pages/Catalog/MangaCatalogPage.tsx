@@ -1,62 +1,294 @@
 import React, { useRef } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { useLocation } from 'react-router-dom';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
-import { getUniqueItems } from '@/utils';
-import {
-  mangaOrderByOptions,
-  mangaStatusOptions,
-  mangaTypeOptions,
-  MEDIA_QUERY,
-} from '@/variables';
-import {
-  Genre,
-  MangaSearchOrder,
-  MangaSearchParams,
-  mangaSearchStatus,
-  MangaSearchStatus,
-  MangaSearchType,
-  mangaSearchType,
-  SortOptions,
-} from '@/models';
-import { FetchStatus } from '@/typescript';
-import { CommonIntro, FilterIcon, MangaCard, Pagination } from '@/components';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
+import { useForm, Controller } from 'react-hook-form';
+import { useLocation } from 'react-router-dom';
+
+import { fetchMangaGenres } from '@/store/genres/mangaGenresSlice';
+import { fetchMangaByParams } from '@/store/catalog/mangaCatalogSlice';
+
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
+import { AllowedParams, getUniqueItems, isEmpty, parseMangaParams, scrollToTop } from '@/utils';
+import { mangaOrderByOptions, mangaStatusOptions, mangaTypeOptions } from '@/resources';
+import { CommonIntro, EmptyValueMessage, FilterIcon, MangaCard, Pagination } from '@/components';
+
+import {
+  MangaSearchOrder,
+  MangaSearchParams,
+  MangaSearchStatus,
+  MangaSearchType,
+  SortOptions,
+} from '@/models';
+import { ExtractOptionValue, FetchStatus, SelectOption } from '@/typescript';
+
 import clsx from 'clsx';
 import './CatalogPage.scss';
-import { fetchMangaGenres } from '@/store/genres/mangaGenresSlice';
-import { fetchMangaByParams } from '@/store/manga/mangaCatalogSlice';
+import { breakpoints } from '@/constants';
 
+const setSortForOrderBy = (param: MangaSearchOrder | undefined): SortOptions | undefined => {
+  const sort: Partial<Record<MangaSearchOrder, SortOptions>> = {
+    score: 'desc',
+    popularity: 'asc',
+    favorites: 'desc',
+    mal_id: 'asc',
+  };
+  return param ? sort[param] : undefined;
+};
+
+const allowedMangaParams: AllowedParams<MangaSearchParams> = {
+  allAllowed: false,
+  rules: {
+    type: true,
+    status: true,
+    min_score: true,
+    max_score: true,
+    genres: true,
+    order_by: { include: ['mal_id', 'score', 'popularity', 'favorites'] },
+    page: true,
+  },
+} as const;
+
+type AllowedMangaParams = keyof NonNullable<typeof allowedMangaParams.rules>;
+
+const defaultSearchParams: Pick<MangaSearchParams, AllowedMangaParams> = {
+  order_by: 'score',
+};
+
+const parseSearchParams = parseMangaParams(allowedMangaParams);
+
+//========================================================================================================================================================
 const MangaCatalogPage: React.FC = () => {
-  const dispatch = useAppDispatch();
-  const location = useLocation();
-  const appNavigate = useAppNavigate(parseSearchParams, {
-    order_by: 'score',
-  });
+  const cardsRef = React.useRef<HTMLDivElement>(null);
 
-  const searchParams = React.useMemo<MangaSearchParams>(() => {
-    const urlParams = parseSearchParams(location.search);
-    if (!urlParams.order_by) urlParams.order_by = 'score';
-    return {
-      ...urlParams,
-      sort: setSortForOrderBy(urlParams.order_by as keyof MangaSearchParams),
-    };
-  }, [location.search]);
+  const abortableDispatch = useAbortableDispatch();
+  const location = useLocation();
 
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.mangaGenres);
   const { items, pagination, status } = useAppSelector((state) => state.mangaCatalog);
-  const { isLoading } = useFetchStatus(status);
+  const { isLoading, isError, isSuccess } = useFetchStatus(status);
 
-  const isTablet = useMatchMedia('max', MEDIA_QUERY.tablet);
   const [isShowFilters, setIsShowFilters] = React.useState(false);
-  const openFilters = () => setIsShowFilters(true);
-  const closeFilters = () => setIsShowFilters(false);
+  const isTablet = useMatchMedia('max', breakpoints.tablet);
+
+  const parseSearchParams = React.useMemo(
+    () =>
+      parseMangaParams({
+        allAllowed: false,
+        rules: {
+          page: true,
+          status: true,
+          min_score: true,
+          max_score: true,
+          type: { include: mangaTypeOptions.map((obj) => obj.value) },
+          order_by: { include: ['mal_id', 'score', 'popularity', 'favorites'] },
+          genres:
+            genres.length > 0 ? { include: genres.map((obj) => obj.mal_id.toString()) } : true,
+        },
+      }),
+    [genres],
+  );
+
+  const appNavigate = useAppNavigate(parseSearchParams, defaultSearchParams);
+
+  const searchParams = React.useMemo<MangaSearchParams>(() => {
+    const urlParams = parseSearchParams(location.search);
+    return {
+      ...defaultSearchParams,
+      ...urlParams,
+      sort: setSortForOrderBy(
+        urlParams.order_by ? urlParams.order_by : defaultSearchParams.order_by,
+      ),
+    };
+  }, [location.search]);
+
+  // Скрываем фильтры поиска если ширина окна isTablet (чтоб не были сразу открытыми, если ширина обратно станет !isTablet)
+  React.useEffect(() => {
+    if (!isTablet && isShowFilters) setIsShowFilters(false);
+  }, [isTablet]);
+
+  // Получение даных об аниме за указанными параметрами
+  React.useEffect(() => {
+    if (genresStatus === FetchStatus.LOADING) return;
+
+    abortableDispatch(fetchMangaByParams, searchParams);
+  }, [searchParams, genres]);
+
+  // Проверка значения параметра page при изменении pagination, чтоб он был в пределах (от 1 до последней видимой страницы в зависимости от запроса)
+  React.useEffect(() => {
+    if (!searchParams.page) return;
+
+    const navigateOptions = { replace: true };
+    if (searchParams.page <= 1) {
+      appNavigate({ ...searchParams, page: undefined }, navigateOptions);
+    } else if (pagination && pagination.last_visible_page < searchParams.page) {
+      appNavigate({ ...searchParams, page: pagination.last_visible_page }, navigateOptions);
+    }
+  }, [pagination, appNavigate]);
+
+  React.useEffect(() => {
+    appNavigate(searchParams, { replace: true });
+  }, [appNavigate]);
+
+  return (
+    <div className="catalog">
+      <CommonIntro
+        bgPrefix="manga"
+        title="Manga Catalog"
+        subtitle={
+          <>
+            Search manga results: <span>{(pagination && pagination.items.total) || '*****'}</span>
+          </>
+        }
+      />
+
+      <div className="catalog__cards catalog-cards" ref={cardsRef}>
+        <div className="container">
+          <div className="catalog-cards__top">
+            <button
+              className="catalog-cards__show-filters btn btn--icon btn--fill"
+              onClick={() => setIsShowFilters(true)}>
+              <FilterIcon />
+              Filters
+            </button>
+            <div className="catalog-cards__sorting catalog-sorting">
+              <span>Sort By:</span>
+              <Select
+                className="catalog-sorting__select select"
+                classNamePrefix="select"
+                defaultValue={mangaOrderByOptions[0]}
+                value={mangaOrderByOptions.find((obj) => obj.value === searchParams.order_by)}
+                options={mangaOrderByOptions}
+                onChange={(selected) => {
+                  const value = selected?.value;
+                  appNavigate({
+                    ...searchParams,
+                    order_by: value,
+                    sort: setSortForOrderBy(value),
+                    page: undefined,
+                  });
+                }}
+                menuPortalTarget={document.body}
+                isSearchable={false}
+                unstyled
+              />
+            </div>
+          </div>
+          <div className="catalog-cards__body">
+            <CatalogSidebar
+              className="catalog-cards__sidebar"
+              selectedValues={searchParams}
+              isModal={isTablet}
+              isOpen={isShowFilters}
+              onSubmit={(data) => {
+                const { type, status, min_score, max_score, genres } = data;
+                appNavigate({
+                  ...searchParams,
+                  type: type?.value,
+                  status: status?.value,
+                  min_score: min_score,
+                  max_score: max_score,
+                  genres: genres?.map((g) => g.value).join(','),
+                  page: undefined,
+                });
+
+                setIsShowFilters(false);
+              }}
+              onReset={() => {
+                appNavigate({ order_by: searchParams.order_by });
+              }}
+              onClose={() => setIsShowFilters(false)}
+            />
+            <div className="catalog-cards__content">
+              <div className="catalog-cards__items">
+                {isLoading &&
+                  Array.from({ length: 24 }).map((_, i) => (
+                    <Skeleton
+                      key={i}
+                      containerClassName="catalog-cards__card _skeleton-container border-opacity"
+                      className=" _skeleton "
+                    />
+                  ))}
+                {isSuccess &&
+                  items.length > 0 &&
+                  getUniqueItems(items).map((item) => (
+                    <MangaCard key={item.mal_id} item={item} className="catalog-cards__card" />
+                  ))}
+              </div>
+              {isSuccess && items.length === 0 && (
+                <EmptyValueMessage
+                  message="No search results found."
+                  className="catalog-cards__message"
+                />
+              )}
+              {isError && (
+                <EmptyValueMessage
+                  message="Something went wrong!"
+                  className="catalog-cards__message"
+                />
+              )}
+              {pagination && (
+                <Pagination
+                  currentPage={pagination.current_page}
+                  totalItems={pagination.items.total}
+                  itemsPerPage={pagination.items.per_page}
+                  className="catalog-cards__pagination"
+                  onChangePage={(page) => {
+                    appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
+                    scrollToTop(cardsRef);
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MangaCatalogPage;
+
+//========================================================================================================================================================
+
+type SelectValues = {
+  type: SelectOption<MangaSearchType> | null;
+  status: SelectOption<MangaSearchStatus> | null;
+  genres: SelectOption<number>[];
+};
+type FormValues = SelectValues & {
+  min_score: number | null;
+  max_score: number | null;
+};
+
+interface CatalogSidebar {
+  isModal?: boolean;
+  isOpen?: boolean;
+  selectedValues: MangaSearchParams; // Pick<AnimeSearchParams, 'type' | 'status' | 'rating' | 'min_score' | 'max_score' | 'genres'>;
+  onSubmit?: (data: FormValues) => void;
+  onReset?: () => void;
+  onClose?: () => void;
+  className?: string;
+}
+
+const CatalogSidebar: React.FC<CatalogSidebar> = ({
+  isModal = false,
+  isOpen = false,
+  selectedValues,
+  onSubmit,
+  onReset,
+  onClose,
+  className,
+}) => {
+  const dispatch = useAppDispatch();
+  const { items: genres, status: genresStatus } = useAppSelector((state) => state.mangaGenres);
+  const { isLoading: isGenresLoading, isSuccess: isGenresSuccess } = useFetchStatus(genresStatus);
+
+  const filterRef = React.useRef<HTMLFormElement>(null);
 
   const mangaGenresOptions = React.useMemo(() => {
     return genres.length > 0
-      ? getUniqueItems(genres).map((obj: Genre) => ({
+      ? getUniqueItems(genres).map((obj) => ({
           value: obj.mal_id,
           label: obj.name,
         }))
@@ -64,114 +296,61 @@ const MangaCatalogPage: React.FC = () => {
   }, [genres]);
 
   const { control, handleSubmit, reset, register } = useForm<FormValues>({
-    defaultValues: getFormDefaulValues(),
+    defaultValues: getValuesForForm(),
   });
 
-  const cardsRef = React.useRef<HTMLDivElement>(null);
-  const isFirstRender = useRef(true);
-
-  // Получить жанры аниме, если их нет
-  React.useEffect(() => {
-    appNavigate(searchParams, { replace: isFirstRender.current });
-    if (genresStatus === FetchStatus.SUCCESS) return;
-    dispatch(fetchMangaGenres());
-  }, []);
-
-  // Обновить данные в форме после получения жанров и формирования mangaGenresOptions
-  React.useEffect(() => {
-    // if (mangaGenresOptions.length > 0) reset(getFormDefaulValues());
-  }, [mangaGenresOptions]);
-
-  // Получение даных об аниме за указанными параметрами
-  const fetchMangaController = useRef<AbortController | null>(null);
-  React.useEffect(() => {
-    reset(getFormDefaulValues());
-    if (genresStatus === FetchStatus.LOADING) return;
-
-    fetchMangaController.current?.abort();
-    fetchMangaController.current = new AbortController();
-
-    const urlParams = parseSearchParams(location.search);
-    if (!urlParams.order_by) urlParams.order_by = 'score';
-    dispatch(
-      fetchMangaByParams(
-        {
-          ...searchParams,
-          sort: setSortForOrderBy(searchParams.order_by),
-        },
-        { signal: fetchMangaController.current.signal },
-      ),
-    );
-
-    return () => {
-      fetchMangaController.current?.abort();
-    };
-  }, [location.search, genres]);
-
-  // Проверка значения параметра page при изменении pagination, чтоб он был в пределах (1 - последняя видимая страница в зависимости от запроса)
-  React.useEffect(() => {
-    if (searchParams.page && searchParams.page < 1) {
-      appNavigate({ ...searchParams, page: undefined }, { replace: isFirstRender.current });
-    } else if (
-      pagination &&
-      searchParams.page &&
-      pagination.last_visible_page < searchParams.page
-    ) {
-      appNavigate(
-        { ...searchParams, page: pagination.last_visible_page },
-        { replace: isFirstRender.current },
-      );
-    }
-  }, [pagination]);
-
-  React.useEffect(() => {
-    if (!isTablet && isShowFilters) setIsShowFilters(false);
-  }, [isTablet]);
-
   // Получить данные с формы
-  function getFormDefaulValues() {
+  function getValuesForForm(): FormValues {
+    const { type, status, min_score, max_score, genres } = selectedValues;
     return {
-      type: searchParams.type
-        ? mangaTypeOptions.find((obj) => obj.value === searchParams.type)
-        : null,
-      status: searchParams.status
-        ? mangaStatusOptions.find((obj) => obj.value === searchParams.status)
-        : null,
-      min_score: searchParams.min_score && +searchParams.min_score ? +searchParams.min_score : null,
-      max_score: searchParams.max_score && +searchParams.max_score ? +searchParams.max_score : null,
+      type: (type && mangaTypeOptions.find((obj) => obj.value === type)) || null,
+      status: (status && mangaStatusOptions.find((obj) => obj.value === status)) || null,
+      min_score: min_score || null,
+      max_score: max_score || null,
       genres:
-        searchParams.genres && mangaGenresOptions
-          ? mangaGenresOptions.filter(
-              (obj) =>
-                searchParams.genres &&
-                searchParams.genres.split(',').includes(obj.value.toString()),
-            )
+        genres && mangaGenresOptions
+          ? mangaGenresOptions.filter((obj) => genres.split(',').includes(obj.value.toString()))
           : [],
     };
   }
 
-  // При сабмите формы собрать с неё данные и сохранить в searchParams
-  const onSubmit = handleSubmit((data: FormValues) => {
-    appNavigate({
-      ...searchParams,
-      type: data.type?.value,
-      status: data.status?.value,
-      min_score: data.min_score,
-      max_score: data.max_score,
-      genres: data.genres?.map((g: any) => g.value).join(','),
-      page: undefined,
-    });
-  });
+  React.useEffect(() => {
+    // Получить жанры аниме, если их нет
+    if (isGenresSuccess && genresStatus.length > 0) return;
+    dispatch(fetchMangaGenres());
+  }, []);
+
+  // Получение даных об аниме по выбраным параметрам
+  React.useEffect(() => {
+    reset(getValuesForForm());
+  }, [mangaGenresOptions, selectedValues]);
+
+  // При сабмите формы
+  const onSubmitForm = (data: FormValues) => {
+    if (onSubmit) onSubmit(data);
+  };
+
+  // При сбросе данных формы
+  const onResetForm = () => {
+    reset();
+    if (onReset) onReset();
+  };
 
   // Держать значение для minScore и maxScore в пределах нормы 1-9.99
   const onScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const min = Number(e.target.min);
-    const max = Number(e.target.max);
-    const value = Number(e.target.value);
+    if (isEmpty(e.target.value)) return;
 
-    if (value < min) e.target.value = min.toString();
-    else if (value > max) e.target.value = max.toString();
-    else e.target.value = value.toFixed(2).replace(/\.?0+$/, '');
+    const min = e.target.min;
+    const max = e.target.max;
+    const value = e.target.value;
+
+    if (+value < +min) {
+      e.target.value = min;
+    } else if (+value > +max) {
+      e.target.value = max;
+    } else if (!/^\d*\.?\d{0,2}$/.test(value)) {
+      e.target.value = value.match(/^\d*\.?\d{0,2}/)?.[0] ?? '';
+    }
   };
 
   // Рендер кастомного выпадающего списка
@@ -194,9 +373,9 @@ const MangaCatalogPage: React.FC = () => {
             value={field.value}
             onChange={field.onChange}
             placeholder={placeholder}
-            menuPortalTarget={isTablet ? null : document.body}
-            isSearchable={false}
+            menuPortalTarget={isModal ? null : document.body}
             closeMenuOnSelect={!isMulti}
+            isSearchable={false}
             isMulti={isMulti}
             isClearable
             unstyled
@@ -206,15 +385,18 @@ const MangaCatalogPage: React.FC = () => {
     );
   }
 
-  // Рендер сайдбара (фильтров)
-  const renderCatalogSidebar = () => (
-    <aside className={clsx('catalog-cards__sidebar catalog-sidebar', { _show: isShowFilters })}>
+  return (
+    <aside className={clsx(className, 'catalog-sidebar', { _show: isOpen, _modal: isModal })}>
       <div className="catalog-sidebar__inner">
         <div className="catalog-sidebar__header">
           <div className="catalog-sidebar__title">Filters</div>
-          <button className="catalog-sidebar__close-btn" onClick={closeFilters}></button>
+          <button className="catalog-sidebar__close-btn" onClick={onClose}></button>
         </div>
-        <form onSubmit={onSubmit} className="catalog-sidebar__filters">
+        <form
+          ref={filterRef}
+          className="catalog-sidebar__filters"
+          onSubmit={handleSubmit(onSubmitForm)}
+          onReset={onResetForm}>
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">Type</div>
             {renderSelect('type', mangaTypeOptions, 'Select manga type...')}
@@ -225,13 +407,12 @@ const MangaCatalogPage: React.FC = () => {
           </div>
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">Genre</div>
-            {genresStatus === FetchStatus.LOADING ? (
+            {isGenresLoading ? (
               <Skeleton className="select__control " containerClassName="select" />
             ) : (
               renderSelect('genres', mangaGenresOptions, 'Genres for one manga ...', true)
             )}
           </div>
-
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">
               Score <span>( 1 - 9.99 )</span>
@@ -247,20 +428,8 @@ const MangaCatalogPage: React.FC = () => {
                     {...register('min_score', {
                       min: 1,
                       max: 9.99,
-                      setValueAs: (value) => {
-                        console.log(value);
-
-                        if (value === '') return null;
-                        const min = 1;
-                        const max = 9.99;
-
-                        if (value < min) return min;
-                        else if (value > max) return max;
-                        else
-                          return Number(value)
-                            .toFixed(2)
-                            .replace(/\.?0+$/, '');
-                      },
+                      setValueAs: (v) => (v === '' ? null : parseFloat(v)),
+                      onChange: onScoreChange,
                     })}
                   />
                 </div>
@@ -284,215 +453,14 @@ const MangaCatalogPage: React.FC = () => {
             </div>
           </div>
 
-          <button className="catalog-sidebar__filters-btn btn btn--outline">Search</button>
+          <button className="catalog-sidebar__filters-btn btn btn--white" type="submit">
+            Search
+          </button>
+          <button className="catalog-sidebar__filters-btn btn btn--outline" type="reset">
+            Clear
+          </button>
         </form>
       </div>
     </aside>
   );
-
-  return (
-    <div className="catalog">
-      <CommonIntro
-        bgPrefix="manga"
-        title="Manga Catalog"
-        subtitle={
-          <>
-            Search manga results: <span>{(pagination && pagination.items.total) || '*****'}</span>
-          </>
-        }
-      />
-
-      <div className="catalog__cards catalog-cards" ref={cardsRef}>
-        <div className="container">
-          <div className="catalog-cards__top">
-            <button
-              className="catalog-cards__show-filters btn btn--icon btn--fill"
-              onClick={openFilters}>
-              <FilterIcon />
-              Filters
-            </button>
-            <div className="catalog-cards__sorting catalog-sorting">
-              <span>Sort By:</span>
-              <Select
-                className="catalog-sorting__select select"
-                classNamePrefix="select"
-                placeholder=""
-                defaultValue={mangaOrderByOptions[0]}
-                value={mangaOrderByOptions.find(
-                  (obj) => obj.value === parseSearchParams(location.search).order_by,
-                )}
-                options={mangaOrderByOptions}
-                onChange={(selected) => {
-                  appNavigate({ ...searchParams, order_by: selected?.value, page: undefined });
-                }}
-                menuPortalTarget={document.body}
-                isSearchable={false}
-                unstyled
-              />
-            </div>
-          </div>
-          <div className="catalog-cards__body">
-            {renderCatalogSidebar()}
-            <div className="catalog-cards__content">
-              <div className="catalog-cards__items">
-                {isLoading
-                  ? Array.from({ length: 24 }).map((_, i) => (
-                      <Skeleton
-                        key={i}
-                        containerClassName="catalog-cards__card _skeleton-container border-opacity"
-                        className=" _skeleton "
-                      />
-                    ))
-                  : getUniqueItems(items).map((item) => (
-                      <MangaCard key={item.mal_id} item={item} className="catalog-cards__card" />
-                    ))}
-              </div>
-              {pagination && (
-                <Pagination
-                  currentPage={pagination.current_page}
-                  totalItems={pagination.items.total}
-                  itemsPerPage={pagination.items.per_page}
-                  className="catalog-cards__pagination"
-                  onChangePage={(page) => {
-                    appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
-
-                    if (!cardsRef.current) return;
-
-                    const tabsTop = cardsRef.current.getBoundingClientRect().top;
-                    if (tabsTop >= 0) return;
-
-                    window.scrollTo({
-                      top: tabsTop + window.scrollY - 10,
-                      behavior: 'smooth',
-                    });
-                  }}
-                />
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default MangaCatalogPage;
-
-type OrderBy = Extract<MangaSearchOrder, 'mal_id' | 'score' | 'popularity' | 'favorites'>;
-const allowedOrderBy: OrderBy[] = ['mal_id', 'score', 'popularity', 'favorites'];
-
-function parseSearchParams(search: string): Partial<MangaSearchParams> {
-  const params = new URLSearchParams(search);
-  const result: Partial<MangaSearchParams> = {};
-
-  for (const [key, value] of params.entries()) {
-    switch (key) {
-      case 'order_by':
-        if (allowedOrderBy.includes(value as OrderBy)) {
-          result.order_by = value as OrderBy;
-        }
-        break;
-      case 'type':
-        if (mangaSearchType.includes(value as MangaSearchType)) {
-          result.type = value as MangaSearchType;
-        }
-        break;
-      case 'status':
-        if (mangaSearchStatus.includes(value as MangaSearchStatus)) {
-          result.status = value as MangaSearchStatus;
-        }
-        break;
-      case 'min_score':
-      case 'max_score':
-      case 'score':
-        const score = Number(value);
-        if (!isNaN(score) && score >= 1 && score < 10) {
-          (result as any)[key] = score;
-        }
-        break;
-      case 'genres':
-      case 'genres_exclude':
-        if (value) {
-          result[key] = value
-            .split(',')
-            .filter((v) => /^\d+$/.test(v))
-            .join(','); // в формате "1,2,3"
-        }
-        break;
-      case 'page':
-      case 'limit':
-        const page = parseInt(value, 10);
-        if (!isNaN(page)) {
-          (result as any)[key] = page;
-        }
-        break;
-      case 'sort':
-      case 'magazines':
-      case 'letter':
-      case 'start_date':
-      case 'end_date':
-      case 'q':
-        result[key as keyof MangaSearchParams] = value;
-        break;
-      case 'unapproved':
-      case 'sfw':
-        result[key as keyof MangaSearchParams] = value === 'true';
-        break;
-      default:
-        break;
-    }
-  }
-
-  const availableParams: Array<keyof MangaSearchParams> = [
-    'type',
-    'status',
-    'min_score',
-    'max_score',
-    'genres',
-    'order_by',
-    'page',
-  ];
-
-  for (const key in result) {
-    if (!availableParams.includes(key)) delete result[key];
-  }
-  if (result.min_score && result.max_score && result.min_score > result.max_score)
-    delete result.max_score;
-
-  return result;
-}
-
-type SelectOption<T, L = string> = {
-  value: T;
-  label: L;
-};
-
-type SelectValues = {
-  type: SelectOption<MangaSearchType> | null;
-  status: SelectOption<MangaSearchStatus> | null;
-  genres: SelectOption<number>[];
-};
-type FormValues = SelectValues & {
-  min_score: number | null;
-  max_score: number | null;
-};
-
-type ExtractOptionValue<T> = T extends SelectOption<infer U>
-  ? U
-  : T extends SelectOption<infer U>[]
-  ? U
-  : never;
-
-const setSortForOrderBy = (
-  param: keyof MangaSearchParams | undefined | null,
-): SortOptions | undefined => {
-  if (!param) return undefined;
-
-  const sort: Record<keyof MangaSearchParams, SortOptions> = {
-    score: 'desc',
-    popularity: 'asc',
-    favorites: 'desc',
-    mal_id: 'asc',
-  };
-  return sort[param];
 };

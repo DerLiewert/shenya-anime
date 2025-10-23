@@ -1,5 +1,5 @@
 import { TopEndpoints } from '@/api';
-import { getResource } from '@/api/api.client';
+import { getResource } from '@/api/client/api.client';
 import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Manga } from '@/models';
@@ -18,16 +18,16 @@ export const fetchTopManga = createAsyncThunk<Manga[]>(
 
 interface topMangaState {
   items: Manga[];
-  status: FetchStatus;
+  status: FetchStatus | null;
 }
 
 const initialState: topMangaState = {
   items: [],
-  status: FetchStatus.LOADING,
+  status: null,
 };
 
 export const mangaTopSlice = createSlice({
-  name: 'intro-anime',
+  name: 'top-manga',
   initialState,
   reducers: {},
   extraReducers: (builder) => {

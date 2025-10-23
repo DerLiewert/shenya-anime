@@ -1,7 +1,8 @@
 import React from 'react';
 import { PersonVoices } from '@/models';
-import { personEmptyValueMessages } from '@/variables';
 import { EntityTabItem, EntityTab } from '@/components';
+import { personEmptyValueMessages } from '@/constants';
+import { appPaths } from '@/resources';
 
 const PersonVoicesTab: React.FC = () => {
   return (
@@ -13,7 +14,7 @@ const PersonVoicesTab: React.FC = () => {
         return (
           <EntityTabItem
             key={item.anime.mal_id + '_' + item.character.mal_id}
-            linkUrl={`/character/${item.character.mal_id}`}
+            linkUrl={appPaths.characterFull(item.character.mal_id)}
             images={item.character.images}
             title={item.character.name}
             subtitles={[

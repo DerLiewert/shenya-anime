@@ -3,12 +3,13 @@ import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus, useYoutubeTrailerImage } from '@/hooks';
-import { clearRandomAnimeState, fetchRandomAnime } from '@/store/anime/randomAnimeSlice';
-import { Score, ArrowIcon, BookmarkIcon } from '@/components';
-import { getImageUrl } from '@/utils';
-import { animePaths, animeTypeOptions } from '@/variables';
+import { clearRandomAnimeState, fetchRandomAnime } from '@/store';
+import { Score, ArrowIcon, BookmarkButton, EmptyValueMessage } from '@/components';
+import { getImageUrl, valueOrDefault } from '@/utils';
+import { appPaths, animeTypeOptions } from '@/resources';
 import clsx from 'clsx';
 import './RandomAnime.scss';
+import { animeEmptyValueMessages } from '@/constants';
 
 const RandomAnime: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -53,7 +54,7 @@ const RandomAnime: React.FC = () => {
           <div className="random-anime__body">
             <div className="random-anime__poster bg border-opacity">
               {item ? (
-                <img src={getImageUrl(item.images)} alt="Poster" aria-hidden />
+                <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" aria-hidden />
               ) : (
                 <Skeleton className="img" />
               )}
@@ -63,7 +64,7 @@ const RandomAnime: React.FC = () => {
             <div className="random-anime__content">
               <h3 className="random-anime__title title title--fz-36">
                 {item ? (
-                  <Link to={animePaths.full(item.mal_id)} title={item.title}>
+                  <Link to={appPaths.animeFull(item.mal_id)} title={item.title}>
                     {item.title}
                   </Link>
                 ) : (
@@ -77,9 +78,10 @@ const RandomAnime: React.FC = () => {
                 ) : (
                   <Skeleton width="67px" height="30px" />
                 )}
+
                 {item ? (
                   <Link
-                    to={animePaths.catalogWithParams({
+                    to={appPaths.animeWithParams({
                       type: animeTypeOptions.find((obj) => obj.label === item.type)?.value,
                     })}
                     className="random-anime__link link">
@@ -90,65 +92,74 @@ const RandomAnime: React.FC = () => {
                 )}
 
                 <p className="random-anime__info-text">
-                  {item ? `Episodes ${item.episodes}` : <Skeleton width="100px" height="22px" />}
+                  {item ? (
+                    `Episodes ${valueOrDefault(item.episodes)}`
+                  ) : (
+                    <Skeleton width="100px" height="22px" />
+                  )}
                 </p>
               </div>
 
               <p className="random-anime__text fz-20 visible-line visible-line--4">
                 {item
-                  ? item.synopsis
+                  ? item.synopsis || (
+                      <EmptyValueMessage message={animeEmptyValueMessages.synopsis} />
+                    )
                   : Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} />)}
               </p>
 
-              <div className="random-anime__genres">
-                {item ? (
-                  <>
-                    {item.demographics.length > 0 &&
-                      item.demographics.map((demographic) => (
-                        <Link
-                          key={demographic.mal_id}
-                          to={animePaths.catalogWithParams({
-                            genres: demographic.mal_id.toString(),
-                          })}
-                          className="random-anime__link link">
-                          {demographic.name}
-                        </Link>
-                      ))}
+              {item ? (
+                (item.demographics.length > 0 || item.genres.length > 0) && (
+                  <div className="random-anime__genres">
+                    {item.demographics.map((demographic) => (
+                      <Link
+                        key={demographic.mal_id}
+                        to={appPaths.animeWithParams({
+                          genres: demographic.mal_id.toString(),
+                        })}
+                        className="random-anime__link link">
+                        {demographic.name}
+                      </Link>
+                    ))}
 
-                    {item.genres.length > 0 &&
-                      item.genres.map((genre) => (
-                        <Link
-                          key={genre.mal_id}
-                          to={animePaths.catalogWithParams({
-                            genres: genre.mal_id.toString(),
-                          })}
-                          className="random-anime__link link">
-                          {genre.name}
-                        </Link>
-                      ))}
-                  </>
-                ) : (
-                  Array.from({ length: 3 }).map((_, i) => (
+                    {item.genres.map((genre) => (
+                      <Link
+                        key={genre.mal_id}
+                        to={appPaths.animeWithParams({
+                          genres: genre.mal_id.toString(),
+                        })}
+                        className="random-anime__link link">
+                        {genre.name}
+                      </Link>
+                    ))}
+                  </div>
+                )
+              ) : (
+                <div className="random-anime__genres">
+                  {Array.from({ length: 3 }).map((_, i) => (
                     <div key={i} className="random-anime__link">
                       <Skeleton width="62px" height="22px" />
                     </div>
-                  ))
-                )}
-              </div>
+                  ))}
+                </div>
+              )}
 
               <div className="random-anime__actions">
                 {item ? (
                   <>
                     <Link
-                      to={animePaths.full(item.mal_id)}
+                      to={appPaths.animeFull(item.mal_id)}
                       className="random-anime__btn random-anime__btn--details btn btn--icon btn--stroke">
                       Show details
                       <ArrowIcon />
                     </Link>
-                    <button className="random-anime__btn random-anime__btn--bookmark btn btn--icon btn--stroke btn--transparent">
-                      <BookmarkIcon />
-                      <span>Bookmark</span>
-                    </button>
+                    <BookmarkButton
+                      item={item}
+                      type="anime"
+                      className="random-anime__btn random-anime__btn--bookmark btn btn--icon btn--stroke"
+                      bookmarkedClassName="btn--white btn--fill"
+                      noBookmarkedClassName="btn--transparent"
+                    />
                   </>
                 ) : (
                   <>

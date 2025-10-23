@@ -1,8 +1,7 @@
 .common-intro {
-  margin-bottom: 25px;
-  padding: 100px 0;
-
   position: relative;
+  padding: 100px 0;
+  margin-bottom: 25px;
 
   &--anime {
     background: url('/assets/anime-catalog.webp') center / cover no-repeat;
@@ -12,6 +11,9 @@
   }
   &--schedules {
     background: url('/assets/calendar-bg.jpg') center / cover no-repeat;
+  }
+  &--bookmark {
+    background: url('/assets/bookmark-bg.jpg') center / cover no-repeat;
   }
 
   @include media-max($tablet) {
@@ -35,6 +37,7 @@
       rgba(var(--bg-color-rgb), 0.7) 90%
     );
   }
+  
   &__inner {
     width: 100%;
     position: relative;

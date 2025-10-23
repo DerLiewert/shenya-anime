@@ -1,8 +1,7 @@
 import React from 'react';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus, useShowMore } from '@/hooks';
-import { EmptyValueMessage, Loading } from '@/components/UI';
-import { commonMessages } from '@/variables';
+import { EmptyValueMessage, Loading } from '@/components';
 
 import type { RootState } from '@/app/store';
 import type { AsyncThunk } from '@reduxjs/toolkit';
@@ -10,6 +9,7 @@ import type { Recommendation } from '@/models';
 import type { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
 
 import './RecommendationsTab.scss';
+import { commonMessages } from '@/constants';
 
 interface RecommendationsTabProps {
   selector: (state: RootState) => Recommendation[];
@@ -44,7 +44,7 @@ const RecommendationsTab = (props: RecommendationsTabProps) => {
   return (
     <div className="anime-recommendations">
       {isSuccess && recommendations.length > 0 ? (
-        <div className="anime-recommendations__items ">
+        <div className="anime-recommendations__items">
           {recommendations.slice(0, visibleCount).map(entityItem)}
         </div>
       ) : (

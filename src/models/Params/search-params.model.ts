@@ -13,20 +13,21 @@ export interface JikanSearchParams {
   start_date?: string;
   end_date?: string;
   unapproved?: boolean;
-
-  [key: string]: string | number | boolean | undefined;
 }
 
-export type SortOptions = 'asc' | 'desc';
+export const sortOptions = ['asc', 'desc'] as const;
+export type SortOptions = (typeof sortOptions)[number];
 
-export type SearchOrder =
-  | 'mal_id'
-  | 'title'
-  | 'start_date'
-  | 'end_date'
-  | 'score'
-  | 'scored_by'
-  | 'rank'
-  | 'popularity'
-  | 'members'
-  | 'favorites';
+export const searchOrder = [
+  'mal_id',
+  'title',
+  'start_date',
+  'end_date',
+  'score',
+  'scored_by',
+  'rank',
+  'popularity',
+  'members',
+  'favorites',
+] as const;
+export type SearchOrder = (typeof searchOrder)[number];

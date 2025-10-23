@@ -1,43 +1,25 @@
-import { useAppSelector } from '@/app/hooks';
-import { BroadcastItem, EmptyValueMessage, Pagination } from '@/components';
-import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
-import { schedulesFilter, SchedulesFilter, SchedulesParams } from '@/models';
-import { fetchSchedulesAnime } from '@/store/anime/schedulesAnimeSlice';
-import { scrollToTop, getUniqueItems } from '@/utils';
-import { animeEmptyValueMessages, commonMessages, weekDaysOptions } from '@/variables';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import isEqual from 'lodash.isequal';
+import { useAppSelector } from '@/app/hooks';
+import { fetchSchedulesAnime } from '@/store';
+import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
+import { animeEmptyValueMessages, commonMessages } from '@/constants';
+import { scrollToTop, getUniqueItems, parseBroadcastAnimeParams } from '@/utils';
+import { weekDaysOptions } from '@/resources';
+import { BroadcastItem, EmptyValueMessage, Pagination } from '@/components';
+import { schedulesFilter } from '@/models';
+
 import './Broadcast.scss';
 
-function parseSearchParams(search: string): Partial<SchedulesParams> {
-  const params = new URLSearchParams(search);
-  const result: Partial<SchedulesParams> = {};
+const parseSearchParams = parseBroadcastAnimeParams({
+  allAllowed: false,
+  rules: { filter: true, page: true },
+});
 
-  for (const [key, value] of params.entries()) {
-    switch (key) {
-      case 'filter':
-        if (schedulesFilter.includes(value as SchedulesFilter)) {
-          result.filter = value as SchedulesFilter;
-        }
-        break;
-      case 'page':
-        const page = parseInt(value, 10);
-        if (!isNaN(page)) {
-          (result as any)[key] = page;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  return result;
-}
-
-function Broadcast() {
+const Broadcast = () => {
   const broadcastRef = React.useRef<HTMLDivElement>(null);
 
   const abortableDispatch = useAbortableDispatch();
@@ -56,14 +38,14 @@ function Broadcast() {
 
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
-    abortableDispatch(fetchSchedulesAnime, searchParams);
+    abortableDispatch(fetchSchedulesAnime, searchParams as any);
   }, []);
 
   React.useEffect(() => {
     const newParams = getSearchParams();
     if (!isEqual(searchParams, newParams)) {
       setSearchParams(newParams);
-      abortableDispatch(fetchSchedulesAnime, newParams);
+      abortableDispatch(fetchSchedulesAnime, newParams as any);
     }
   }, [location.search]);
 
@@ -114,6 +96,6 @@ function Broadcast() {
       )}
     </div>
   );
-}
+};
 
 export default Broadcast;

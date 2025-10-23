@@ -1,8 +1,9 @@
 import React from 'react';
 import { AnimeStaff } from '@/models';
-import { fetchAnimeStaff } from '@/store/anime/animeFullByIdSlice';
 import { EntityTab, EntityTabItem } from '@/components';
-import { animeEmptyValueMessages } from '@/variables';
+import { animeEmptyValueMessages } from '@/constants';
+import { fetchAnimeStaff } from '@/store';
+import { appPaths } from '@/resources';
 import './StaffTab.scss';
 
 const StaffTab: React.FC = () => {
@@ -17,7 +18,7 @@ const StaffTab: React.FC = () => {
         return (
           <EntityTabItem
             key={item.person.mal_id}
-            linkUrl={`/people/${item.person.mal_id}`}
+            linkUrl={appPaths.personFull(item.person.mal_id)}
             images={item.person.images}
             title={item.person.name}
             subtitles={item.positions}

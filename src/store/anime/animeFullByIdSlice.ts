@@ -10,7 +10,7 @@ import {
   getAnimeStaff,
   getAnimeStatistics,
   getAnimeVideos,
-} from '@/api/anime.client';
+} from '@/api/client/anime.client';
 import {
   AnimeCharacter,
   AnimeEpisode,

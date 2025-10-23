@@ -1,7 +1,7 @@
 import React from 'react';
 import { PicturesTab } from '@/components';
-import { fetchAnimePictures } from '@/store/anime/animeFullByIdSlice';
-import { animeEmptyValueMessages } from '@/variables';
+import { animeEmptyValueMessages } from '@/constants';
+import { fetchAnimePictures } from '@/store';
 
 const AnimePicturesTab: React.FC = () => {
   return (

@@ -1,15 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { InfoRow, InfoValue, Score, Status } from '@/components';
+import { specialStatus } from '@/constants';
+import { getImageUrl, getShortAnimeRating, valueOrDefault } from '@/utils';
+import { appPaths } from '@/resources';
 import { Anime } from '@/models';
-import { getImageUrl, getShortAnimeRating } from '@/utils';
-import { SpecialStatus } from '@/variables';
+import './SearchItem.scss';
 
 const SearchAnimeItem: React.FC<{ item: Anime }> = ({ item }) => {
   return (
-    <Link to={`anime/${item.mal_id}`} className="search-modal__item search-item">
+    <Link to={appPaths.animeFull(item.mal_id)} className="search-modal__item search-item">
       <div className="search-item__image bg">
-        <img src={getImageUrl(item.images)} alt="Poster" aria-hidden />
+        <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" aria-hidden />
       </div>
       <div className="search-item__content">
         <div className="search-item__labels">
@@ -21,30 +23,29 @@ const SearchAnimeItem: React.FC<{ item: Anime }> = ({ item }) => {
         </div>
         <div className="search-item__info">
           <InfoRow name="Type">
-            <InfoValue>{item.type ? item.type : SpecialStatus.Unknown}</InfoValue>
-            {item.rating && <InfoValue isLinkPrimary>{getShortAnimeRating(item.rating)}</InfoValue>}
-            {item.aired.prop.from.year && item.aired.prop.from.year}
-          </InfoRow>
-          {item.episodes && (
-            <InfoRow name="Episodes">
-              <InfoValue>
-                {item.episodes}
-                {item.duration && item.duration !== SpecialStatus.Unknown && (
-                  <>
-                    &nbsp;&nbsp; {/* 2 spaces */}
-                    <span>( {item.duration} )</span>
-                  </>
-                )}
+            <InfoValue>{valueOrDefault(item.type)}</InfoValue>
+            {item.rating && (
+              <InfoValue isPrimaryColor title={item.rating}>
+                {getShortAnimeRating(item.rating)}
               </InfoValue>
-            </InfoRow>
-          )}
-          {item.genres.length > 0 && (
-            <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
-              {item.genres.map((genre) => (
-                <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>
-              ))}
-            </InfoRow>
-          )}
+            )}
+            {item.aired.prop.from.year && <InfoValue>{item.aired.prop.from.year}</InfoValue>}
+          </InfoRow>
+
+          <InfoRow name="Episodes">
+            <InfoValue>{valueOrDefault(item.episodes, specialStatus.mark)}</InfoValue>
+            {item.duration && item.duration !== 'Unknown' && (
+              <InfoValue>{<span>( {item.duration} )</span>}</InfoValue>
+            )}
+          </InfoRow>
+
+          <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
+            {item.genres.length > 0 ? (
+              item.genres.map((genre) => <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>)
+            ) : (
+              <InfoValue>{specialStatus.unknown}</InfoValue>
+            )}
+          </InfoRow>
         </div>
       </div>
     </Link>

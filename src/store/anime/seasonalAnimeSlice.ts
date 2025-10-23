@@ -1,4 +1,4 @@
-import { getResource } from '@/api/api.client';
+import { getResource } from '@/api/client/api.client';
 import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Anime } from '../../models';

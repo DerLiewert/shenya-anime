@@ -4,45 +4,18 @@ import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
 import { AnimeCard, Pagination } from '@/components';
-import { AnimeSeason, animeSeasons, JikanSeasonsPlusParams } from '@/models';
-import { fetchSeasonsList } from '@/store/season/seasonListSlice';
-import { fetchSeasonsAnime } from '@/store/season/seasonsAnimeSlice';
-import { getSeasonName, getUniqueItems, scrollToTop } from '@/utils';
+import { fetchSeasonsList, fetchSeasonsAnime } from '@/store';
+import { getSeasonName, getUniqueItems, parseSeasonAnimeParams, scrollToTop } from '@/utils';
+import { seasonOptions } from '@/resources';
 import Select from 'react-select';
 import isEqual from 'lodash.isequal';
 import './Seasonal.scss';
-import { seasonOptions } from '@/variables';
 
-function parseSearchParams(search: string): Partial<JikanSeasonsPlusParams> {
-  const params = new URLSearchParams(search);
-  const result: Partial<JikanSeasonsPlusParams> = {};
+const parseSearchParams = parseSeasonAnimeParams({
+  allAllowed: false,
+  rules: { year: true, season: true, page: true },
+});
 
-  for (const [key, value] of params.entries()) {
-    switch (key) {
-      case 'year':
-        const year = Number(value);
-        if (!isNaN(year)) result.year = year;
-        break;
-      case 'season':
-        if (animeSeasons.includes(value as AnimeSeason)) {
-          result.season = value as AnimeSeason;
-        }
-        break;
-      case 'page':
-        const page = parseInt(value, 10);
-        if (!isNaN(page)) {
-          (result as any)[key] = page;
-        }
-        break;
-      default:
-        break;
-    }
-  }
-
-  return result;
-}
-
-// ===== Seasonal ===== //
 function Seasonal() {
   const seasonalRef = React.useRef<HTMLDivElement>(null);
 

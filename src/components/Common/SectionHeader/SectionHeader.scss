@@ -1,7 +1,6 @@
 .section-header {
   display: flex;
   justify-content: space-between;
-  // align-items: flex-end;
   align-items: center;
   flex-wrap: wrap;
   gap: 10px 50px;
@@ -18,8 +17,8 @@
 
   &__title {
     line-height: math.div(48, 36);
-    padding-left: 15px;
     border-left: 10px solid var(--primary-color);
+    padding-left: 15px;
 
     @include media-max($tablet) {
       border-width: 8px;
@@ -35,11 +34,10 @@
   }
 
   &__link {
-    color: var(--primary-color);
     font-size: 20px;
     line-height: math.div(29, 20);
-    // line-height: 29px;
     text-transform: capitalize;
+    color: var(--primary-color);
     display: flex;
     align-items: center;
     margin-top: 7px;
@@ -63,6 +61,7 @@
 
     @media (any-hover: hover) {
       transition: color 0.3s ease 0s;
+      
       svg {
         transition: transform 0.3s ease 0s;
         path {

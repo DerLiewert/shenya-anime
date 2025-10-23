@@ -1,13 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Character } from '@/models';
 import { getImageUrl } from '@/utils';
+import { appPaths } from '@/resources';
+import { Character } from '@/models';
+import './SearchItem.scss';
 
 const SearchMangaItem: React.FC<{ item: Character }> = ({ item }) => {
   return (
-    <Link to={`character/${item.mal_id}`} className="search-modal__item search-item">
+    <Link to={appPaths.characterFull(item.mal_id)} className="search-modal__item search-item">
       <div className="search-item__image bg">
-        <img src={getImageUrl(item.images)} alt="Poster" aria-hidden />
+        <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" aria-hidden />
       </div>
       <div className="search-item__content">
         <div className="search-item__top">

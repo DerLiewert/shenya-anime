@@ -1,7 +1,7 @@
 import React from 'react';
-import { PicturesTab } from '../CommonTabsContent/PicturesTab';
-import { personEmptyValueMessages } from '@/variables';
-import { fetchPersonPictures } from '@/store/person/personFullByIdSlice';
+import { fetchPersonPictures } from '@/store';
+import { personEmptyValueMessages } from '@/constants';
+import { PicturesTab } from '@/components';
 
 const PersonPicturesTab: React.FC = () => {
   return (

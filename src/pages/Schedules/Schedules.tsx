@@ -1,23 +1,27 @@
 import React from 'react';
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { Broadcast, CommonIntro, Seasonal } from '@/components';
+// import { CommonIntro, Broadcast, Seasonal } from '@/components';
+import { CommonIntro } from '@/components';
+import { NotFound } from '@/pages';
+import { TabRoute } from '@/typescript';
 import './Schedules.scss';
-import NotFound from '../NotFound/NotFound';
+import Broadcast from '@/components/Sections/Broadcast/Broadcast';
+import Seasonal from '@/components/Sections/Seasonal/Seasonal';
+import { appPaths } from '@/resources';
 
-const routeItems: { label: string; path: string; element: React.JSX.Element }[] = [
-  { label: 'Currently Airing', path: 'broadcast', element: <Broadcast /> },
-  { label: 'Seasonal Anime', path: 'seasonal', element: <Seasonal /> },
+const routeItems: TabRoute[] = [
+  { label: 'Currently Airing', value: 'broadcast', element: <Broadcast /> },
+  { label: 'Seasonal Anime', value: 'seasonal', element: <Seasonal /> },
 ];
+
+const pagePath = appPaths.schedules;
 
 function Schedules() {
   const navigate = useNavigate();
   const location = useLocation();
-  const segments = location.pathname.split('/').filter(Boolean);
+  const tabSegments = location.pathname.replace(pagePath, '').split('/').filter(Boolean);
 
-  if (
-    (segments.length > 1 && !routeItems.find((obj) => obj.path === segments[1])) ||
-    segments.length > 2
-  )
+  if (tabSegments.length > 0 && !routeItems.find((obj) => obj.value === tabSegments[0]))
     return <NotFound />;
 
   return (
@@ -25,28 +29,26 @@ function Schedules() {
       <CommonIntro bgPrefix="schedules" title="Schedules Anime" />
       <div className="schedules__tabs schedules-tabs">
         <div className="container">
-          <div className="schedules-tabs__list">
+          <div className="schedules-tabs__list tab-list">
             {routeItems.map((item) => (
               <div
-                key={item.path}
-                className="schedules-tabs__trigger fz-16 "
-                aria-selected={segments[1] === item.path}
+                key={item.value}
+                className="tab-list__trigger fz-16"
+                aria-selected={tabSegments[0] === item.value}
                 onClick={(e) => {
                   if (e.currentTarget.getAttribute('aria-selected') === 'true') return;
-                  navigate({ pathname: `/${segments[0]}/${item.path}` });
+                  navigate(`${pagePath}/${item.value}`);
                 }}>
                 {item.label}
               </div>
             ))}
           </div>
           <div className="schedules-tabs__content">
-            {/* <Route key={routeItems[0].path} path={'/'} element={routeItems[0].element} /> */}
             <Routes>
-              <Route index element={<Navigate to={routeItems[0].path} replace />} />
+              <Route index element={<Navigate to={routeItems[0].value} replace />} />
               {routeItems.map((item) => (
-                <Route key={item.path} path={item.path} element={item.element} />
+                <Route key={item.value} path={item.value} element={item.element} />
               ))}
-              {/* <Route path={'*'} element={<Navigate to="/not-found" replace />} /> */}
             </Routes>
           </div>
         </div>

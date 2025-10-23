@@ -68,13 +68,13 @@
       grid-template-columns: repeat(4, 1fr);
     }
     @include media-max($mobile) {
+      gap: 10px;
+    }
+    @include media-max(700px) {
       grid-template-columns: repeat(3, 1fr);
     }
-    @include media-max(600px) {
+    @include media-max($mobileSmall) {
       grid-template-columns: repeat(2, 1fr);
-    }
-    @include media-max(360px) {
-      grid-template-columns: 1fr;
     }
   }
 
@@ -140,7 +140,9 @@
 }
 
 .catalog-sidebar {
-  @include media-max($tablet) {
+  $self: &;
+
+  &._modal {
     position: fixed;
     top: 0;
     left: -100%;
@@ -151,8 +153,7 @@
     // transform: translateX(-100%);
     background-color: rgba(var(--bg-color-rgb), 0.6);
     backdrop-filter: blur(5px);
-  }
-  @include media-between($mobileSmall, $tablet) {
+
     opacity: 0;
     transition: opacity 0.3s ease 0s, left 0s ease 0.3s;
     // transition: opacity 0.3s ease 0s, transform 0s ease 0.3s;
@@ -162,51 +163,46 @@
       // transform: translateX(0%);
       transition: opacity 0.3s ease 0s;
     }
-  }
-  @include media-max($mobileSmall) {
-    // transition: transform 0.3s ease 0s;
-    left: -120%;
-    transition: left 0.5s ease 0s;
-    &._show {
-      left: 0;
-      // transform: translateX(0%);
+
+    @include media-max($mobileSmall) {
+      // transition: transform 0.3s ease 0s;
+      left: -120%;
+      transition: left 0.5s ease 0s;
+      &._show {
+        left: 0;
+        // transform: translateX(0%);
+      }
     }
   }
 
-  &__inner {
-    @include media-max($tablet) {
-      background-color: var(--bg-color);
-      display: flex;
-      flex-direction: column;
-      width: 280px;
-      height: 100%;
-      max-height: 100%;
-      border-right: 1px solid var(--main-color);
-    }
-    @include media-between($mobileSmall, $tablet) {
-      position: relative;
-      left: -100%;
-      transition: left 0.3s ease 0s;
-      // transform: translateX(-100%);
-      // transition: transform 0.3s ease 0s;
-    }
+  &._modal &__inner {
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    height: 100%;
+    max-height: 100%;
+    border-right: 1px solid var(--main-color);
+
+    position: relative;
+    left: -100%;
+    transition: left 0.3s ease 0s, width 0.3s ease 0s;
+
     @include media-max($mobileSmall) {
       width: 100%;
       border-right: none;
     }
   }
-  &._show &__inner {
-    @include media-between($mobileSmall, $tablet) {
-      left: 0;
-      // transform: translateX(0%);
-    }
+  &._modal._show &__inner {
+    left: 0;
   }
 
   &__header {
-    @include media-min($tablet) {
-      display: none;
-    }
-    @include media-max($tablet) {
+    display: none;
+  }
+
+  &._modal & {
+    &__header {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -214,20 +210,14 @@
       padding: 17px 12px;
       border-bottom: 1px solid var(--main-color);
     }
-  }
 
-  &__title {
-    @include media-max($tablet) {
+    &__title {
       text-transform: uppercase;
       font-weight: 500;
       letter-spacing: 1.5px;
     }
-  }
 
-  &__close-btn {
-    display: none;
-    @include media-max($tablet) {
-      display: block;
+    &__close-btn {
       position: relative;
       width: 26px;
       height: 18px;
@@ -253,10 +243,8 @@
         transform: rotate(45deg);
       }
     }
-  }
 
-  &__filters {
-    @include media-max($tablet) {
+    &__filters {
       flex: 1 1 auto;
       overflow: auto;
       padding: 17px 12px 20px;

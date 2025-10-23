@@ -1,8 +1,8 @@
 import React from 'react';
-import { EntityTabItem } from '@/components/Common';
+import { EntityTab, EntityTabItem } from '@/components';
 import { CharacterManga } from '@/models';
-import { characterEmptyValueMessages } from '@/variables';
-import EntityTab from '../CommonTabsContent/EntityTab/EntityTab';
+import { characterEmptyValueMessages } from '@/constants';
+import { appPaths } from '@/resources';
 
 const CharacterMangaTab: React.FC = () => {
   return (
@@ -14,7 +14,7 @@ const CharacterMangaTab: React.FC = () => {
         return (
           <EntityTabItem
             key={item.manga.mal_id}
-            linkUrl={`/manga/${item.manga.mal_id}`}
+            linkUrl={appPaths.mangaFull(item.manga.mal_id)}
             images={item.manga.images}
             title={item.manga.title}
             subtitles={[{ prefix: 'Role', text: item.role }]}

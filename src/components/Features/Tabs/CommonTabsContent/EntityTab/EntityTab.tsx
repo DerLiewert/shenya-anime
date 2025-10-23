@@ -2,13 +2,13 @@ import React from 'react';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useShowMore, useFetchStatus } from '@/hooks';
 import { EmptyValueMessage, Loading } from '@/components';
-import { commonMessages } from '@/variables';
 
 import type { AsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '@/app/store';
 import type { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript';
 
 import './EntityTab.scss';
+import { commonMessages } from '@/constants';
 
 interface EntityTabProps<T> {
   selector: (state: RootState) => T[];

@@ -1,8 +1,7 @@
 import React from 'react';
-import { EntityTabItem } from '@/components/Common';
 import { CharacterVoiceActor } from '@/models';
-import { characterEmptyValueMessages } from '@/variables';
-import EntityTab from '../CommonTabsContent/EntityTab/EntityTab';
+import { EntityTab, EntityTabItem } from '@/components';
+import { characterEmptyValueMessages } from '@/constants';
 
 const CharacterVoicesTab: React.FC = () => {
   return (

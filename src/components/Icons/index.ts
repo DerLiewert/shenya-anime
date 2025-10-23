@@ -6,3 +6,5 @@ export * from './SearchIcon';
 export * from './PlayCircleIcon';
 export * from './CryoIcon';
 export * from './FilterIcon';
+export * from './SfwOffIcon';
+export * from './SfwOnIcon';

@@ -1,0 +1,17 @@
+.additional-info {
+  background-color: var(--bg-color-light);
+  padding: 15px 15px 18px;
+  @include media-max($mobile) {
+    padding: 10px 10px 13px;
+  }
+  &__row {
+    color: var(--main-color);
+    .info-row__value {
+      &:not(:last-child) {
+        &::after {
+          content: ',';
+        }
+      }
+    }
+  }
+}

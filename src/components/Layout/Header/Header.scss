@@ -6,37 +6,132 @@
   // right: 0;
   // z-index: 900;
   padding: 25px 0;
+
+  @include media-max($tablet) {
+    padding: 20px 0;
+  }
+
   &__body {
     display: flex;
     align-items: center;
     justify-content: space-between;
     column-gap: 50px;
+    @include media-max($mobileSmall) {
+      column-gap: 15px;
+    }
   }
-  @include media-max($tablet) {
-    padding: 20px 0;
-  }
-}
 
-.logo,
-.actions {
-  @include media-min($tablet) {
-    max-width: 200px;
-    width: 100%;
+  &__logo,
+  &__actions {
+    @include media-min($tablet) {
+      max-width: 200px;
+      width: 100%;
+    }
   }
-}
 
-.logo {
-  img {
-    width: 100%;
+  &__logo {
+    img {
+      width: 100%;
+    }
+    @include media-max($tablet) {
+      max-width: 180px;
+    }
+    @include media-max($mobile) {
+      max-width: 160px;
+    }
+    @include media-max($mobileSmall) {
+      max-width: 140px;
+    }
   }
-  @include media-max($tablet) {
-    max-width: 180px;
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px 12px;
+    @include media-max($mobile) {
+      gap: 10px;
+    }
+    @include media-max($mobileSmall) {
+      gap: 8px;
+    }
   }
-  @include media-max($mobile) {
-    max-width: 160px;
+
+  &__sfw-btn,
+  &__action-btn {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+
+    @include media-max($mobile) {
+      width: 30px;
+      height: 30px;
+    }
+    @include media-max($mobileSmall) {
+      width: 28px;
+      height: 28px;
+    }
   }
-  @include media-max($mobileSmall) {
-    max-width: 140px;
+
+  &__sfw-btn {
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (any-hover: hover) {
+      svg {
+        rect {
+          transition: stroke 0.3s ease 0s;
+        }
+        text {
+          transition: color 0.3s ease 0s;
+        }
+      }
+
+      &:hover {
+        svg {
+          rect {
+            stroke: var(--primary-color);
+          }
+          text {
+            color: var(--primary-color);
+          }
+        }
+      }
+    }
+  }
+
+  &__action-btn {
+    border: 2px solid var(--main-color);
+    svg {
+      width: 70%;
+      height: 70%;
+      stroke: var(--main-color);
+      path {
+        stroke: var(--main-color);
+      }
+    }
+
+    @media (any-hover: hover) {
+      transition: border-color 0.3s ease 0s;
+
+      svg path {
+        transition: stroke 0.3s ease 0s;
+      }
+
+      &:hover {
+        border-color: var(--primary-color);
+        svg path {
+          stroke: var(--primary-color);
+        }
+      }
+    }
   }
 }
 
@@ -45,13 +140,13 @@
     position: absolute;
     top: 100%;
     right: -100%;
-    width: 100%;
     z-index: 100;
+    width: 100%;
     height: calc(100vh - 100%);
-    transition: right 0.3s ease 0s;
-    background-color: var(--bg-color);
     overflow: auto;
+    background-color: var(--bg-color);
     padding: 25px math.div($containerPadding, 2) + px;
+    transition: right 0.3s ease 0s;
 
     .menu-open & {
       right: 0;
@@ -64,6 +159,7 @@
       min-height: 100%;
     }
   }
+
   &__list {
     display: flex;
     flex-wrap: wrap;
@@ -105,57 +201,20 @@
   }
 }
 
-//==== Actions ====================================================================================================================================================
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px 20px;
-}
-.search-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  background-color: var(--main-color);
-  width: 32px;
-  height: 32px;
-  svg {
-    width: 70%;
-    height: 70%;
-  }
-
-  @media (any-hover: hover) {
-    transition: background-color 0.3s ease 0s;
-    svg path {
-      transition: stroke 0.3s ease 0s;
-    }
-
-    &:hover {
-      background-color: var(--primary-color);
-      svg path {
-        stroke: var(--main-color);
-      }
-    }
-  }
-
-  @include media-max($mobile) {
-    width: 28px;
-    height: 28px;
-  }
-}
 .burger {
   display: none;
+
   @include media-max($tablet) {
     display: block;
     position: relative;
     width: 36px;
     height: 20px;
     z-index: 5;
+
     @media (any-hover: none) {
       cursor: default;
     }
+
     span,
     &::before,
     &::after {
@@ -193,6 +252,7 @@
       }
     }
   }
+
   @include media-max($mobile) {
     width: 32px;
     height: 18px;

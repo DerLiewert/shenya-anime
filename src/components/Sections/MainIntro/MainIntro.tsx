@@ -1,9 +1,9 @@
 import React from 'react';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
+import { fetchIntroAnime } from '@/store';
 import { getUniqueItems } from '@/utils';
-import { fetchIntroAnime } from '@/store/anime/introAnimeSlice';
-import MainIntroSlide, { MainIntroSkeleton } from './MainIntroSlide';
+import { MainIntroSlide, MainIntroSkeleton } from './MainIntroSlide';
 
 import { Swiper, SwiperSlide, useSwiper } from 'swiper/react';
 import { Autoplay, EffectFade, Pagination } from 'swiper/modules';
@@ -12,13 +12,15 @@ import 'swiper/scss';
 import 'swiper/scss/effect-fade';
 import 'swiper/scss/autoplay';
 
+import mainBg from '@/assets/main-bg.jpg';
+
 import clsx from 'clsx';
 import './MainIntro.scss';
 
 const MainIntro: React.FC = () => {
   const abortableDispatch = useAbortableDispatch();
   const { items, status } = useAppSelector((state) => state.introAnime);
-  const { isLoading, isSuccess } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
   const uniqueItems = React.useMemo(() => getUniqueItems(items).slice(0, 10), [items]);
 
   // Из-за EffectFade изображения на всех слайдах сразу подгружаются. Фикс, типа lazy-loading
@@ -38,13 +40,36 @@ const MainIntro: React.FC = () => {
   };
 
   React.useEffect(() => {
-    if (!isLoading && !isSuccess) abortableDispatch(fetchIntroAnime);
+    if (items.length === 0) abortableDispatch(fetchIntroAnime);
   }, []);
 
   // На случай, если uniqueItems будут как-то обновлять после загрузки (но добавлять мы этого не будем XD). Пока избыточно
   // React.useEffect(() => {
   //   if(loadedSlides.size > 0) setLoadedSlides(new Set())
   // }, [uniqueItems]);
+
+  if (isError || (isSuccess && items.length === 0))
+    return (
+      <div className="main-intro">
+        <div className="main-intro__preview main-preview bg">
+          <div className="main-preview__image">
+            <img src={mainBg} alt="Main background" aria-hidden />
+          </div>
+          <div className="container">
+            <div className="main-preview__content">
+              <h1 className="main-preview__title fz-48">
+                Discover your next <span>Anime</span> adventure
+              </h1>
+              <p className="main-preview__text fz-18">
+                Your ultimate source for everything anime! Discover reviews, the latest
+                recommendations, fan-favorite characters, and exciting news and trivia. Dive into
+                the world of anime with us and find your next favorite series to enjoy!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
 
   return (
     <div className="main-intro">

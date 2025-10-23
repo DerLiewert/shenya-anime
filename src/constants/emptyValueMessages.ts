@@ -46,6 +46,7 @@ export const mangaEmptyValueMessages = {
 };
 
 export const characterEmptyValueMessages = {
+  about: 'There is no information about this character.',
   pictures: 'No pictures are available for this character.',
   anime: 'No anime has been added for this character.',
   manga: 'No manga has been added for this character.',
@@ -58,6 +59,10 @@ export const personEmptyValueMessages = {
   anime: 'No anime has been added for this person.',
   manga: 'No manga has been added for this person.',
   voices: 'No voice actors has been added for this person.',
+};
+
+export const producerEmptyValueMessages = {
+  about: 'No info about this producer has been added.',
 };
 
 export const commonMessages = {

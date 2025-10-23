@@ -1,5 +1,5 @@
 import { SchedulesEndpoints } from '@/api';
-import { getResource } from '@/api/api.client';
+import { getResource } from '@/api/client/api.client';
 import { AsyncThunkConfig, FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Anime, JikanPaginationPlus, JikanResponse, SchedulesFilter } from '../../models';
@@ -41,13 +41,15 @@ export const schedulesAnimeSlice = createSlice({
 
 export const fetchSchedulesAnime = createAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
-  { filter: SchedulesFilter; page?: number }, AsyncThunkConfig
+  { filter: SchedulesFilter; page?: number },
+  AsyncThunkConfig
 >('schedules-anime/fetchAnimeItems', async ({ page, filter }, { signal }) => {
   const data = await getResource<Anime[], JikanPaginationPlus>({
     endpoint: SchedulesEndpoints.schedules,
     queryParams: {
       filter,
       page,
+      limit: 24,
     },
     signal,
   });

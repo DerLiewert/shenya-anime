@@ -2,6 +2,70 @@
   $self: &;
   min-height: 0;
   overflow: hidden;
+  position: relative;
+
+  &__bookmark {
+    opacity: 0;
+    &._bookmarked {
+      opacity: 1;
+    }
+
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 10;
+
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // border-radius: 8px;
+    // background-color: var(--main-color);
+    width: 32px;
+    height: 32px;
+    padding: unset;
+    // svg {
+    //   width: 70%;
+    //   height: 70%;
+    //   stroke: var(--bg-color);
+    // }
+
+    // &._bookmarked {
+    //   background-color: var(--primary-color);
+    //   svg path {
+    //     stroke: var(--main-color);
+    //   }
+    // }
+
+    // @media (any-hover: hover) {
+    //   transition: background-color 0.3s ease 0s;
+    //   svg path {
+    //     transition: stroke 0.3s ease 0s;
+    //   }
+
+    //   &:hover {
+    //     background-color: var(--primary-color-dark);
+    //     svg path {
+    //       stroke: var(--main-color);
+    //     }
+    //   }
+    // }
+
+    // @include media-max($mobile) {
+    //   width: 28px;
+    //   height: 28px;
+    // }
+  }
+
+  @media (any-hover: hover) {
+    &:hover &__bookmark {
+      opacity: 1;
+    }
+  }
+
+  &__inner {
+    width: 100%;
+    border-radius: inherit;
+  }
 
   &__image {
     width: 100%;
@@ -22,7 +86,8 @@
   }
 
   &__status,
-  &__score {
+  &__score,
+  &__bookmark {
     position: absolute;
     z-index: 1;
   }
@@ -53,10 +118,10 @@
   }
 
   &__text {
-    line-height: math.div(18, 14);
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 5px 10px;
+    line-height: math.div(18, 14);
   }
 }

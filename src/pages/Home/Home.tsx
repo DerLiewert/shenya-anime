@@ -7,43 +7,40 @@ import {
   NewEpisodes,
   RandomAnime,
 } from '@/components';
-import { Anime, animeSeasons, Manga } from '@/models';
-import { fetchSeasonalAnime } from '@/store/anime/seasonalAnimeSlice';
-import { fetchTopManga } from '@/store/manga/mangaTopSlice';
-import './Home.scss';
+import { appPaths } from '@/resources';
 import { getSeasonName, toFirstUppercase } from '@/utils';
-import { commonPaths } from '@/variables';
-import { fetchIntroAnime } from '@/store/anime/introAnimeSlice';
+import { fetchIntroAnime, fetchSeasonalAnime, fetchTopManga } from '@/store';
+import './Home.scss';
 
 const Home: React.FC = () => {
   return (
     <>
       <MainIntro />
-      <MediaBlock<Anime>
+      <MediaBlock
         type="anime"
         header={{
           title: 'Top Anime',
-          link: { url: commonPaths.anime, text: 'View all' },
+          link: { url: appPaths.anime, text: 'View all' },
         }}
         selector={(state) => state.introAnime}
         renderCard={(item) => <AnimeCard item={item} />}
         fetchAction={fetchIntroAnime}
       />
-      <MediaBlock<Manga>
+      <MediaBlock
         type="manga"
         header={{
           title: 'Top Manga',
-          link: { url: commonPaths.manga, text: 'View all' },
+          link: { url: appPaths.manga, text: 'View all' },
         }}
         selector={(state) => state.mangaTop}
         renderCard={(item) => <MangaCard item={item} />}
         fetchAction={fetchTopManga}
       />
-      <MediaBlock<Anime>
+      <MediaBlock
         type="anime"
         header={{
           title: 'Seasonal anime',
-          link: { url: commonPaths.seasonal, text: 'View all' },
+          link: { url: appPaths.seasonal, text: 'View all' },
         }}
         subtitle={`${toFirstUppercase(getSeasonName())} ${new Date().getFullYear()}`}
         selector={(state) => state.seasonalAnime}

@@ -21,13 +21,6 @@
     border-radius: 6px;
     margin-right: 15px;
 
-    // @include media-between($mobileSmall, $mobile) {
-    //   // width: 130px;
-    //   width: 86px;
-    //   min-height: 120px;
-    //   margin-right: 10px;
-    // }
-
     @include media-max($mobile) {
       width: 86px;
       min-height: 115px;
@@ -40,17 +33,6 @@
       margin-right: 7px;
     }
 
-    // @include media-max(400px) {
-    // @include media-max($mobile) {
-    //   width: 100%;
-    //   height: 130px;
-    //   margin-right: 0;
-    //   margin-bottom: 10px;
-    // }
-    // @include media-max($mobileSmall) {
-    //   height: 110px;
-    // }
-
     @media (any-hover: hover) {
       img {
         transition: transform 0.3s ease 0s;
@@ -60,7 +42,6 @@
 
   &__body {
     align-self: center;
-    // padding: 10px 20px;
     @include media-max($mobile) {
       padding: 0 5px 2px;
     }

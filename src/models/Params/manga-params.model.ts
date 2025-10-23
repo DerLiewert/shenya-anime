@@ -1,4 +1,4 @@
-import { JikanSearchParams, SearchOrder } from './search-params.model';
+import { JikanSearchParams, searchOrder } from './search-params.model';
 
 export interface MangaSearchParams extends JikanSearchParams {
   type?: MangaSearchType;
@@ -7,7 +7,8 @@ export interface MangaSearchParams extends JikanSearchParams {
   magazines?: string;
 }
 
-export type MangaSearchOrder = 'chapters' | 'volumes' | SearchOrder;
+export const mangaSearchOrder = ['chapters', 'volumes', ...searchOrder] as const;
+export type MangaSearchOrder = typeof mangaSearchOrder[number];
 
 export const mangaSearchType = [
   'manga',
@@ -18,8 +19,7 @@ export const mangaSearchType = [
   'manhwa',
   'manhua',
 ] as const;
-
-export type MangaSearchType = (typeof mangaSearchType)[number] ;
+export type MangaSearchType = (typeof mangaSearchType)[number];
 
 export const mangaSearchStatus = [
   'publishing',
@@ -28,5 +28,4 @@ export const mangaSearchStatus = [
   'discontinued',
   'upcoming',
 ] as const;
-
 export type MangaSearchStatus = (typeof mangaSearchStatus)[number];

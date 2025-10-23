@@ -1,7 +1,6 @@
-import { mangaEmptyValueMessages } from '@/variables';
-import { fetchMangaRecommendations } from '@/store/manga/mangaFullByIdSlice';
 import { MangaRecommendationCard, RecommendationsTab } from '@/components';
-import './RecommendationsTab.scss';
+import { mangaEmptyValueMessages } from '@/constants';
+import { fetchMangaRecommendations } from '@/store';
 
 const MangaRecommendationsTab = () => {
   return (

@@ -1,8 +1,6 @@
 import React from 'react';
 import BG from '@/assets/manga-bg.jpeg';
-import { fetchFullMangaById } from '@/store/manga/mangaFullByIdSlice';
 import { JikanNamedResource, MangaFull } from '@/models';
-import { mangaPaths } from '@/variables';
 import {
   EntityPageLayout,
   MangaCharacterTab,
@@ -11,6 +9,8 @@ import {
   MangaDetailsTab,
   MangaRecommendationsTab,
 } from '@/components';
+import { fetchFullMangaById } from '@/store';
+import { appPaths } from '@/resources';
 import './MangaPage.scss';
 
 const MangaPage = () => {
@@ -19,7 +19,7 @@ const MangaPage = () => {
       fetchAction={fetchFullMangaById}
       selector={(state) => state.mangaFullById.item}
       status={(state) => state.mangaFullById.status.item}
-      getBasePath={(id) => mangaPaths.full(id)}
+      getBasePath={(id) => appPaths.mangaFull(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.title,
@@ -27,6 +27,7 @@ const MangaPage = () => {
           ? [item.title_english, item.title_japanese].filter((str): str is string => Boolean(str))
           : [],
         resources: item && <MangaResources item={item} />,
+        bookmark: 'manga',
         breadcrumbs: item
           ? [
               { label: 'Top', url: '#' },
@@ -99,7 +100,7 @@ const MangaResources: React.FC<{ item: MangaFull }> = ({ item }) => {
       <ul className="anime-leftside__list leftside-list">
         {resources.length > 0 ? (
           resources.map((resource) => (
-            <li key={resource.url} className="leftside-list__item">
+            <li key={resource.url} className="leftside-list__item leftside-list__item--icon">
               <a
                 href={resource.url}
                 className="leftside-list__link"
@@ -110,7 +111,7 @@ const MangaResources: React.FC<{ item: MangaFull }> = ({ item }) => {
             </li>
           ))
         ) : (
-          <li className="leftside-list__empry">{emptyMessage}</li>
+          <li className="leftside-list__empty">{emptyMessage}</li>
         )}
       </ul>
     </div>

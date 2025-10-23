@@ -1,0 +1,22 @@
+.empty-value-message {
+  display: flex;
+  align-items: flex-end;
+
+  &__image {
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 37px;
+    height: 59px;
+    object-fit: contain;
+    margin-right: 10px;
+
+    @include media-max($mobile) {
+      width: 28px;
+      height: 43px;
+    }
+  }
+
+  &__text {
+    line-height: 1.3;
+  }
+}

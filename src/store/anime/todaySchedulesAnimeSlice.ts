@@ -1,8 +1,9 @@
-import { getResource } from '@/api/api.client';
-import { FetchStatus } from '@/typescript';
+import { getResource } from '@/api/client/api.client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Anime } from '../../models';
-import { WEEK_DAYS } from '../../variables';
+
+import { FetchStatus } from '@/typescript';
+import { Anime } from '@/models';
+import { weekDays } from '@/constants';
 
 interface TodaySchedulesAnimeState {
   items: Anime[];
@@ -47,7 +48,7 @@ export const fetchTodaySchedulesAnime = createAsyncThunk<Anime[]>(
     const { data } = await getResource<Anime[]>({
       endpoint: `https://api.jikan.moe/v4/schedules`,
       queryParams: {
-        filter: WEEK_DAYS[weekDayIndex],
+        filter: weekDays[weekDayIndex],
         // limit: 6,
       },
       signal,

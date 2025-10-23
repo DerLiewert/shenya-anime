@@ -1,62 +1,48 @@
-// TooltipWrapper.tsx
 import React from 'react';
-import { Manga } from '@/models';
-import { mangaPaths, mangaTypeOptions, SpecialStatus } from '@/variables';
-
-import { EmptyValueMessage, FormatDate, Loading, Score, Status } from '../../UI';
-import { InfoRow, InfoValue } from '../../Common/InfoRowWithValue';
 import { Link } from 'react-router-dom';
-import { FetchStatus } from '@/typescript';
 import { useFetchStatus } from '@/hooks';
-import TooltipWrapperProps from './Tooltip';
-import { getMangaById } from '@/api/manga.client';
+import { specialStatus } from '@/constants';
+import { appPaths, mangaTypeOptions } from '@/resources';
+import {
+  InfoRow,
+  InfoValue,
+  EmptyValueMessage,
+  FormatDate,
+  Loading,
+  Score,
+  Status,
+  Tooltip,
+} from '@/components';
+
+import type { FetchStatus } from '@/typescript';
+import type { Manga } from '@/models';
+
 import './Tooltip.scss';
+import { valueOrDefault } from '@/utils';
 
 type MangaTooltipProps = { children: React.ReactElement } & (
   | { id: number; item?: never }
   | { id?: never; item: Manga }
 );
 
-const MangaTooltip = ({ children, item, id }: MangaTooltipProps) => {
-  const [mangaItem, setMangaItem] = React.useState(item);
-  const [status, setStatus] = React.useState<FetchStatus>(
-    item ? FetchStatus.SUCCESS : FetchStatus.LOADING,
-  );
-
-  const onShowTippy = () => {
-    if (!id || mangaItem) return;
-
-    setStatus(FetchStatus.LOADING);
-
-    const getManga = async () => {
-      try {
-        const { data } = await getMangaById(id);
-        setMangaItem(data);
-        setStatus(FetchStatus.SUCCESS);
-      } catch (error) {
-        setStatus(FetchStatus.ERROR);
-      }
-    };
-
-    getManga();
-  };
-
+export const MangaTooltip = (props: MangaTooltipProps) => {
   return (
-    <TooltipWrapperProps
-      content={<MangaTooltipContent item={mangaItem ? mangaItem : null} status={status} />}
-      onShowTippy={onShowTippy}>
-      {children}
-    </TooltipWrapperProps>
+    <Tooltip
+      type="manga"
+      tooltipContent={(item, status) => <MangaTooltipContent item={item} status={status} />}
+      {...props}
+    />
   );
 };
 
-export default MangaTooltip;
+const MangaTooltipContent: React.FC<{
+  item: Manga | null | undefined;
+  status: FetchStatus | null;
+}> = ({ item, status }) => {
+  const { isLoading, isError, isIdle } = useFetchStatus(status);
 
-const MangaTooltipContent: React.FC<{ item: Manga | null; status: FetchStatus }> = ({
-  item,
-  status,
-}) => {
-  const { isLoading, isError, isSuccess } = useFetchStatus(status);
+  if (isIdle) return null;
+
   if (isLoading)
     return (
       <div className="tooltip">
@@ -81,11 +67,11 @@ const MangaTooltipContent: React.FC<{ item: Manga | null; status: FetchStatus }>
     <div className="tooltip">
       <div className="tooltip__labels">
         <Score className="tooltip__label tooltip__label--score" score={item.score} />
-        <Status className="tooltip__label tooltip__label--status" status={item.status as any} />
+        <Status className="tooltip__label tooltip__label--status" status={item.status} />
       </div>
       <div className="tooltip__section">
         <h3 className="tooltip__title title visible-line visible-line--2">
-          <Link to={`/manga/${item.mal_id}`} title={item.title}>
+          <Link to={appPaths.mangaFull(item.mal_id)} title={item.title}>
             {item.title}
           </Link>
         </h3>
@@ -95,24 +81,27 @@ const MangaTooltipContent: React.FC<{ item: Manga | null; status: FetchStatus }>
       </div>
       <div className="tooltip__section">
         <ul className="tooltip__list">
-          {item.type && (
-            <InfoRow name={'Type'}>
+          <InfoRow name="Type">
+            {item.type ? (
               <InfoValue
                 isLink
-                to={mangaPaths.catalogWithParams({
+                to={appPaths.mangaWithParams({
                   type: mangaTypeOptions.find((obj) => obj.label === item.type)?.value,
                 })}>
                 {item.type}
               </InfoValue>
-            </InfoRow>
-          )}
+            ) : (
+              <InfoValue>{specialStatus.unknown}</InfoValue>
+            )}
+          </InfoRow>
 
           <InfoRow name="Chapters">
-            <InfoValue>{item.chapters ? item.chapters : SpecialStatus.QuestionMark}</InfoValue>
+            <InfoValue>{valueOrDefault(item.chapters, specialStatus.mark)}</InfoValue>
           </InfoRow>
           <InfoRow name="Volumes">
-            <InfoValue>{item.volumes ? item.volumes : SpecialStatus.QuestionMark}</InfoValue>
+            <InfoValue>{valueOrDefault(item.volumes, specialStatus.mark)}</InfoValue>
           </InfoRow>
+
           <InfoRow name="Published">
             <InfoValue>
               {item.published.prop.from.year ? (
@@ -126,38 +115,36 @@ const MangaTooltipContent: React.FC<{ item: Manga | null; status: FetchStatus }>
                   )}
                 </>
               ) : (
-                'Not yet published'
+                specialStatus.unknown
               )}
             </InfoValue>
           </InfoRow>
 
-          <InfoRow name={item.authors.length > 1 ? 'Authors' : 'Author'}>
-            {item.authors.length > 0 ? (
-              item.authors.map((author) => (
-                <InfoValue key={author.mal_id} isLink to={`/people/${author.mal_id}`}>
+          {item.authors.length > 0 && (
+            <InfoRow name={item.authors.length > 1 ? 'Authors' : 'Author'}>
+              {item.authors.map((author) => (
+                <InfoValue key={author.mal_id} isLink to={appPaths.personFull(author.mal_id)}>
                   {author.name}
                 </InfoValue>
-              ))
-            ) : (
-              <InfoValue>{SpecialStatus.Unknown}</InfoValue>
-            )}
-          </InfoRow>
+              ))}
+            </InfoRow>
+          )}
 
-          <InfoRow name={item.serializations.length > 1 ? 'Serializations' : 'Serialization'}>
-            {item.serializations.length > 0 ? (
-              item.serializations.map((obj) => <InfoValue key={obj.mal_id}>{obj.name}</InfoValue>)
-            ) : (
-              <InfoValue>{SpecialStatus.Unknown}</InfoValue>
-            )}
-          </InfoRow>
+          {item.serializations.length > 0 && (
+            <InfoRow name={item.serializations.length > 1 ? 'Serializations' : 'Serialization'}>
+              {item.serializations.map((obj) => (
+                <InfoValue key={obj.mal_id}>{obj.name}</InfoValue>
+              ))}
+            </InfoRow>
+          )}
 
           {item.demographics.length > 0 && (
             <InfoRow name={item.demographics.length > 1 ? 'Demographics' : 'Demographic'}>
               {item.demographics.map((demographic) => (
                 <InfoValue
                   key={demographic.mal_id}
-                  isLink
-                  to={mangaPaths.catalogWithParams({ genres: demographic.mal_id.toString() })}>
+                  to={appPaths.mangaWithParams({ genres: demographic.mal_id.toString() })}
+                  isLink>
                   {demographic.name}
                 </InfoValue>
               ))}
@@ -169,13 +156,13 @@ const MangaTooltipContent: React.FC<{ item: Manga | null; status: FetchStatus }>
               item.genres.map((genre) => (
                 <InfoValue
                   key={genre.mal_id}
-                  isLink
-                  to={mangaPaths.catalogWithParams({ genres: genre.mal_id.toString() })}>
+                  to={appPaths.mangaWithParams({ genres: genre.mal_id.toString() })}
+                  isLink>
                   {genre.name}
                 </InfoValue>
               ))
             ) : (
-              <InfoValue>{SpecialStatus.Unknown}</InfoValue>
+              <InfoValue>{specialStatus.unknown}</InfoValue>
             )}
           </InfoRow>
 
@@ -184,8 +171,8 @@ const MangaTooltipContent: React.FC<{ item: Manga | null; status: FetchStatus }>
               {item.themes.map((theme) => (
                 <InfoValue
                   key={theme.mal_id}
-                  isLink
-                  to={mangaPaths.catalogWithParams({ genres: theme.mal_id.toString() })}>
+                  to={appPaths.mangaWithParams({ genres: theme.mal_id.toString() })}
+                  isLink>
                   {theme.name}
                 </InfoValue>
               ))}
