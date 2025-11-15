@@ -72,20 +72,25 @@ interface BookmarkedItems<T extends AnimeAndMangaType> {
 
 function BookmarkedItems<T extends AnimeAndMangaType>({ type, selector }: BookmarkedItems<T>) {
   const items = useAppSelector(selector);
-  const tempItems = React.useRef(items); // Чтоб при удалении айтема из Bookmarked, он оставался на странице до её обновления (на случай, если случайно удалили, чтоб сразу не исчезло)
 
-  if (Object.values(tempItems.current).length === 0)
+  // Чтоб при удалении айтема из Bookmarked, он оставался на странице до её обновления (на случай, если случайно удалили, чтоб сразу не исчезло)
+  const [tempData, setTempData] = React.useState({ type, items });
+  React.useEffect(() => {
+    setTempData({ type, items });
+  }, [selector]);
+
+  if (Object.values(tempData.items).length === 0)
     return <EmptyValueMessage message={`No bookmarked ${type}`} />;
 
   return (
     <div className="bookmark__items">
-      {Object.values(tempItems.current)
+      {Object.values(tempData.items)
         .sort((a, b) => {
           if (a.score && b.score) return b.score - a.score;
           else return 0;
         })
         .map((item) => {
-          switch (type) {
+          switch (tempData.type) {
             case 'anime':
               return <AnimeCard item={item as AnimeAndMangaOf<'anime'>} key={item.mal_id} />;
             case 'manga':

@@ -49,7 +49,7 @@ const MangaCatalogPage: React.FC = () => {
 
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.mangaGenres);
   const { items, pagination, status } = useAppSelector((state) => state.mangaCatalog);
-  const { isLoading, isError, isSuccess } = useFetchStatus(status);
+  const { isIdle, isLoading, isError, isSuccess } = useFetchStatus(status);
 
   const [isShowFilters, setIsShowFilters] = React.useState(false);
   const isTablet = useMatchMedia('max', breakpoints.tablet);
@@ -59,7 +59,9 @@ const MangaCatalogPage: React.FC = () => {
       parseMangaParams({
         allAllowed: false,
         rules: {
-          page: true,
+          page: pagination?.last_visible_page
+            ? { include: { from: 1, to: pagination.last_visible_page } }
+            : true,
           status: true,
           min_score: true,
           max_score: true,
@@ -97,18 +99,6 @@ const MangaCatalogPage: React.FC = () => {
     abortableDispatch(fetchMangaByParams, searchParams);
   }, [searchParams, genres]);
 
-  // Проверка значения параметра page при изменении pagination, чтоб он был в пределах (от 1 до последней видимой страницы в зависимости от запроса)
-  React.useEffect(() => {
-    if (!searchParams.page) return;
-
-    const navigateOptions = { replace: true };
-    if (searchParams.page <= 1) {
-      appNavigate({ ...searchParams, page: undefined }, navigateOptions);
-    } else if (pagination && pagination.last_visible_page < searchParams.page) {
-      appNavigate({ ...searchParams, page: pagination.last_visible_page }, navigateOptions);
-    }
-  }, [pagination, appNavigate]);
-
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
   }, [appNavigate]);
@@ -124,7 +114,6 @@ const MangaCatalogPage: React.FC = () => {
           </>
         }
       />
-
       <div className="catalog__cards catalog-cards" ref={cardsRef}>
         <div className="container">
           <div className="catalog-cards__top">
@@ -184,7 +173,7 @@ const MangaCatalogPage: React.FC = () => {
             />
             <div className="catalog-cards__content">
               <div className="catalog-cards__items">
-                {isLoading &&
+                {(isIdle || isLoading) &&
                   Array.from({ length: 24 }).map((_, i) => (
                     <Skeleton
                       key={i}
