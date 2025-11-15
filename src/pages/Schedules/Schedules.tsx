@@ -1,13 +1,15 @@
 import React from 'react';
-import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, useNavigate } from 'react-router-dom';
 // import { CommonIntro, Broadcast, Seasonal } from '@/components';
 import { CommonIntro } from '@/components';
 import { NotFound } from '@/pages';
 import { TabRoute } from '@/typescript';
-import './Schedules.scss';
 import Broadcast from '@/components/Sections/Broadcast/Broadcast';
 import Seasonal from '@/components/Sections/Seasonal/Seasonal';
 import { appPaths } from '@/resources';
+import { usePathSegments } from '@/hooks';
+import { renderTabRoutes } from '@/utils';
+import './Schedules.scss';
 
 const routeItems: TabRoute[] = [
   { label: 'Currently Airing', value: 'broadcast', element: <Broadcast /> },
@@ -18,8 +20,7 @@ const pagePath = appPaths.schedules;
 
 function Schedules() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const tabSegments = location.pathname.replace(pagePath, '').split('/').filter(Boolean);
+  const tabSegments = usePathSegments(pagePath);
 
   if (tabSegments.length > 0 && !routeItems.find((obj) => obj.value === tabSegments[0]))
     return <NotFound />;
@@ -44,12 +45,7 @@ function Schedules() {
             ))}
           </div>
           <div className="schedules-tabs__content">
-            <Routes>
-              <Route index element={<Navigate to={routeItems[0].value} replace />} />
-              {routeItems.map((item) => (
-                <Route key={item.value} path={item.value} element={item.element} />
-              ))}
-            </Routes>
+            <Routes>{renderTabRoutes(routeItems)}</Routes>
           </div>
         </div>
       </div>
@@ -58,3 +54,24 @@ function Schedules() {
 }
 
 export default Schedules;
+
+//========================================================================================================================================================
+
+// const RouteTab = (routeItems: TabRoute[], className?: string) => {
+//   return (
+//     <div className={clsx(className, 'tab-list')}>
+//       {routeItems.map((item) => (
+//         <div
+//           key={item.value}
+//           className="tab-list__trigger fz-16"
+//           aria-selected={tabSegments[0] === item.value}
+//           onClick={(e) => {
+//             if (e.currentTarget.getAttribute('aria-selected') === 'true') return;
+//             navigate(`${pagePath}/${item.value}`);
+//           }}>
+//           {item.label}
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };

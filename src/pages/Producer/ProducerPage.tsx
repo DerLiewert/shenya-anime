@@ -40,10 +40,10 @@ const ProducerResources: React.FC<{ item: ProducerFull }> = ({ item }) => {
   const resources = item && item.external ? item.external : [];
 
   return (
-    <div className="anime-leftside__resources border-radius">
-      <div className="anime-leftside__item">
-        <h4 className="anime-leftside__title">{'External links'}</h4>
-        <ul className="anime-leftside__list leftside-list">
+    <div className="full-page-leftside__resources border-radius">
+      <div className="full-page-leftside__item">
+        <h4 className="full-page-leftside__title">{'External links'}</h4>
+        <ul className="full-page-leftside__list leftside-list">
           {resources.length > 0 ? (
             resources.map((resource) => (
               <li key={resource.url} className="leftside-list__item leftside-list__item--icon">

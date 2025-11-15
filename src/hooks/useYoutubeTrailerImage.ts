@@ -1,7 +1,7 @@
 // В трейлере может вместо картинки maximum_image_url быть серая заглушка от ютуб.
 // Поэтому проверяем, если нет maximum_image_url или заглушка, то отображаем large_image_url если есть, иначе свою картинку not-found.jpg
-import { TrailerImagesCollection } from '@/models';
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { AnimeYoutubeVideo, TrailerImagesCollection } from '@/models';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import notFoundImage from '@/assets/not-found.jpg';
 
 const isYoutubePlaceholder = (img: HTMLImageElement): boolean => {
@@ -9,16 +9,153 @@ const isYoutubePlaceholder = (img: HTMLImageElement): boolean => {
   return img.naturalWidth === 120 && img.naturalHeight === 90;
 };
 
-export const useYoutubeTrailerImage = (images: TrailerImagesCollection | null | undefined) => {
+// export const useYoutubeTrailerImage1 = (images: TrailerImagesCollection | null | undefined) => {
+//   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
+
+//   const isFallback = useMemo(() => currentUrl === notFoundImage, [currentUrl]);
+//   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+//   useEffect(() => {
+//     if (images) {
+//       setCurrentUrl(images.maximum_image_url || images.large_image_url || notFoundImage);
+//     }
+//   }, [images]);
+
+//   const onLoad = useCallback(
+//     (e: React.SyntheticEvent<HTMLImageElement>) => {
+//       const img = e.currentTarget;
+//       const url = img.src;
+
+//       if (!images || url === notFoundImage) {
+//         setIsLoading(false);
+//         return;
+//       }
+
+//       // Если максимальное изображение загрузилось и не заглушка — всё ок
+//       if (url === images.maximum_image_url) {
+//         if (!isYoutubePlaceholder(img)) {
+//           setIsLoading(false);
+//           return;
+//         }
+//         if (images.large_image_url) {
+//           setCurrentUrl(images.large_image_url);
+//           return;
+//         }
+//       }
+
+//       // Иначе, если не пробовали fallback и есть large_image_url — переключаемся на него
+//       if (url === images.large_image_url && !isYoutubePlaceholder(img)) {
+//         setIsLoading(false);
+//         return;
+//       }
+
+//       // Если и large_image_url уже пробовали или нет — показываем заглушку
+//       setCurrentUrl(notFoundImage);
+//       setIsLoading(false);
+//     },
+//     [images],
+//   );
+
+//   const resetSrc = () => setCurrentUrl(null);
+
+//   return { src: currentUrl, onLoad, isFallback, isLoading, resetSrc };
+// };
+
+// export const useYoutubeTrailerImage2 = (url: string | null | undefined) => {
+//   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
+
+//   const isFallback = useMemo(() => currentUrl === notFoundImage, [currentUrl]);
+//   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+//   const images = useMemo(() => {
+//     const videoId = url?.replace('https://www.youtube-nocookie.com/embed/', '').split('?')[0];
+//     return {
+//       maximum_image_url: videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : null,
+//       large_image_url: videoId ? `https://img.youtube.com/vi/${videoId}/sddefault.jpg` : null,
+//     };
+//   }, [url]);
+
+//   useEffect(() => {
+//     if (images) {
+//       setCurrentUrl(images.maximum_image_url || images.large_image_url || notFoundImage);
+//     }
+//   }, [images]);
+
+//   const onLoad = useCallback(
+//     (e: React.SyntheticEvent<HTMLImageElement>) => {
+//       const img = e.currentTarget;
+//       const url = img.src;
+
+//       if (!images || url === notFoundImage) {
+//         setIsLoading(false);
+//         return;
+//       }
+
+//       // Если максимальное изображение загрузилось и не заглушка — всё ок
+//       if (url === images.maximum_image_url) {
+//         if (!isYoutubePlaceholder(img)) {
+//           setIsLoading(false);
+//           return;
+//         }
+//         if (images.large_image_url) {
+//           setCurrentUrl(images.large_image_url);
+//           return;
+//         }
+//       }
+
+//       // Иначе, если не пробовали fallback и есть large_image_url — переключаемся на него
+//       if (url === images.large_image_url && !isYoutubePlaceholder(img)) {
+//         setIsLoading(false);
+//         return;
+//       }
+
+//       // Если и large_image_url уже пробовали или нет — показываем заглушку
+//       setCurrentUrl(notFoundImage);
+//       setIsLoading(false);
+//     },
+//     [images],
+//   );
+
+//   const resetSrc = () => setCurrentUrl(null);
+
+//   return { src: currentUrl, onLoad, isFallback, isLoading, resetSrc };
+// };
+
+export const useYoutubeTrailerImage = (item: AnimeYoutubeVideo | null | undefined) => {
+  const activeId = useRef<number>(0); // ← флаг актуального запроса
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
   const isFallback = useMemo(() => currentUrl === notFoundImage, [currentUrl]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const images = useMemo(() => {
+    if (!item) return null;
+    if (item.images.maximum_image_url || item.images.large_image_url) return item.images;
+    if (!item.embed_url) return null;
+
+    const videoId = item.embed_url
+      .replace('https://www.youtube-nocookie.com/embed/', '')
+      .split('?')[0];
+
+    return {
+      maximum_image_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+      large_image_url: `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
+    };
+  }, [item]);
+
   useEffect(() => {
-    if (images) {
-      setCurrentUrl(images.maximum_image_url || images.large_image_url || notFoundImage);
+    // setIsLoading(true);
+  }, [item]);
+
+  // console.log('images', item, images);
+  useEffect(() => {
+    // console.log('useEffect images', item, images);
+    if (!images) {
+      setCurrentUrl(notFoundImage);
+      return;
     }
+
+    setCurrentUrl(images.maximum_image_url || images.large_image_url || notFoundImage);
   }, [images]);
 
   const onLoad = useCallback(

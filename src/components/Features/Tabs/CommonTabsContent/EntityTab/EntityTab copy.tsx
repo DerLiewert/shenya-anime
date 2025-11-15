@@ -10,23 +10,28 @@ import type { AsyncThunkConfig, FetchStatus, StatusSelector } from '@/typescript
 import './EntityTab.scss';
 import { commonMessages } from '@/constants';
 
+type Options<T> = {
+  items: T[];
+  visibleCount: number;
+};
+
 interface EntityTabProps<T> {
   selector: (state: RootState) => T[];
   status: StatusSelector | FetchStatus | undefined;
   fetchAction?: AsyncThunk<T[], any, AsyncThunkConfig>;
-  entityItem: (item: T, index: number) => React.ReactNode;
   visibleItemCount?: number;
   emptyValueMessage: string;
+  itemsBody: (options: Options<T>) => React.ReactNode;
 }
 
-const EntityTab = <T,>(props: EntityTabProps<T>) => {
+const EntityTabx = <T,>(props: EntityTabProps<T>) => {
   const {
     selector,
     status,
     fetchAction,
     emptyValueMessage,
     visibleItemCount = 12,
-    entityItem,
+    itemsBody,
   } = props;
 
   const abortableDispatch = useAbortableDispatch();
@@ -42,11 +47,7 @@ const EntityTab = <T,>(props: EntityTabProps<T>) => {
 
   return (
     <div className="entity-tab">
-      {items.length > 0 && (
-        <div className="entity-tab__items tab-grid-2">
-          {items.slice(0, visibleCount).map(entityItem)}
-        </div>
-      )}
+      {items.length > 0 && itemsBody({ items, visibleCount })}
 
       {isLoading && <Loading className="entity-tab__message" />}
       {isError && (
@@ -70,4 +71,4 @@ const EntityTab = <T,>(props: EntityTabProps<T>) => {
   );
 };
 
-export default EntityTab;
+export default EntityTabx;

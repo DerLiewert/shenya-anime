@@ -80,10 +80,10 @@ export default PersonPage;
 
 const AdditionalInfo: React.FC<{ item: PersonFull }> = ({ item }) => {
   return (
-    <div className="anime-leftside__resources">
-      <div className="anime-leftside__item">
-        <h4 className="anime-leftside__title">Other names</h4>
-        <ul className="anime-leftside__list leftside-list">
+    <div className="full-page-leftside__resources">
+      <div className="full-page-leftside__item">
+        <h4 className="full-page-leftside__title">Alternative names</h4>
+        <ul className="full-page-leftside__list leftside-list">
           {item.alternate_names.length > 0 ? (
             item.alternate_names.map((name) => (
               <li key={name} className="leftside-list__item">
@@ -91,7 +91,7 @@ const AdditionalInfo: React.FC<{ item: PersonFull }> = ({ item }) => {
               </li>
             ))
           ) : (
-            <li className="leftside-list__empty">Not other names</li>
+            <li className="leftside-list__empty">No alternative names</li>
           )}
         </ul>
       </div>

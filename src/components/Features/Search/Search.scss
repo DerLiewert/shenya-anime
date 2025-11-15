@@ -2,7 +2,7 @@
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 200;
+  z-index: var(--z-index-search-modal);
   width: 100%;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.85);
@@ -17,7 +17,7 @@
   &__close {
     position: sticky;
     top: 15px;
-    z-index: 900;
+    z-index: 100;
     width: 26px;
     height: 26px;
     margin: 0 15px 10px calc(100% - 26px);

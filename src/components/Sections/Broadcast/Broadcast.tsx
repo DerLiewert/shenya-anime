@@ -14,20 +14,29 @@ import { schedulesFilter } from '@/models';
 
 import './Broadcast.scss';
 
-const parseSearchParams = parseBroadcastAnimeParams({
-  allAllowed: false,
-  rules: { filter: true, page: true },
-});
-
 const Broadcast = () => {
   const broadcastRef = React.useRef<HTMLDivElement>(null);
 
   const abortableDispatch = useAbortableDispatch();
-  const appNavigate = useAppNavigate(parseSearchParams);
   const location = useLocation();
   const { items, status, pagination } = useAppSelector((state) => state.schedulesAnime);
   const { isError, isLoading, isSuccess } = useFetchStatus(status);
 
+  const parseSearchParams = React.useMemo(
+    () =>
+      parseBroadcastAnimeParams({
+        allAllowed: false,
+        rules: {
+          filter: true,
+          page: pagination?.last_visible_page
+            ? { include: { from: 1, to: pagination.last_visible_page } }
+            : true,
+        },
+      }),
+    [pagination?.last_visible_page],
+  );
+
+  const appNavigate = useAppNavigate(parseSearchParams);
   const [searchParams, setSearchParams] = React.useState(getSearchParams());
 
   function getSearchParams() {

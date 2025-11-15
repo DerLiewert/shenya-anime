@@ -1,11 +1,12 @@
 import { JikanSearchParams, sortOptions, SortOptions } from '@/models';
 
-const isValidScore = (value: string | number): boolean => {
-  const n = Number(value);
-  return !isNaN(n) && n >= 1 && n < 10;
+const validateScore = (value: string | number): number | undefined => {
+  const number = Number(value);
+  const isValid = !isNaN(number) && number >= 1 && number < 10;
+  return isValid ? number : undefined;
 };
 
-const isValidGenres = (v: string) => {
+const validateGenres = (v: string) => {
   const filtered = v
     .split(',')
     .filter((x) => /^\d+$/.test(x))
@@ -13,19 +14,15 @@ const isValidGenres = (v: string) => {
   return filtered || undefined;
 };
 
-// const isValidNumber = (v: string) => {
-//   return isFinite(+v) ? +v : undefined;
-// };
-
-export const paramValuesAsArray = ['genres', 'genres_exclude'];
+export const paramValuesAsArray: Array<keyof JikanSearchParams> = ['genres', 'genres_exclude'];
 
 //========================================================================================================================================================
 export const commonParamsValidators: ParamsValidators<JikanSearchParams> = {
-  min_score: (v) => (isValidScore(v) ? Number(v) : undefined),
-  max_score: (v) => (isValidScore(v) ? Number(v) : undefined),
-  score: (v) => (isValidScore(v) ? Number(v) : undefined),
-  genres: isValidGenres,
-  genres_exclude: isValidGenres,
+  min_score: validateScore,
+  max_score: validateScore,
+  score: validateScore,
+  genres: validateGenres,
+  genres_exclude: validateGenres,
   page: (v) => (isFinite(+v) ? +v : undefined),
   limit: (v) => {
     const limit = +v;
@@ -46,6 +43,17 @@ export const commonParamsValidators: ParamsValidators<JikanSearchParams> = {
 };
 
 //========================================================================================================================================================
+function isRange(value: unknown): value is { from: number; to: number } {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    !Array.isArray(value) &&
+    'from' in value &&
+    'to' in value
+  );
+}
+
+//========================================================================================================================================================
 export type ParamParser<T> = (value: string) => T | undefined;
 
 export type ParamsValidators<T> = {
@@ -56,14 +64,16 @@ export type ParamRule<T> =
   | true // разрешён без ограничений
   | false // запрещён
   | {
-      include?: readonly T[]; // разрешённые значения
+      include?: [NonNullable<T>] extends [number]
+        ? readonly T[] | { from: NonNullable<T>; to: NonNullable<T> }
+        : readonly T[]; // разрешённые значения
       exclude?: readonly T[]; // запрещённые значения
     };
 
 export interface AllowedParams<T extends object> {
-  /** Если true - все параметры разрешены, кроме тех, что явно запрещены (false) */
+  // Если true - все параметры разрешены, кроме тех, что явно запрещены (false)
   allAllowed?: boolean;
-  /** Правила для конкретных параметров */
+  // Правила для конкретных параметров
   rules?: { [P in keyof T]?: ParamRule<T[P]> };
 }
 
@@ -97,7 +107,12 @@ export function parseSearchParams<T extends object, K extends keyof T = keyof T>
     // если параметр (rule) - обьект, значит есть запрещёные или разрешёные значения для него
     if (typeof rule === 'object') {
       const checkAllowed = (val: any) => {
-        if (rule.include && !rule.include.includes(val)) return false;
+        // if (rule.include && !rule.include.includes(val)) return false;
+        if (rule.include) {
+          if (Array.isArray(rule.include) && !rule.include.includes(val)) return false;
+          if (isRange(rule.include) && (val < rule.include.from || val > rule.include.to))
+            return false;
+        }
         if (rule.exclude && rule.exclude.includes(val)) return false;
         return true;
       };

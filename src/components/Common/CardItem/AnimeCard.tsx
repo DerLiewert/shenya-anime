@@ -2,6 +2,7 @@ import React from 'react';
 import { AnimeTooltip, CardItem } from '@/components';
 import { appPaths } from '@/resources';
 import { Anime } from '@/models';
+import { isAnimeNsfw } from '@/utils';
 
 interface AnimeCardProps {
   item: Anime;
@@ -10,13 +11,13 @@ interface AnimeCardProps {
 }
 
 const AnimeCard: React.FC<AnimeCardProps> = ({ item, className, tooltip = true }) => {
-  const { images, title, type, aired, status, score, mal_id } = item;
   const renderCardItem = () => (
     <CardItem
       className={className}
-      linkPath={appPaths.animeFull(mal_id)}
+      linkPath={appPaths.animeFull(item.mal_id)}
       item={item}
       cardType="anime"
+      nsfw={isAnimeNsfw(item)}
     />
   );
   return tooltip ? <AnimeTooltip item={item}>{renderCardItem()}</AnimeTooltip> : renderCardItem();

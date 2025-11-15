@@ -2,8 +2,8 @@ import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { useYoutubeTrailerImage } from '@/hooks';
-import { ArrowIcon, StarIcon, BookmarkButton } from '@/components';
-import { formattedScore, getImageUrl, getShortAnimeRating } from '@/utils';
+import { ArrowIcon, StarIcon, BookmarkButton, SfwImage } from '@/components';
+import { formattedScore, getImageUrl, getShortAnimeRating, isAnimeNsfw } from '@/utils';
 import { appPaths, animeRatingOptions } from '@/resources';
 import { Anime } from '@/models';
 import clsx from 'clsx';
@@ -15,7 +15,8 @@ interface MainIntroSlide {
 }
 
 export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = true }) => {
-  const { src, onLoad, isFallback, isLoading } = useYoutubeTrailerImage(item.trailer.images);
+  const { src, onLoad, isFallback, isLoading } = useYoutubeTrailerImage(item.trailer);
+  console.log('src', src);
 
   return (
     <div className="main-slide__container container">
@@ -31,14 +32,21 @@ export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderIma
 
       <div className="main-slide__body">
         <div className="main-slide__poster bg bodrer">
-          {shouldRenderImage && <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" />}
+          {shouldRenderImage && (
+            <SfwImage
+              src={getImageUrl(item.images)}
+              nsfw={isAnimeNsfw(item)}
+              alt="Poster"
+              loading="lazy"
+            />
+          )}
         </div>
         <div className="main-slide__content">
           <h2 className="main-slide__title title title--fz-48">
             <Link to={appPaths.animeFull(item.mal_id)}>{item.title}</Link>
           </h2>
           <div className="main-slide__text fz-20 visible-line visible-line--3">{item.synopsis}</div>
-          
+
           <div className="main-slide__info">
             <div className="main-slide__score-wrapper">
               <div className="main-slide__score">
@@ -71,7 +79,7 @@ export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderIma
               ))}
             </div>
           </div>
-          
+
           <div className="main-slide__actions">
             <Link
               to={appPaths.animeFull(item.mal_id)}
@@ -82,7 +90,7 @@ export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderIma
 
             <BookmarkButton
               item={item}
-              type='anime'
+              type="anime"
               className="main-slide__btn main-slide__btn--bookmark btn btn--icon btn--stroke"
               bookmarkedClassName="btn--white btn--fill"
               noBookmarkedClassName="btn--transparent"
@@ -93,7 +101,6 @@ export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderIma
     </div>
   );
 };
-
 
 export const MainIntroSkeleton = () => {
   return (

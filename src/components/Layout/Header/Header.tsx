@@ -1,14 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useMatchMedia } from '@/hooks';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { useMatchMedia, usePathSegments } from '@/hooks';
 import { BookmarkIcon, SearchIcon, SfwOffIcon, SfwOnIcon } from '@/components';
 import { breakpoints } from '@/constants';
 import { appPaths } from '@/resources';
+import { toggleSfw } from '@/store';
 import logo from '@/assets/logo.svg';
 import clsx from 'clsx';
 import './Header.scss';
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { toggleSfw } from '@/store';
 
 const links = [
   { path: appPaths.home, label: 'Home' },
@@ -18,6 +18,7 @@ const links = [
 ] as const;
 
 const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
+  const headerRef = React.useRef<HTMLElement>(null);
   const location = useLocation();
   const activeLink = links.findIndex(
     (link) => location.pathname === link.path || location.pathname.startsWith(link.path + '/'),
@@ -32,13 +33,29 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
 
   React.useEffect(() => {
     document.body.classList.toggle('menu-open', isMenuOpen);
+
     return () => {
       document.body.classList.remove('menu-open');
     };
   }, [isMenuOpen]);
 
+  React.useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+
+    const resizeObserver = new ResizeObserver(() => {
+      document.documentElement.style.setProperty(
+        '--header-height',
+        (header ? header.clientHeight : 0) + 'px',
+      );
+    });
+    resizeObserver.observe(header);
+
+    return () => resizeObserver.disconnect();
+  }, [headerRef.current]);
+
   return (
-    <header className="header">
+    <header className="header" ref={headerRef}>
       <div className="container">
         <div className="header__body">
           <Link to={appPaths.home} className="header__logo">

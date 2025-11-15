@@ -1,18 +1,17 @@
 import { getResource } from '@/api/client/api.client';
-import { AsyncThunkConfig, FetchStatus } from '@/typescript';
+import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Anime } from '../../models';
+import { Anime } from '@/models';
+import { TopEndpoints } from '@/api';
 
 export const fetchIntroAnime = createAsyncThunk<Anime[], undefined>(
   'intro-anime/fetchAnimeItems',
   async (_, { signal }) => {
     const { data } = await getResource<Anime[]>({
-      endpoint: 'https://api.jikan.moe/v4/top/anime',
-      queryParams: { limit: 10 },
+      endpoint: TopEndpoints.topAnime,
+      queryParams: { limit: 25 },
       signal,
     });
-    //   // axios.get('https://api.jikan.moe/v4/schedules?filter=thursday').then(({ data }) => {
-    //   // axios.get('https://api.jikan.moe/v4/anime?status=upcoming').then(({ data }) => {
     return data;
   },
 );
@@ -47,7 +46,6 @@ export const introAnimeSlice = createSlice({
   },
 });
 
-// Action creators are generated for each case reducer function
 export const { resetIntroAnime } = introAnimeSlice.actions;
 
 export default introAnimeSlice.reducer;

@@ -2,6 +2,7 @@ import React from 'react';
 import { CardItem, MangaTooltip } from '@/components';
 import { appPaths } from '@/resources';
 import { Manga } from '@/models';
+import { isMangaNsfw } from '@/utils';
 
 interface MangaCardProps {
   item: Manga;
@@ -10,13 +11,13 @@ interface MangaCardProps {
 }
 
 const MangaCard: React.FC<MangaCardProps> = ({ item, className, tooltip = true }) => {
-  const { images, title, type, published, status, score, mal_id } = item;
   const renderCardItem = () => (
     <CardItem
-      className={className}
-      linkPath={appPaths.mangaFull(mal_id)}
-      item={{...item, year: published.prop.from.year}}
       cardType="manga"
+      className={className}
+      linkPath={appPaths.mangaFull(item.mal_id)}
+      item={{ ...item, year: item.published.prop.from.year }}
+      nsfw={isMangaNsfw(item)}
     />
   );
   return tooltip ? <MangaTooltip item={item}>{renderCardItem()}</MangaTooltip> : renderCardItem();

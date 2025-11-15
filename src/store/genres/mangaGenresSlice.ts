@@ -22,7 +22,11 @@ const mangaGenresSlice = createSlice({
       state.status = FetchStatus.LOADING;
     });
     builder.addCase(fetchMangaGenres.fulfilled, (state, action) => {
-      state.items = action.payload;
+        state.items = action.payload.sort((obj1, obj2) => {
+        if (obj1.name < obj2.name) return -1;
+        if (obj1.name > obj2.name) return 1;
+        return 0;
+      });
       state.status = FetchStatus.SUCCESS;
     });
     builder.addCase(fetchMangaGenres.rejected, (state) => {

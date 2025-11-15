@@ -28,11 +28,28 @@ const CharacterPage = () => {
         breadcrumbs: item
           ? [
               ...(item.anime[0]
-                ? [{ label: item.anime[0].anime.title, url: '#' }]
+                ? [
+                    {
+                      label: item.anime[0].anime.title,
+                      url: appPaths.animeFull(item.anime[0].anime.mal_id),
+                    },
+                  ]
                 : item.manga[0]
-                ? [{ label: item.manga[0].manga.title, url: '#' }]
+                ? [
+                    {
+                      label: item.manga[0].manga.title,
+                      url: appPaths.mangaFull(item.manga[0].manga.mal_id),
+                    },
+                  ]
                 : []),
-              { label: 'Character', url: '#' },
+              {
+                label: 'Characters',
+                url: item.anime[0]
+                  ? appPaths.animeFull(item.anime[0].anime.mal_id) + '/characters'
+                  : item.manga[0]
+                  ? appPaths.mangaFull(item.manga[0].manga.mal_id) + '/characters'
+                  : '',
+              },
               { label: item.name, url: '#' },
             ]
           : [],
@@ -79,10 +96,10 @@ export default CharacterPage;
 
 const AdditionalInfo: React.FC<{ item: CharacterFull }> = ({ item }) => {
   return (
-    <div className="anime-leftside__resources">
-      <div className="anime-leftside__item">
-        <h4 className="anime-leftside__title">Nicknames</h4>
-        <ul className="anime-leftside__list leftside-list">
+    <div className="full-page-leftside__resources">
+      <div className="full-page-leftside__item">
+        <h4 className="full-page-leftside__title">Nicknames</h4>
+        <ul className="full-page-leftside__list leftside-list">
           {item.nicknames.length > 0 ? (
             item.nicknames.map((nickname) => (
               <li key={nickname} className="leftside-list__item">

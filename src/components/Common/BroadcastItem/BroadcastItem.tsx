@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { InfoRow, InfoValue } from '@/components';
-import { getImageUrl, valueOrDefault } from '@/utils';
+import { InfoRow, InfoValue, SfwImage } from '@/components';
+import { getImageUrl, isAnimeNsfw, valueOrDefault } from '@/utils';
 import { specialStatus } from '@/constants';
 import { appPaths } from '@/resources';
 import { Anime } from '@/models';
@@ -21,7 +21,12 @@ const BroadcastItem: React.FC<BroadcastItemProps> = ({ item, className }) => {
       className={clsx(className, 'broadcast-item border-opacity')}>
       <div className="broadcast-item__inner _title-parent">
         <div className="broadcast-item__image bg">
-          <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" />
+          <SfwImage
+            src={getImageUrl(item.images)}
+            nsfw={isAnimeNsfw(item)}
+            alt="Poster"
+            loading="lazy"
+          />
         </div>
         <div className="broadcast-item__body">
           <h4 className="broadcast-item__title title title--fz-14 visible-line" title={item.title}>

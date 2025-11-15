@@ -6,7 +6,7 @@ import type {
   JikanResourceRelation,
   JikanResourceTitle,
 } from '../Common';
-import type { AnimeSeason } from './anime-season.model';
+import type { AnimeSeasons } from './anime-season.model';
 import type { AnimeTheme } from './anime-theme.model';
 import type { AnimeYoutubeVideo } from './anime-video.model';
 
@@ -37,7 +37,7 @@ export interface Anime {
   favorites: number | null;
   synopsis: string | null;
   background: string | null;
-  season: AnimeSeason | null;
+  season: AnimeSeasons | null;
   year: number | null;
   broadcast: AnimeBroadcast;
   producers: JikanResource[];

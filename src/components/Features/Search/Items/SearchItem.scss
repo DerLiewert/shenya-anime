@@ -29,6 +29,9 @@
     width: 80px;
     height: 120px;
     margin-right: 10px;
+    .nsfw-img {
+      font-size: 12px;
+    }
 
     @include media-max($mobileSmall) {
       width: 76px;

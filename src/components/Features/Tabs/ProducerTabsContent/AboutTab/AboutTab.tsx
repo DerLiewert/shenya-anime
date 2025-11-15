@@ -9,10 +9,10 @@ const AboutTab = ({ item }: { item: ProducerFull }) => {
     return <EmptyValueMessage message={producerEmptyValueMessages.about} />;
 
   return (
-    <div className="about-tab">
-      <p className="about-tab__text">Established: {item.established.split('T')[0]}</p>
-      <p className="about-tab__text about-tab__text_empty"></p>
-      <p className="about-tab__text">{item.about}</p>
+    <div className="about-producer">
+      <p className="about-producer__text">Established: {item.established.split('T')[0]}</p>
+      <p className="about-producer__text about-producer__text_empty"></p>
+      <p className="about-producer__text">{item.about}</p>
     </div>
   );
 };

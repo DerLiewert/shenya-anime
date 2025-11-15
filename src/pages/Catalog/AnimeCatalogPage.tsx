@@ -1,9 +1,12 @@
-import React, { useRef } from 'react';
+import React from 'react';
+import Select from 'react-select';
+import Skeleton from 'react-loading-skeleton';
 import { useForm, Controller } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
-import { scrollToTop, getUniqueItems, parseAnimeSearchParams, AllowedParams } from '@/utils';
+import { breakpoints } from '@/constants';
+import { scrollToTop, getUniqueItems, parseAnimeSearchParams, onScoreChange } from '@/utils';
 import {
   animeOrderByOptions,
   animeRatingOptions,
@@ -19,15 +22,10 @@ import {
   SortOptions,
 } from '@/models';
 import { ExtractOptionValue, FetchStatus, SelectOption } from '@/typescript';
-import { fetchAnimeByParams } from '@/store/catalog/animeCatalogSlice';
-import { fetchAnimeGenres } from '@/store/genres/animeGenresSlice';
 import { AnimeCard, CommonIntro, EmptyValueMessage, FilterIcon, Pagination } from '@/components';
-import Select from 'react-select';
-import Skeleton from 'react-loading-skeleton';
+import { fetchAnimeByParams, fetchAnimeGenres } from '@/store';
 import clsx from 'clsx';
 import './CatalogPage.scss';
-import { isEmpty } from 'lodash';
-import { breakpoints } from '@/constants';
 
 const setSortForOrderBy = (param: AnimeSearchOrder | undefined): SortOptions | undefined => {
   const sort: Partial<Record<AnimeSearchOrder, SortOptions>> = {
@@ -52,7 +50,7 @@ const AnimeCatalogPage: React.FC = () => {
 
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.animeGenres);
   const { items, pagination, status } = useAppSelector((state) => state.animeCatalog);
-  const { isLoading, isSuccess, isError } = useFetchStatus(status);
+  const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const [isShowFilters, setIsShowFilters] = React.useState(false);
   const isTablet = useMatchMedia('max', breakpoints.tablet);
@@ -62,7 +60,9 @@ const AnimeCatalogPage: React.FC = () => {
       parseAnimeSearchParams({
         allAllowed: false,
         rules: {
-          page: true,
+          page: pagination?.last_visible_page
+            ? { include: { from: 1, to: pagination.last_visible_page } }
+            : true,
           status: true,
           rating: true,
           min_score: true,
@@ -73,7 +73,7 @@ const AnimeCatalogPage: React.FC = () => {
             genres.length > 0 ? { include: genres.map((obj) => obj.mal_id.toString()) } : true,
         },
       }),
-    [genres],
+    [genres, pagination?.last_visible_page],
   );
 
   const appNavigate = useAppNavigate(parseSearchParams, defaultSearchParams);
@@ -99,18 +99,6 @@ const AnimeCatalogPage: React.FC = () => {
 
     abortableDispatch(fetchAnimeByParams, searchParams);
   }, [searchParams, genresStatus]);
-
-  // Проверка значения параметра page при изменении pagination, чтоб он был в пределах (от 1 до последней видимой страницы в зависимости от запроса)
-  React.useEffect(() => {
-    if (!searchParams.page) return;
-
-    const navigateOptions = { replace: true };
-    if (searchParams.page <= 1) {
-      appNavigate({ ...searchParams, page: undefined }, navigateOptions);
-    } else if (pagination && pagination.last_visible_page < searchParams.page) {
-      appNavigate({ ...searchParams, page: pagination.last_visible_page }, navigateOptions);
-    }
-  }, [pagination, appNavigate]);
 
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
@@ -190,7 +178,7 @@ const AnimeCatalogPage: React.FC = () => {
             />
             <div className="catalog-cards__content">
               <div className="catalog-cards__items">
-                {isLoading &&
+                {(isIdle || isLoading) &&
                   Array.from({ length: 24 }).map((_, i) => (
                     <Skeleton
                       key={i}
@@ -246,6 +234,7 @@ type SelectValues = {
   rating: SelectOption<AnimeSearchRating> | null;
   genres: SelectOption<number>[];
 };
+
 type FormValues = SelectValues & {
   min_score: number | null;
   max_score: number | null;
@@ -255,20 +244,20 @@ interface CatalogSidebar {
   isModal?: boolean;
   isOpen?: boolean;
   selectedValues: AnimeSearchParams; // Pick<AnimeSearchParams, 'type' | 'status' | 'rating' | 'min_score' | 'max_score' | 'genres'>;
+  className?: string;
   onSubmit?: (data: FormValues) => void;
   onReset?: () => void;
   onClose?: () => void;
-  className?: string;
 }
 
 const CatalogSidebar: React.FC<CatalogSidebar> = ({
   isModal = false,
   isOpen = false,
   selectedValues,
+  className,
   onSubmit,
   onReset,
   onClose,
-  className,
 }) => {
   const dispatch = useAppDispatch();
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.animeGenres);
@@ -325,23 +314,6 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
   const onResetForm = () => {
     reset();
     if (onReset) onReset();
-  };
-
-  // Держать значение для minScore и maxScore в пределах нормы 1-9.99
-  const onScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (isEmpty(e.target.value)) return;
-
-    const min = e.target.min;
-    const max = e.target.max;
-    const value = e.target.value;
-
-    if (+value < +min) {
-      e.target.value = min;
-    } else if (+value > +max) {
-      e.target.value = max;
-    } else if (!/^\d*\.?\d{0,2}$/.test(value)) {
-      e.target.value = value.match(/^\d*\.?\d{0,2}/)?.[0] ?? '';
-    }
   };
 
   // Рендер кастомного выпадающего списка
@@ -403,7 +375,7 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">Genre</div>
             {isGenresLoading ? (
-              <Skeleton className="select__control " containerClassName="select" />
+              <Skeleton className="select__control" containerClassName="select" />
             ) : (
               renderSelect('genres', animeGenresOptions, 'Genres for one anime ...', true)
             )}

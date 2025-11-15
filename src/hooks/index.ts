@@ -6,3 +6,4 @@ export * from './useFetchStatus';
 export * from './useBreakpoints';
 export * from './useMatchMedia';
 export * from './useAppNavigate';
+export * from './usePathSegments';

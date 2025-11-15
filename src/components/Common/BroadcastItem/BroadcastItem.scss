@@ -21,6 +21,10 @@
     border-radius: 6px;
     margin-right: 15px;
 
+    .sfw-img {
+      font-size: 12px;
+    }
+
     @include media-max($mobile) {
       width: 86px;
       min-height: 115px;

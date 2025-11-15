@@ -1,5 +1,5 @@
 import {
-  AnimeSeason,
+  AnimeSeasons,
   animeSeasons,
   JikanSeasonsPlusParams,
   seasonAnimeType,
@@ -17,7 +17,7 @@ export const seasonParamsValidators: ParamsValidators<JikanSeasonsPlusParams> = 
   limit: commonParamsValidators.limit,
   filter: (v) =>
     seasonAnimeType.includes(v as SeasonAnimeType) ? (v as SeasonAnimeType) : undefined,
-  season: (v) => (animeSeasons.includes(v as AnimeSeason) ? (v as AnimeSeason) : undefined),
+  season: (v) => (animeSeasons.includes(v as AnimeSeasons) ? (v as AnimeSeasons) : undefined),
   year: (v) => (!isNaN(+v) ? +v : undefined),
   sfw: commonParamsValidators.sfw,
   unapproved: commonParamsValidators.unapproved,

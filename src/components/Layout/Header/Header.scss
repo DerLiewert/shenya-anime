@@ -1,11 +1,14 @@
 .header {
   position: relative;
-  // position: fixed;
-  // top: 0;
-  // left: 0;
-  // right: 0;
-  // z-index: 900;
+  z-index: var(--z-index-header);
   padding: 25px 0;
+
+  // &._absolute {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   right: 0;
+  // }
 
   @include media-max($tablet) {
     padding: 20px 0;

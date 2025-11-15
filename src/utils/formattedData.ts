@@ -1,16 +1,24 @@
 import { specialStatus } from '@/constants';
 
-export const formattedScore = (score: number | null): string => {
-  if (score === null) return specialStatus.notAvailable;
-  return Number.isInteger(score) ? `${score}.0` : score.toString();
+type SplitOptions = {
+  separator: string;
+  clearSpaces: boolean;
 };
-
-export const splitText = (text: string, separator: string = '\n'): string[] => {
-  return text.split(separator);
+export const splitText = (
+  text: string,
+  options: SplitOptions = { separator: '\n', clearSpaces: true },
+): string[] => {
+  const arrayText = text.split(options.separator);
+  return options.clearSpaces ? arrayText.filter((val) => val) : arrayText;
 };
 
 export const toFirstUppercase = (value: string): string => {
   return value.slice(0, 1).toUpperCase() + value.slice(1);
+};
+
+export const formattedScore = (score: number | null): string => {
+  if (score === null) return specialStatus.notAvailable;
+  return Number.isInteger(score) ? `${score}.0` : score.toString();
 };
 
 // Некоторые обьекты с сервера (например аниме/манга) могут посторяться в массиве несколькор раз с одинаковым mal_id

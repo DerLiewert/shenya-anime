@@ -1,4 +1,4 @@
-import { AnimeSeason } from '../Anime';
+import { AnimeSeasons } from '../Anime';
 
 export interface JikanSeasonsParams {
   page?: number;
@@ -10,7 +10,7 @@ export interface JikanSeasonsParams {
 }
 export interface JikanSeasonsPlusParams extends JikanSeasonsParams {
   year: number;
-  season: AnimeSeason;
+  season: AnimeSeasons;
 }
 
 export const seasonAnimeType = ['tv', 'movie', 'ova', 'special', 'ona', 'music'];

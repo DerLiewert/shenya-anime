@@ -29,25 +29,3 @@ export const appPaths = {
   notFound: '/not-found',
 } as const;
 
-const paths = {
-  home: { path: '/' },
-  anime: {
-    path: '/anime',
-    children: {
-      full: {
-        path: (id: number) => `/${id}`,
-        children: {
-          details: { path: '/details' },
-          episodes: { path: '/episodes' },
-        },
-      },
-    },
-  },
-  schedules: {
-    path: '/schedules',
-    children: {
-      broadcast: { path: '/broadcast' },
-      seasonal: { path: '/seasonal' },
-    },
-  },
-};

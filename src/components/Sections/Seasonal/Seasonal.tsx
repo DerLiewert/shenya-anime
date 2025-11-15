@@ -10,11 +10,7 @@ import { seasonOptions } from '@/resources';
 import Select from 'react-select';
 import isEqual from 'lodash.isequal';
 import './Seasonal.scss';
-
-const parseSearchParams = parseSeasonAnimeParams({
-  allAllowed: false,
-  rules: { year: true, season: true, page: true },
-});
+import { animeSeasons } from '@/models';
 
 function Seasonal() {
   const seasonalRef = React.useRef<HTMLDivElement>(null);
@@ -22,7 +18,6 @@ function Seasonal() {
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
-  const appNavigate = useAppNavigate(parseSearchParams);
 
   const { items: seasonsList, status: seasonsStatus } = useAppSelector(
     (state) => state.seasonsList,
@@ -37,6 +32,30 @@ function Seasonal() {
     [seasonsList],
   );
 
+  const parseSearchParams = React.useMemo(
+    () =>
+      parseSeasonAnimeParams({
+        allAllowed: false,
+        rules: {
+          year:
+            seasonsList.length > 0
+              ? {
+                  include: {
+                    from: seasonsList[seasonsList.length - 1].year,
+                    to: seasonsList[0].year,
+                  },
+                }
+              : true,
+          season: { include: animeSeasons },
+          page: pagination?.last_visible_page
+            ? { include: { from: 1, to: pagination.last_visible_page } }
+            : false,
+        },
+      }),
+    [pagination?.last_visible_page, seasonsList],
+  );
+
+  const appNavigate = useAppNavigate(parseSearchParams);
   const [searchParams, setSearchParams] = React.useState(getSearchParams());
 
   function getSearchParams() {
@@ -57,8 +76,13 @@ function Seasonal() {
   }, []);
 
   React.useEffect(() => {
+    appNavigate(getSearchParams(), { replace: true });
+  }, [appNavigate]);
+
+  React.useEffect(() => {
     const newParams = getSearchParams();
     if (!isEqual(searchParams, newParams)) {
+      appNavigate(newParams, { replace: true });
       setSearchParams(newParams);
       abortableDispatch(fetchSeasonsAnime, newParams);
     }
@@ -110,7 +134,7 @@ function Seasonal() {
               <Skeleton
                 key={i}
                 containerClassName="seasonal__card _skeleton-container border-opacity"
-                className=" _skeleton "
+                className="_skeleton "
               />
             ))
           : getUniqueItems(items).map((item) => <AnimeCard item={item} key={item.mal_id} />)}

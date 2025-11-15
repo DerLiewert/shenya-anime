@@ -44,6 +44,7 @@ export const fetchAnimeByParams = createAsyncThunk<
   AnimeSearchParams,
   { rejectValue: any }
 >('anime-catalog/fetchAnimeByParams', async (queryParams, { signal, getState }) => {
-  const { sfw } = (getState() as RootState).settings;
-  return await getAnimeSearch({ limit: 24, ...queryParams, sfw }, signal);
+  // const { sfw } = (getState() as RootState).settings;
+  // return await getAnimeSearch({ limit: 24, ...queryParams, sfw }, signal);
+  return await getAnimeSearch({ limit: 24, ...queryParams }, signal);
 });

@@ -1,11 +1,11 @@
 import { getSeason } from '@/api';
 import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Anime, AnimeSeason, JikanPaginationPlus, JikanResponse } from '../../models';
+import { Anime, AnimeSeasons, JikanPaginationPlus, JikanResponse } from '../../models';
 
 export const fetchSeasonsAnime = createAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
-  { year: number; season: AnimeSeason; page?: number | undefined }
+  { year: number; season: AnimeSeasons; page?: number | undefined }
 >('seasons-anime/fetchAnimeItems', async ({ year, season, page = 1 }, { signal }) => {
   const data = await getSeason({ year, season, queryParams: { page, limit: 24 } }, signal);
   return data;
@@ -16,7 +16,7 @@ interface SeasonsAnimeState {
   pagination: JikanPaginationPlus | null;
   season: {
     year: number;
-    season: AnimeSeason;
+    season: AnimeSeasons;
   } | null;
   status: FetchStatus;
 }

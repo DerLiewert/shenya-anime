@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { InfoRow, InfoValue, Score, Status } from '@/components';
+import { InfoRow, InfoValue, Score, SfwImage, Status } from '@/components';
 import { specialStatus } from '@/constants';
-import { getImageUrl, valueOrDefault } from '@/utils';
+import { getImageUrl, isMangaNsfw, valueOrDefault } from '@/utils';
 import { appPaths } from '@/resources';
 import { Manga } from '@/models';
 import './SearchItem.scss';
@@ -11,7 +11,13 @@ const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
   return (
     <Link to={appPaths.mangaFull(item.mal_id)} className="search-modal__item search-item">
       <div className="search-item__image bg">
-        <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" aria-hidden />
+        <SfwImage
+          nsfw={isMangaNsfw(item)}
+          src={getImageUrl(item.images)}
+          alt="Poster"
+          loading="lazy"
+          aria-hidden
+        />
       </div>
       <div className="search-item__content">
         <div className="search-item__labels">

@@ -39,21 +39,26 @@ const RecommendationsTab = (props: RecommendationsTabProps) => {
     if (recommendations.length === 0 && (!isSuccess || !isLoading)) abortableDispatch(fetchAction);
   }, []);
 
-  if (isLoading) return <Loading />;
-
   return (
-    <div className="anime-recommendations">
-      {isSuccess && recommendations.length > 0 ? (
-        <div className="anime-recommendations__items">
+    <div className="recommendations">
+      {recommendations.length > 0 && (
+        <div className="recommendations__items">
           {recommendations.slice(0, visibleCount).map(entityItem)}
         </div>
-      ) : (
-        <EmptyValueMessage message={isError ? commonMessages.error : emptyValueMessage} />
       )}
+
+      {isLoading && <Loading className="recommendations__message" />}
+      {isError && (
+        <EmptyValueMessage className="recommendations__message" message={commonMessages.error} />
+      )}
+      {isSuccess && recommendations.length === 0 && (
+        <EmptyValueMessage className="recommendations__message" message={emptyValueMessage} />
+      )}
+
       {recommendations.length > 0 && recommendations.length > visibleCount && (
-        <div className="anime-recommendations__show-more-wrapper bnts-wrapper">
+        <div className="recommendations__show-more-wrapper bnts-wrapper">
           <button
-            className="anime-recommendations__show-more show-more-btn btn btn--upper btn--outline"
+            className="recommendations__show-more show-more-btn btn btn--upper btn--outline"
             onClick={showMore}
             disabled={isLoading}>
             Show more

@@ -19,11 +19,16 @@
   --secondary-color: #136fe8;
   --secondary-color-light: #2582fa;
   --secondary-color-rgb: 19, 111, 232;
-  --accent-color: #ff0004;
+  // --accent-color: #ff0004;
+  --accent-color: #f53f42;
 
   --released-color: #00df7e;
   // --ongoing-color: #ffa600;
   --ongoing-color: #0099ff; //#0099ff
   --anons-color: #df0004;
   --anons-unknown: #4b4b4b;
+
+  --z-index-header: 200;
+  --z-index-search-modal: 300;
+  --z-index-catalog-sidebar: 50;
 }

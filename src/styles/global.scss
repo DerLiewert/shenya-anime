@@ -22,6 +22,7 @@ body.menu-open {
 .wrapper {
   flex-direction: column;
   overflow: hidden;
+  position: relative;
   @supports (overflow: clip) {
     overflow: clip;
   }

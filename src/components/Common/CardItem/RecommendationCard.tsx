@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AnimeTooltip, MangaTooltip } from '@/components';
+import { AnimeTooltip, MangaTooltip, SfwImage } from '@/components';
 import { getImageUrl } from '@/utils';
 import { appPaths } from '@/resources';
 import { RecommendationEntry } from '@/models';
@@ -10,16 +10,18 @@ import './CardItem.scss';
 interface RecommendationCard {
   item: RecommendationEntry;
   linkPath: string;
+  nsfw?: boolean;
   className?: string;
 }
 
 export const RecommendationCard = React.forwardRef<HTMLAnchorElement, RecommendationCard>(
-  ({ item, linkPath, className }, ref) => {
+  ({ item, linkPath, nsfw = false, className }, ref) => {
     const { images, title } = item;
     return (
       <Link to={linkPath} ref={ref} className={clsx(className, 'card-item border-opacity')}>
         <div className="card-item__image bg bg--dark">
-          <img src={getImageUrl(images)} alt="Poster" loading="lazy" />
+          <SfwImage src={getImageUrl(images)} alt="Poster" loading="lazy" nsfw={nsfw} />
+          {/* <img src={getImageUrl(images)} alt="Poster" loading="lazy" /> */}
         </div>
         <div className="card-item__content">
           <h3 className="card-item__title title title--fz-14 visible-line" title={title}>
@@ -35,6 +37,7 @@ interface RecommendationCardWithTooltip {
   item: RecommendationEntry;
   className?: string;
   tooltip?: boolean;
+  nsfw?: boolean;
   key: any;
 }
 
@@ -42,10 +45,12 @@ interface RecommendationCardWithTooltip {
 export const AnimeRecommendationCard: React.FC<RecommendationCardWithTooltip> = ({
   item,
   className,
+  nsfw = false,
   tooltip = true,
 }) => {
   const renderCard = () => (
     <RecommendationCard
+      nsfw={nsfw}
       item={item}
       className={className}
       linkPath={appPaths.animeFull(item.mal_id)}
@@ -58,10 +63,12 @@ export const AnimeRecommendationCard: React.FC<RecommendationCardWithTooltip> = 
 export const MangaRecommendationCard: React.FC<RecommendationCardWithTooltip> = ({
   item,
   className,
+  nsfw = false,
   tooltip = true,
 }) => {
   const renderCard = () => (
     <RecommendationCard
+      nsfw={nsfw}
       item={item}
       className={className}
       linkPath={appPaths.mangaFull(item.mal_id)}

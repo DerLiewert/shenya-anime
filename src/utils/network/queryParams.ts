@@ -1,4 +1,4 @@
-import { AnimeSeason, animeSeasons, SeasonAnimeType, seasonAnimeType } from '@/models';
+import { AnimeSeasons, animeSeasons, SeasonAnimeType, seasonAnimeType } from '@/models';
 import { isEmpty } from '../general';
 
 export const searchParamsToObj = (paramsString: string) => {
@@ -22,7 +22,7 @@ const paramsValidators = {
     const year = Number(value);
     return isNaN(year) ? undefined : year;
   },
-  season: (value: string) => animeSeasons.includes(value as AnimeSeason) ? value as AnimeSeason : undefined,
+  season: (value: string) => animeSeasons.includes(value as AnimeSeasons) ? value as AnimeSeasons : undefined,
   filter: (value: string) => seasonAnimeType.includes(value as SeasonAnimeType) ? value as SeasonAnimeType : undefined,
   page: (value: string) => {
     const page = parseInt(value, 10);

@@ -6,10 +6,11 @@ import {
   useAbortableDispatch,
   useFetchStatus,
   useMatchMedia,
+  usePathSegments,
   useYoutubeTrailerImage,
 } from '@/hooks';
 import { NotFound } from '@/pages';
-import { BookmarkButton, Breadcrumbs, PlayCircleIcon, TabList } from '@/components';
+import { BookmarkButton, Breadcrumbs, PlayCircleIcon, SfwImage, TabList } from '@/components';
 import { getImageUrl, renderTabRoutes, scrollToTop } from '@/utils';
 import { breakpoints } from '@/constants';
 
@@ -31,6 +32,24 @@ import 'lightgallery/scss/lg-video.scss';
 
 import clsx from 'clsx';
 import './EntityPageLayout.scss';
+
+//========================================================================================================================================================
+
+const isValidPath = (pathParts: string[], tabs: TabRoute[]): boolean => {
+  if (pathParts.length === 0) return true;
+
+  const [current, ...rest] = pathParts;
+
+  const tab = tabs.find((t) => t.value === current);
+
+  if (!tab) return false;
+  if (rest.length === 0) return true;
+  if (!tab.children) return false;
+
+  return isValidPath(rest, tab.children);
+};
+
+//========================================================================================================================================================
 
 type ItemTypes = AnimeFull | MangaFull | PersonFull | CharacterFull | ProducerFull;
 type NullableItemTypes<T> = T | null;
@@ -54,12 +73,14 @@ interface EntityPageLayoutProps<T extends ItemTypes> {
   // Base
   getBasePath: (id: number) => string;
   introBg?: string;
+  isNsfw?: (item: NullableItemTypes<T>) => boolean;
 
   // Render logic
   render: (item: NullableItemTypes<T>) => EntityRenderResult;
 }
 
 const EntityPageLayout = <T extends ItemTypes>({
+  isNsfw = () => false,
   introBg,
   getBasePath,
   fetchAction,
@@ -72,28 +93,17 @@ const EntityPageLayout = <T extends ItemTypes>({
   const navigate = useNavigate();
   const id = Number(useParams().id);
   const basePath = getBasePath(id);
-  const activeTabFromUrl = decodeURIComponent(
-    location.pathname.split(basePath)[1]?.split('/').filter(Boolean)[0],
-  );
+  const tabSegments = usePathSegments(basePath);
 
   const item = useAppSelector(selector);
   const renderItem = React.useMemo(() => render(item), [item]);
-  const { isLoading, isSuccess, isError } = useFetchStatus(status);
-  const { src, onLoad, isFallback } = useYoutubeTrailerImage(
-    renderItem.trailer ? renderItem.trailer.images : null,
-  );
+  const { src, onLoad, isFallback } = useYoutubeTrailerImage(renderItem.trailer);
+  const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const isTablet = useMatchMedia('max', breakpoints.tablet);
   const isMobile = useMatchMedia('max', breakpoints.mobile);
 
-  const getTab = () => {
-    if (renderItem.tabs.length === 0 || activeTabFromUrl === renderItem.tabs[0].value) return '';
-    if (renderItem.tabs.find((obj) => obj.value === activeTabFromUrl)?.value)
-      return activeTabFromUrl;
-    return renderItem.tabs[0].value || '';
-  };
-
-  const [activeTab, setActiveTab] = React.useState(getTab());
+  const [activeTab, setActiveTab] = React.useState(tabSegments[0]);
   const tabsRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -101,14 +111,10 @@ const EntityPageLayout = <T extends ItemTypes>({
   }, [id]);
 
   React.useEffect(() => {
-    const currentTab = getTab();
-    if (currentTab !== activeTab) {
-      if (renderItem.tabs.find((item) => item.value === currentTab)) setActiveTab(currentTab);
-      else setActiveTab('');
-    }
-
+    if (activeTab === tabSegments[0]) return;
+    setActiveTab(tabSegments[0]);
     scrollToTop(tabsRef, true);
-  }, [location]);
+  }, [location, renderItem.tabs]);
 
   React.useEffect(() => {
     scrollToTop(tabsRef);
@@ -118,17 +124,14 @@ const EntityPageLayout = <T extends ItemTypes>({
     window.scrollTo({ top: 0 });
   }, [id]);
 
-  React.useEffect(() => {
-    setActiveTab(getTab());
-  }, [renderItem.tabs]);
-
   // Рендер постера аниме
   const renderPoster = () => (
-    <div className="anime-leftside__poster image-centered border-radius">
+    <div className="full-page-leftside__poster image-centered border-radius">
       {item ? (
-        <img src={getImageUrl(item.images)} alt="Poster" />
+        <SfwImage nsfw={isNsfw(item)} src={getImageUrl(item.images)} alt="Poster" />
       ) : (
-        <Skeleton className="anime-skeleton__image _skeleton" />
+        // <img src={getImageUrl(item.images)} alt="Poster" />
+        <Skeleton className="full-page-skeleton__image _skeleton" />
       )}
     </div>
   );
@@ -138,54 +141,25 @@ const EntityPageLayout = <T extends ItemTypes>({
     return item ? renderItem.resources : <Skeleton className="border-radius" height="150px" />;
   };
 
-  // Смена активного таба при клике на таб
-  const onTabTrigger = React.useCallback(
-    (value: string) => {
-      setActiveTab(value);
-      navigate(
-        renderItem.tabs.length > 0 && value === renderItem.tabs[0].value
-          ? basePath
-          : `${basePath}/${value}`,
-      );
-    },
-    [basePath, item],
-  );
-
-  const isValidPath = (pathParts: string[], tabs: TabRoute[]): boolean => {
-    if (pathParts.length === 0) return true;
-
-    const [current, ...rest] = pathParts;
-
-    const tab = tabs.find((t) => t.value === current);
-
-    if (!tab) return false;
-    if (rest.length === 0) return true;
-    if (!tab.children) return false;
-
-    return isValidPath(rest, tab.children);
-  };
-
-  const rawPathParts = location.pathname
-    .replace(basePath, '')
-    .split('/')
-    .filter(Boolean)
-    .map(decodeURIComponent);
-
-  const firstTab = renderItem.tabs[0]?.value;
-  const directMatch = isValidPath(rawPathParts, renderItem.tabs);
-
-  const fallbackMatch =
-    firstTab && !directMatch ? isValidPath([firstTab, ...rawPathParts], renderItem.tabs) : false;
-
-  const pathIsValid = directMatch || fallbackMatch;
-  if ((isSuccess && !item) || isError || !pathIsValid) return <NotFound />;
+  if (
+    isError ||
+    (isSuccess && !item) ||
+    (!isLoading && !isIdle && !isValidPath(tabSegments, renderItem.tabs))
+  )
+    return <NotFound />;
 
   return (
-    <div className="anime">
-      <div className="anime__intro anime-intro">
-        <div className="anime-intro__bg bg">
-          {renderItem.trailer ? (
-            src ? (
+    <div className="full-page">
+      <div className="full-page__intro full-page-intro">
+        <div className="full-page-intro__bg bg">
+          {isLoading ? (
+            <SkeletonTheme baseColor="transparent">
+              <Skeleton className="full-page-skeleton__image" />
+            </SkeletonTheme>
+          ) : !renderItem.trailer ? (
+            <img src={introBg} alt="Background image" aria-hidden />
+          ) : (
+            src && (
               <img
                 className={clsx({ '_not-found': isFallback })}
                 src={src}
@@ -193,32 +167,26 @@ const EntityPageLayout = <T extends ItemTypes>({
                 alt="Background image"
                 aria-hidden
               />
-            ) : (
-              <SkeletonTheme baseColor="transparent">
-                <Skeleton className="anime-skeleton__image" />
-              </SkeletonTheme>
             )
-          ) : (
-            <img src={introBg} alt="Background image" aria-hidden />
           )}
         </div>
 
-        <div className="anime-intro__container container">
+        <div className="full-page-intro__container container">
           {isMobile && renderPoster()}
-          <div className="anime-intro__body">
-            <h2 className="anime-intro__title title title--fz-48">
+          <div className="full-page-intro__body">
+            <h2 className="full-page-intro__title title title--fz-48">
               {item && renderItem.title ? renderItem.title : <Skeleton />}
             </h2>
             {!item &&
               Array.from({ length: 2 }).map((_, i) => (
-                <h3 key={i} className="anime-intro__sub-title title">
+                <h3 key={i} className="full-page-intro__sub-title title">
                   <Skeleton />
                 </h3>
               ))}
             {renderItem.subtitles &&
               renderItem.subtitles.length > 0 &&
               renderItem.subtitles.map((str, index) => (
-                <h3 className="anime-intro__sub-title title" title={str} key={index}>
+                <h3 className="full-page-intro__sub-title title" title={str} key={index}>
                   {str}
                 </h3>
               ))}
@@ -226,14 +194,15 @@ const EntityPageLayout = <T extends ItemTypes>({
         </div>
       </div>
 
-      <div className="anime__about anime-about">
+      <div className="full-page__about full-page-about">
         <div className="container">
-          <div className="anime-about__inner">
-            <div className="anime-about__left anime-leftside">
+          <div className="full-page-about__inner">
+            <div className="full-page-about__left full-page-leftside">
               {!isMobile && renderPoster()}
               {(renderItem.trailer || renderItem.bookmark) && (
-                <div className="anime-leftside__buttons">
+                <div className="full-page-leftside__buttons">
                   {renderItem.trailer &&
+                    renderItem.trailer.embed_url &&
                     (item ? (
                       <TrailerButton trailer={renderItem.trailer} />
                     ) : (
@@ -245,7 +214,7 @@ const EntityPageLayout = <T extends ItemTypes>({
                       <BookmarkButton
                         item={item as any}
                         type={renderItem.bookmark}
-                        className="anime-leftside__btn btn btn--upper btn--icon btn--stroke btn--white"
+                        className="full-page-leftside__btn btn btn--upper btn--icon btn--stroke btn--white"
                         bookmarkedClassName="btn--fill"
                       />
                     ) : (
@@ -256,29 +225,29 @@ const EntityPageLayout = <T extends ItemTypes>({
               {!isTablet && renderAnimeResources()}
             </div>
 
-            <div className="anime-about__body">
+            <div className="full-page-about__body">
               {renderItem.breadcrumbs &&
                 (item ? (
                   <Breadcrumbs
-                    className="anime-about__breadcrumbs"
+                    className="full-page-about__breadcrumbs"
                     items={renderItem.breadcrumbs}
                   />
                 ) : (
                   <Skeleton
-                    className="anime-about__breadcrumbs"
+                    className="full-page-about__breadcrumbs"
                     height="20px"
                     style={{ maxWidth: '480px' }}
                   />
                 ))}
 
               {item ? (
-                <div ref={tabsRef} className="anime-about__tabs anime-tabs">
+                <div ref={tabsRef} className="full-page-about__tabs full-page-tabs">
                   <TabList
                     tabs={renderItem.tabs}
                     activeTab={activeTab}
-                    onTabTrigger={onTabTrigger}
+                    onTabTrigger={(value) => navigate(`${basePath}/${value}`)}
                   />
-                  <div className="anime-tabs__body">
+                  <div className="full-page-tabs__body">
                     <Routes>
                       {renderTabRoutes(renderItem.tabs)}
                       <Route path="*" element={<NotFound />} />
@@ -287,7 +256,7 @@ const EntityPageLayout = <T extends ItemTypes>({
                 </div>
               ) : (
                 <Skeleton
-                  containerClassName="anime-about__tabs"
+                  containerClassName="full-page-about__tabs"
                   height="100%"
                   style={{ minHeight: ' 200px' }}
                 />
@@ -308,7 +277,7 @@ export default EntityPageLayout;
 const TrailerButton: React.FC<{ trailer: AnimeYoutubeVideo }> = ({ trailer }) => {
   return (
     <LightGallery
-      addClass="anime-video-trailer"
+      addClass="full-page-video-trailer"
       licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
       plugins={[lgVideo]}
       download={false}
@@ -325,8 +294,8 @@ const TrailerButton: React.FC<{ trailer: AnimeYoutubeVideo }> = ({ trailer }) =>
         controls: false,
       }}>
       <button
-        className="anime-leftside__btn btn btn--upper btn--icon btn--stroke"
-        data-src={trailer.url}>
+        className="full-page-leftside__btn btn btn--upper btn--icon btn--stroke"
+        data-src={trailer.url || trailer.embed_url}>
         <PlayCircleIcon />
         watch trailer
       </button>

@@ -59,7 +59,8 @@ export async function getResource<T, P = JikanPaginationBase>({
     label: `[GET ${url}]`,
   });
 
-  // console.log('response', response);
+  console.log('response', response.data);
+
   if (!response.data.data) {
     // Можно логировать или включить больше контекста
     console.log(new Error((response.data as any).message));

@@ -1,21 +1,34 @@
-import { Outlet, Route } from 'react-router-dom';
+import { Navigate, Outlet, Route } from 'react-router-dom';
 import { TabRoute } from '@/typescript';
+import React from 'react';
 
 // Рекурсивный рендер Route
 export const renderTabRoutes = (tabs: TabRoute[], depth: number = 0): React.ReactNode =>
   tabs.map((tab, index) => {
-    const path = tab.value;
-    if (tab.children) {
+    const { value: path, element, children } = tab;
+    const isFirstRoot = depth === 0 && index === 0;
+    const key = `${path}-${depth}`;
+
+    if (children) {
       return (
-        <Route key={path} path={depth === 0 && index === 0 ? '' : tab.value} element={<Outlet />}>
-          <Route index element={tab.element} />
-          {renderTabRoutes(tab.children, depth + 1)}
-        </Route>
+        <React.Fragment key={key}>
+          <Route index element={<Navigate to={path} replace />} />
+          <Route path={path} element={<Outlet />}>
+            <Route index element={element} />
+            {renderTabRoutes(children, depth + 1)}
+          </Route>
+        </React.Fragment>
       );
     }
-    return depth === 0 && index === 0 ? (
-      <Route key={tab.value} index element={tab.element} />
-    ) : (
-      <Route key={tab.value} path={tab.value} element={tab.element} />
-    );
+
+    if (isFirstRoot) {
+      return (
+        <React.Fragment key={key}>
+          <Route index element={<Navigate to={path} replace />} />
+          <Route path={path} element={element} />
+        </React.Fragment>
+      );
+    }
+
+    return <Route key={key} path={path} element={tab.element} />;
   });

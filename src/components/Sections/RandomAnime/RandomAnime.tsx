@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus, useYoutubeTrailerImage } from '@/hooks';
 import { clearRandomAnimeState, fetchRandomAnime } from '@/store';
-import { Score, ArrowIcon, BookmarkButton, EmptyValueMessage } from '@/components';
-import { getImageUrl, valueOrDefault } from '@/utils';
+import { Score, ArrowIcon, BookmarkButton, EmptyValueMessage, SfwImage } from '@/components';
+import { getImageUrl, isAnimeNsfw, valueOrDefault } from '@/utils';
 import { appPaths, animeTypeOptions } from '@/resources';
 import clsx from 'clsx';
 import './RandomAnime.scss';
@@ -16,7 +16,7 @@ const RandomAnime: React.FC = () => {
   const abortableDispatch = useAbortableDispatch();
   const { item, status } = useAppSelector((state) => state.randomAnime);
   const { isSuccess, isError } = useFetchStatus(status);
-  const { src, onLoad, isFallback } = useYoutubeTrailerImage(item && item.trailer.images);
+  const { src, onLoad, isFallback } = useYoutubeTrailerImage(item && item.trailer);
 
   React.useEffect(() => {
     abortableDispatch(fetchRandomAnime);
@@ -54,7 +54,13 @@ const RandomAnime: React.FC = () => {
           <div className="random-anime__body">
             <div className="random-anime__poster bg border-opacity">
               {item ? (
-                <img src={getImageUrl(item.images)} alt="Poster" loading="lazy" aria-hidden />
+                <SfwImage
+                  src={getImageUrl(item.images)}
+                  nsfw={isAnimeNsfw(item)}
+                  alt="Poster"
+                  loading="lazy"
+                  aria-hidden
+                />
               ) : (
                 <Skeleton className="img" />
               )}

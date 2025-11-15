@@ -1,23 +1,33 @@
 import React from 'react';
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { useAppSelector } from '@/app/hooks';
-import { AnimeCard, CommonIntro, MangaCard } from '@/components';
-import { TabRoute } from '@/typescript';
-import './Bookmark.scss';
+import { AnimeCard, CommonIntro, EmptyValueMessage, MangaCard } from '@/components';
+import { AnimeAndMangaOf, AnimeAndMangaType, TabRoute } from '@/typescript';
 import NotFound from '../NotFound/NotFound';
 import { appPaths } from '@/resources';
+import { usePathSegments } from '@/hooks';
+import './Bookmark.scss';
+import { RootState } from '@/app/store';
 
 const routeItems: TabRoute[] = [
-  { label: 'Anime', value: 'anime', element: <BookmarkedAnime /> },
-  { label: 'Manga', value: 'manga', element: <BookmarkedManga /> },
+  {
+    label: 'Anime',
+    value: 'anime',
+    element: <BookmarkedItems type="anime" selector={(state) => state.bookmark.anime} />,
+  },
+  {
+    label: 'Manga',
+    value: 'manga',
+    element: <BookmarkedItems type="manga" selector={(state) => state.bookmark.manga} />,
+  },
 ];
 
 const pagePath = appPaths.bookmark;
 
 const Bookmark = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const tabSegments = location.pathname.replace(pagePath, '').split('/').filter(Boolean);
+  const tabSegments = usePathSegments(pagePath);
+
   if (tabSegments.length > 0 && !routeItems.find((obj) => obj.value === tabSegments[0]))
     return <NotFound />;
 
@@ -40,14 +50,12 @@ const Bookmark = () => {
               </div>
             ))}
           </div>
-          <div className="bookmark__items">
-            <Routes>
-              <Route index element={<Navigate to={routeItems[0].value} replace />} />
-              {routeItems.map((item) => (
-                <Route key={item.value} path={item.value} element={item.element} />
-              ))}
-            </Routes>
-          </div>
+          <Routes>
+            <Route index element={<Navigate to={routeItems[0].value} replace />} />
+            {routeItems.map((item) => (
+              <Route key={item.value} path={item.value} element={item.element} />
+            ))}
+          </Routes>
         </div>
       </div>
     </div>
@@ -57,44 +65,33 @@ const Bookmark = () => {
 export default Bookmark;
 
 //========================================================================================================================================================
-function BookmarkedAnime() {
-  const items = useAppSelector((state) => state.bookmark.anime);
-  const sfw = useAppSelector((state) => state.settings.sfw);
-  const sfwItems = sfw
-    ? Object.values(items).filter((item) => item.genres.find((obj) => obj.mal_id !== 12))
-    : Object.values(items);
-
-  return (
-    <>
-      {sfwItems
-        .sort((a, b) => {
-          if (a.score && b.score) return b.score - a.score;
-          else return 0;
-        })
-        .map((item) => (
-          <AnimeCard item={item} key={item.mal_id} />
-        ))}
-    </>
-  );
+interface BookmarkedItems<T extends AnimeAndMangaType> {
+  type: T;
+  selector: (state: RootState) => { [key in number]: AnimeAndMangaOf<T> };
 }
 
-function BookmarkedManga() {
-  const items = useAppSelector((state) => state.bookmark.manga);
-  const sfw = useAppSelector((state) => state.settings.sfw);
-  const sfwItems = sfw
-    ? Object.values(items).filter((item) => item.genres.find((obj) => obj.mal_id !== 12))
-    : Object.values(items);
+function BookmarkedItems<T extends AnimeAndMangaType>({ type, selector }: BookmarkedItems<T>) {
+  const items = useAppSelector(selector);
+  const tempItems = React.useRef(items); // Чтоб при удалении айтема из Bookmarked, он оставался на странице до её обновления (на случай, если случайно удалили, чтоб сразу не исчезло)
+
+  if (Object.values(tempItems.current).length === 0)
+    return <EmptyValueMessage message={`No bookmarked ${type}`} />;
 
   return (
-    <>
-      {sfwItems
+    <div className="bookmark__items">
+      {Object.values(tempItems.current)
         .sort((a, b) => {
           if (a.score && b.score) return b.score - a.score;
           else return 0;
         })
-        .map((item) => (
-          <MangaCard item={item} key={item.mal_id} />
-        ))}
-    </>
+        .map((item) => {
+          switch (type) {
+            case 'anime':
+              return <AnimeCard item={item as AnimeAndMangaOf<'anime'>} key={item.mal_id} />;
+            case 'manga':
+              return <MangaCard item={item as AnimeAndMangaOf<'manga'>} key={item.mal_id} />;
+          }
+        })}
+    </div>
   );
 }

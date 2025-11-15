@@ -1,4 +1,4 @@
-.anime-recommendations {
+.recommendations {
   &__items {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -13,21 +13,6 @@
     @include media-max($mobileSmall) {
       grid-template-columns: repeat(2, 1fr);
     }
-
-    // @include media-max($mobile) {
-    //   grid-template-columns: repeat(3, 1fr);
-    //   gap: 12px;
-    // }
-    // @include media-max(600px) {
-    //   grid-template-columns: repeat(2, 1fr);
-    // }
-    // @include media-max(400px) {
-    //   grid-template-columns: 1fr;
-    // }
-
-    &:not(:last-child) {
-      margin-bottom: 20px;
-    }
   }
 
   &__item {
@@ -38,6 +23,16 @@
       }
       @include media-max(400px) {
         height: 180px;
+      }
+    }
+  }
+
+  &__message,
+  &__show-more-wrapper {
+    &:not(:first-child) {
+      margin-top: 20px;
+      @include media-max($mobile) {
+        margin-top: 15px;
       }
     }
   }

@@ -1,4 +1,4 @@
-.anime {
+.full-page {
   &__intro {
     @include media-max($tablet) {
       // margin-bottom: 25px;
@@ -53,7 +53,7 @@
   }
 }
 
-.anime-intro {
+.full-page-intro {
   position: relative;
   display: flex;
   align-items: flex-end;
@@ -126,7 +126,7 @@
 }
 
 //========================================================================================================================================================
-.anime-about {
+.full-page-about {
   position: relative;
   z-index: 3;
 
@@ -173,7 +173,8 @@
     height: 100%;
   }
 }
-.anime-leftside {
+
+.full-page-leftside {
   width: 100%;
   max-width: 25.256%;
   margin-top: -220px;
@@ -194,6 +195,10 @@
   &__poster {
     height: 489px;
     background-color: var(--bg-color-light);
+    .nsfw-img {
+      width: 100%;
+      height: 100%;
+    }
 
     &:not(:last-child) {
       margin-bottom: 17px;
@@ -346,7 +351,7 @@
   }
 }
 
-.anime-tabs {
+.full-page-tabs {
   display: flex;
   flex-direction: column;
 
@@ -368,12 +373,12 @@
   }
 }
 
-.anime-video-trailer .lg-outer {
+.full-page-video-trailer .lg-outer {
   padding-bottom: 50px;
 }
 
 //========================================================================================================================================================
-.anime-skeleton {
+.full-page-skeleton {
   &__image {
     position: absolute;
     top: 0;

@@ -149,14 +149,14 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
               <div className="search-modal__message fz-16">
                 Enter a search term to find {selectedType.value}.
               </div>
+            ) : isLoading ? (
+              <div className="search-modal__message fz-16">
+                <Loading />
+              </div>
             ) : isError ? (
               <div className="search-modal__message fz-16">{commonMessages.error}</div>
             ) : isSuccess && items.length === 0 ? (
               <div className="search-modal__message fz-16">No search results found.</div>
-            ) : isLoading && inputValue !== value ? (
-              <div className="search-modal__message fz-16">
-                <Loading />
-              </div>
             ) : (
               <>
                 <div className="search-modal__items">

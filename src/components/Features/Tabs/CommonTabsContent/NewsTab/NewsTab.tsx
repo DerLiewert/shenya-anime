@@ -14,7 +14,7 @@ import type {
 } from '@/typescript';
 import './NewsTab.scss';
 import { getImageUrl } from '@/utils';
-import { mangaEmptyValueMessages } from '@/constants';
+import { commonMessages, mangaEmptyValueMessages } from '@/constants';
 
 interface NewsTabProps {
   status: StatusSelector | FetchStatus | undefined;
@@ -35,7 +35,7 @@ const NewsTab: React.FC<NewsTabProps> = ({
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const { data: news, pagination } = useAppSelector(newsSelector);
-  const { isLoading, isSuccess } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
   const { visibleCount, showMore } = useShowMore(visibleNewsCount);
 
   React.useEffect(() => {
@@ -54,11 +54,9 @@ const NewsTab: React.FC<NewsTabProps> = ({
     }
   }, [visibleCount]);
 
-  if (isLoading && news.length === 0) return <Loading />;
-
   return (
     <div className="news-tab">
-      {(isSuccess || isLoading) && news.length > 0 ? (
+      {news.length > 0 && (
         <div className="news-tab__items">
           {news.slice(0, visibleCount).map((obj) => (
             <a
@@ -83,10 +81,16 @@ const NewsTab: React.FC<NewsTabProps> = ({
             </a>
           ))}
         </div>
-      ) : (
-        <EmptyValueMessage message={mangaEmptyValueMessages.news} />
       )}
-      {isLoading && <Loading />}
+
+      {isLoading && <Loading className="news-tab__message" />}
+      {isError && (
+        <EmptyValueMessage className="news-tab__message" message={commonMessages.error} />
+      )}
+      {isSuccess && news.length === 0 && (
+        <EmptyValueMessage className="news-tab__message" message={mangaEmptyValueMessages.news} />
+      )}
+
       {news.length > 0 && (news.length > visibleCount || pagination?.has_next_page) && (
         <div className="news-tab__show-more-wrapper bnts-wrapper">
           <button

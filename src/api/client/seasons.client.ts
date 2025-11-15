@@ -1,6 +1,6 @@
 import {
   Anime,
-  AnimeSeason,
+  AnimeSeasons,
   JikanPaginationPlus,
   JikanSeasonsParams,
   SeasonsListData,
@@ -19,7 +19,7 @@ export const getSeason = (
     year,
     season,
     queryParams = {},
-  }: { year: number; season: AnimeSeason; queryParams?: Partial<JikanSeasonsParams> },
+  }: { year: number; season: AnimeSeasons; queryParams?: Partial<JikanSeasonsParams> },
   signal?: AbortSignal,
 ) => {
   return getResource<Anime[], JikanPaginationPlus>({

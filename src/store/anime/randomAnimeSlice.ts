@@ -1,20 +1,17 @@
 import { getAnimeSearch } from '@/api';
-import { getResource } from '@/api/client/api.client';
 import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../../app/store';
-import { Anime, JikanPaginationPlus } from '../../models';
-import { randomInteger } from '../../utils';
+import { RootState } from '@/app/store';
+import { Anime } from '@/models';
+import { randomInteger } from '@/utils';
 
 interface randomAnimeState {
   item: Anime | null;
-  minScore: number;
   status: FetchStatus | null;
 }
 
 const initialState: randomAnimeState = {
   item: null,
-  minScore: 8,
   status: null,
 };
 
@@ -33,7 +30,8 @@ export const randomAnimeSlice = createSlice({
       state.status = FetchStatus.SUCCESS;
     });
 
-    builder.addCase(fetchRandomAnime.rejected, (state) => {
+    builder.addCase(fetchRandomAnime.rejected, (state, action) => {
+      if (action.meta.aborted) return;
       state.status = FetchStatus.ERROR;
     });
   },
@@ -46,7 +44,7 @@ export default randomAnimeSlice.reducer;
 export const fetchRandomAnime = createAsyncThunk<Anime, void, { state: RootState }>(
   'random-anime/fetchRandomAnime',
   async (_, thunkAPI) => {
-    const minScore = thunkAPI.getState().randomAnime.minScore;
+    const minScore = 8;
 
     // Получаем количество страниц
     const firstResponse = await getAnimeSearch({ min_score: minScore, limit: 1 }, thunkAPI.signal);
@@ -58,16 +56,14 @@ export const fetchRandomAnime = createAsyncThunk<Anime, void, { state: RootState
     const totalPages = firstResponse.pagination.last_visible_page;
     const page = randomInteger(1, totalPages);
 
-    // Получаем случайное аниме с этой страницы
-    const pageResponse = await getResource<Anime[], JikanPaginationPlus>({
-      endpoint: `https://api.jikan.moe/v4/anime`,
-      queryParams: {
+    const pageResponse = await getAnimeSearch(
+      {
         min_score: minScore,
         limit: 1,
         page,
       },
-      signal: thunkAPI.signal,
-    });
+      thunkAPI.signal,
+    );
 
     if (!pageResponse.data.length) {
       return thunkAPI.rejectWithValue('No anime found on selected page');

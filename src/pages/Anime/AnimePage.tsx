@@ -14,12 +14,13 @@ import {
   ReturnBack,
 } from '@/components';
 import { appPaths, animeTypeOptions } from '@/resources';
-import { toFirstUppercase } from '@/utils';
+import { isAnimeNsfw, toFirstUppercase } from '@/utils';
 import './AnimePage.scss';
 
 const AnimePage = () => {
   return (
     <EntityPageLayout<AnimeFull>
+      isNsfw={(item) => (item ? isAnimeNsfw(item) : false)}
       fetchAction={fetchFullAnimeById}
       selector={(state) => state.animeFullById.item}
       status={(state) => state.animeFullById.status.item}
@@ -133,9 +134,9 @@ const AnimeResources: React.FC<{ item: AnimeFull }> = ({ item }) => {
   const others = resources.filter((obj) => obj.name !== 'Official Site' && obj.name[0] !== '@');
 
   const renderResourcesList = ({ resources, title, emptyMessage }: ResourcesList) => (
-    <div className="anime-leftside__item">
-      <h4 className="anime-leftside__title">{title}</h4>
-      <ul className="anime-leftside__list leftside-list">
+    <div className="full-page-leftside__item">
+      <h4 className="full-page-leftside__title">{title}</h4>
+      <ul className="full-page-leftside__list leftside-list">
         {resources.length > 0 ? (
           resources.map((resource) => (
             <li key={resource.url} className="leftside-list__item leftside-list__item--icon">
@@ -156,7 +157,7 @@ const AnimeResources: React.FC<{ item: AnimeFull }> = ({ item }) => {
   );
 
   return (
-    <div className="anime-leftside__resources border-radius">
+    <div className="full-page-leftside__resources border-radius">
       {renderResourcesList({
         resources: official,
         title: 'Available At',

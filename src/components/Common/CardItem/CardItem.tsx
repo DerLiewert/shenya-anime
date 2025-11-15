@@ -1,11 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AnimeStatus, JikanImages, MangaStatus } from '@/models';
 import { getImageUrl } from '@/utils';
-import { BookmarkButton, Score, Status } from '@/components';
+import { BookmarkButton, Score, SfwImage, Status } from '@/components';
 import clsx from 'clsx';
 import './CardItem.scss';
 import { AnimeAndMangaOf, AnimeAndMangaType } from '@/typescript';
+import { useAppSelector } from '@/app/hooks';
 
 // interface CardItemProps {
 //   linkPath: string;
@@ -70,8 +70,9 @@ interface CardItemProps<T extends AnimeAndMangaType = AnimeAndMangaType> {
   linkPath: string;
   item: AnimeAndMangaOf<T> & { year: number | null };
   className?: string;
-  ref?: React.Ref<HTMLDivElement>;
+  nsfw: boolean;
   cardType: T;
+  ref?: React.Ref<HTMLDivElement>;
 }
 
 const CardItem = React.forwardRef<HTMLDivElement, CardItemProps>(
@@ -81,7 +82,7 @@ const CardItem = React.forwardRef<HTMLDivElement, CardItemProps>(
       item,
       cardType,
       className,
-      // ref,
+      nsfw
     },
     ref,
   ) => {
@@ -99,7 +100,12 @@ const CardItem = React.forwardRef<HTMLDivElement, CardItemProps>(
         <Link to={linkPath} className="card-item__inner">
           <div className="card-item__image bg ">
             <Status className="card-item__status" status={status} isShadow />
-            <img src={getImageUrl(images)} alt="Poster" loading="lazy" />
+            <SfwImage
+              src={getImageUrl(images)}
+              alt="Poster"
+              loading="lazy"
+              nsfw={nsfw}
+            />
             <Score className="card-item__score" score={score} isShadow />
           </div>
           <div className="card-item__content">

@@ -41,16 +41,15 @@ export const fetchTodaySchedulesAnime = createAsyncThunk<Anime[]>(
   'today-schedules-anime/fetchAnimeItems',
   async (_, { signal }) => {
     const weekDayIndex = new Date().getDay();
-    // const { data } = await axios.get<JikanResponse<Anime[]>>(
-    //   `https://api.jikan.moe/v4/schedules?filter=${WEEK_DAYS[weekDayIndex]}&limit=6`,
-    // );
-
     const { data } = await getResource<Anime[]>({
       endpoint: `https://api.jikan.moe/v4/schedules`,
       queryParams: {
         filter: weekDays[weekDayIndex],
         // limit: 6,
       },
+
+      // endpoint: 'https://api.jikan.moe/v4/anime',
+      // queryParams: { limit: 25, genres: [12], order_by: 'score', sort: 'desc' },
       signal,
     });
     return data;

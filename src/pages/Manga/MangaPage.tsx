@@ -11,11 +11,13 @@ import {
 } from '@/components';
 import { fetchFullMangaById } from '@/store';
 import { appPaths } from '@/resources';
+import { isMangaNsfw } from '@/utils';
 import './MangaPage.scss';
 
 const MangaPage = () => {
   return (
     <EntityPageLayout<MangaFull>
+      isNsfw={(item) => (item ? isMangaNsfw(item) : false)}
       fetchAction={fetchFullMangaById}
       selector={(state) => state.mangaFullById.item}
       status={(state) => state.mangaFullById.status.item}
@@ -66,11 +68,6 @@ const MangaPage = () => {
             label: 'Recommendations',
             element: <MangaRecommendationsTab />,
           },
-          {
-            value: 'more-info',
-            label: 'More info',
-            element: <div>more info</div>,
-          },
         ],
       })}
     />
@@ -95,9 +92,9 @@ const MangaResources: React.FC<{ item: MangaFull }> = ({ item }) => {
   const others = resources.filter((obj) => obj.name !== 'Official Site' && obj.name[0] !== '@');
 
   const renderResourcesList = ({ resources, title, emptyMessage }: ResourcesList) => (
-    <div className="anime-leftside__item">
-      <h4 className="anime-leftside__title">{title}</h4>
-      <ul className="anime-leftside__list leftside-list">
+    <div className="full-page-leftside__item">
+      <h4 className="full-page-leftside__title">{title}</h4>
+      <ul className="full-page-leftside__list leftside-list">
         {resources.length > 0 ? (
           resources.map((resource) => (
             <li key={resource.url} className="leftside-list__item leftside-list__item--icon">
@@ -118,7 +115,7 @@ const MangaResources: React.FC<{ item: MangaFull }> = ({ item }) => {
   );
 
   return (
-    <div className="anime-leftside__resources">
+    <div className="full-page-leftside__resources">
       {renderResourcesList({
         resources: official,
         title: 'Available At',
