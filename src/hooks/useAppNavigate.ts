@@ -10,7 +10,6 @@ export function useAppNavigate<T>(
 
   return (paramsObject: Record<string, any>, options?: { replace?: boolean }) => {
     // const validated = parseSearchParams(searchParamsToString(defaultParams ? {...defaultParams, ...paramsObject} : paramsObject));
-
     const validated = parseSearchParams(searchParamsToString(paramsObject));
 
     if (defaultParams) {

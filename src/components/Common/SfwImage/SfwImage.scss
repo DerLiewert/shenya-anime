@@ -1,25 +1,46 @@
-.nsfw-img {
+.sfw-image {
   position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: var(--bg-color-light);
+
+  &._dark {
+    background-color: var(--bg-color-dark);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    &._contain {
+      object-fit: contain;
+    }
+  }
+
   @include media-max($mobile) {
     font-size: 14px;
   }
   @include media-max($mobileSmall) {
     font-size: 12px;
   }
-  &::after {
-    content: 'NSFW';
-    font-weight: 600;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    z-index: 10;
-    padding: 3px 5px;
-    border-radius: 3px;
-    background-color: var(--accent-color);
-  }
-}
 
-.nsfw {
-  filter: blur(10px); //grayscale(1);
+  &._nsfw {
+    &::after {
+      content: 'NSFW';
+      font-weight: 600;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate3d(-50%, -50%, 0);
+      z-index: 10;
+      padding: 3px 5px;
+      border-radius: 3px;
+      background-color: var(--accent-color);
+    }
+    img {
+      filter: blur(10px); //grayscale(1);
+    }
+  }
 }

@@ -39,7 +39,7 @@ const MangaTooltipContent: React.FC<{
   item: Manga | null | undefined;
   status: FetchStatus | null;
 }> = ({ item, status }) => {
-  const { isLoading, isError, isIdle } = useFetchStatus(status);
+  const { isLoading, isError, isIdle } = useFetchStatus(status, true);
 
   if (isIdle) return null;
 

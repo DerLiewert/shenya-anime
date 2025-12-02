@@ -16,7 +16,6 @@ interface MainIntroSlide {
 
 export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = true }) => {
   const { src, onLoad, isFallback, isLoading } = useYoutubeTrailerImage(item.trailer);
-  console.log('src', src);
 
   return (
     <div className="main-slide__container container">
@@ -31,16 +30,15 @@ export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderIma
       )}
 
       <div className="main-slide__body">
-        <div className="main-slide__poster bg bodrer">
-          {shouldRenderImage && (
-            <SfwImage
-              src={getImageUrl(item.images)}
-              nsfw={isAnimeNsfw(item)}
-              alt="Poster"
-              loading="lazy"
-            />
-          )}
-        </div>
+        {shouldRenderImage && (
+          <SfwImage
+            src={getImageUrl(item.images)}
+            nsfw={isAnimeNsfw(item)}
+            alt="Poster"
+            loading="lazy"
+            classWrapper="main-slide__poster bodrer"
+          />
+        )}
         <div className="main-slide__content">
           <h2 className="main-slide__title title title--fz-48">
             <Link to={appPaths.animeFull(item.mal_id)}>{item.title}</Link>

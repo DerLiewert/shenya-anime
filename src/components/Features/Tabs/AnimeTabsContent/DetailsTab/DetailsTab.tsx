@@ -24,7 +24,7 @@ import './DetailsTab.scss';
 const DetailsTab: React.FC = () => {
   const item = useAppSelector((state) => state.animeFullById.item);
   const { visibleCounts, initShowMore, showMore } = useShowMoreMap(6);
-  const isNotMobile = useMatchMedia('min', breakpoints.mobile);
+  const isMobile = useMatchMedia('max', breakpoints.mobile);
 
   React.useEffect(() => {
     if (item && item.relations) {
@@ -172,7 +172,7 @@ const DetailsTab: React.FC = () => {
           </div>
         </div>
 
-        {isNotMobile && (
+        {!isMobile && (
           <div className="anime-details__score-stats">
             <div className="anime-details__score-stats-title">Score Status</div>
             <ScoreStats type="anime" />

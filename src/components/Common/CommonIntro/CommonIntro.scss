@@ -2,6 +2,7 @@
   position: relative;
   padding: 100px 0;
   margin-bottom: 25px;
+  background-color: var(--bg-color-light) !important;
 
   &--anime {
     background: url('/assets/anime-catalog.webp') center / cover no-repeat;
@@ -37,7 +38,7 @@
       rgba(var(--bg-color-rgb), 0.7) 90%
     );
   }
-  
+
   &__inner {
     width: 100%;
     position: relative;

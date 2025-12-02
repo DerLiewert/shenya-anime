@@ -20,7 +20,7 @@ const Broadcast = () => {
   const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
   const { items, status, pagination } = useAppSelector((state) => state.schedulesAnime);
-  const { isError, isLoading, isSuccess } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const parseSearchParams = React.useMemo(
     () =>

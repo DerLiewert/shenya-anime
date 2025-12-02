@@ -49,7 +49,7 @@ const MangaCatalogPage: React.FC = () => {
 
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.mangaGenres);
   const { items, pagination, status } = useAppSelector((state) => state.mangaCatalog);
-  const { isIdle, isLoading, isError, isSuccess } = useFetchStatus(status);
+  const { isLoading, isError, isSuccess } = useFetchStatus(status);
 
   const [isShowFilters, setIsShowFilters] = React.useState(false);
   const isTablet = useMatchMedia('max', breakpoints.tablet);
@@ -173,7 +173,7 @@ const MangaCatalogPage: React.FC = () => {
             />
             <div className="catalog-cards__content">
               <div className="catalog-cards__items">
-                {(isIdle || isLoading) &&
+                {isLoading &&
                   Array.from({ length: 24 }).map((_, i) => (
                     <Skeleton
                       key={i}

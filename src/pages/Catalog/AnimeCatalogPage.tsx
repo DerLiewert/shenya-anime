@@ -21,9 +21,9 @@ import {
   AnimeSearchType,
   SortOptions,
 } from '@/models';
-import { ExtractOptionValue, FetchStatus, SelectOption } from '@/typescript';
+import { ExtractOptionValue, SelectOption } from '@/typescript';
 import { AnimeCard, CommonIntro, EmptyValueMessage, FilterIcon, Pagination } from '@/components';
-import { fetchAnimeByParams, fetchAnimeGenres } from '@/store';
+import { fetchAnimeByParams, fetchAnimeGenres, minusOpenModal, plusOpenModal } from '@/store';
 import clsx from 'clsx';
 import './CatalogPage.scss';
 
@@ -37,20 +37,30 @@ const setSortForOrderBy = (param: AnimeSearchOrder | undefined): SortOptions | u
   return param ? sort[param] : undefined;
 };
 
-const defaultSearchParams: AnimeSearchParams | undefined = {
-  order_by: 'score',
-};
+function createDefaultSearchParams(): AnimeSearchParams {
+  const order_by = 'score';
+
+  return {
+    order_by,
+    sort: setSortForOrderBy(order_by),
+  };
+}
+
+const defaultSearchParams = createDefaultSearchParams();
 
 //========================================================================================================================================================
 const AnimeCatalogPage: React.FC = () => {
   const cardsRef = React.useRef<HTMLDivElement>(null);
 
+  const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
 
   const { items: genres, status: genresStatus } = useAppSelector((state) => state.animeGenres);
+  const { isLoading: isGenresLoading } = useFetchStatus(genresStatus);
+
   const { items, pagination, status } = useAppSelector((state) => state.animeCatalog);
-  const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const [isShowFilters, setIsShowFilters] = React.useState(false);
   const isTablet = useMatchMedia('max', breakpoints.tablet);
@@ -60,9 +70,6 @@ const AnimeCatalogPage: React.FC = () => {
       parseAnimeSearchParams({
         allAllowed: false,
         rules: {
-          page: pagination?.last_visible_page
-            ? { include: { from: 1, to: pagination.last_visible_page } }
-            : true,
           status: true,
           rating: true,
           min_score: true,
@@ -71,6 +78,9 @@ const AnimeCatalogPage: React.FC = () => {
           order_by: { include: ['mal_id', 'score', 'popularity', 'favorites'] },
           genres:
             genres.length > 0 ? { include: genres.map((obj) => obj.mal_id.toString()) } : true,
+          page: pagination?.last_visible_page
+            ? { include: { from: 1, to: pagination.last_visible_page } }
+            : true,
         },
       }),
     [genres, pagination?.last_visible_page],
@@ -90,12 +100,15 @@ const AnimeCatalogPage: React.FC = () => {
   }, [location.search]);
 
   React.useEffect(() => {
-    if (!isTablet && isShowFilters) setIsShowFilters(false);
+    if (!isTablet && isShowFilters) {
+      dispatch(minusOpenModal());
+      setIsShowFilters(false);
+    }
   }, [isTablet]);
 
   // Получение даных об аниме по выбраным параметрам
   React.useEffect(() => {
-    if (genresStatus === FetchStatus.LOADING) return;
+    if (isGenresLoading) return;
 
     abortableDispatch(fetchAnimeByParams, searchParams);
   }, [searchParams, genresStatus]);
@@ -123,7 +136,10 @@ const AnimeCatalogPage: React.FC = () => {
           <div className="catalog-cards__top">
             <button
               className="catalog-cards__show-filters btn btn--icon btn--fill"
-              onClick={() => setIsShowFilters(true)}>
+              onClick={() => {
+                dispatch(plusOpenModal());
+                setIsShowFilters(true);
+              }}>
               <FilterIcon />
               Filters
             </button>
@@ -169,16 +185,20 @@ const AnimeCatalogPage: React.FC = () => {
                   page: undefined,
                 });
 
+                dispatch(minusOpenModal());
                 setIsShowFilters(false);
               }}
               onReset={() => {
                 appNavigate({ order_by: searchParams.order_by });
               }}
-              onClose={() => setIsShowFilters(false)}
+              onClose={() => {
+                dispatch(minusOpenModal());
+                setIsShowFilters(false);
+              }}
             />
             <div className="catalog-cards__content">
               <div className="catalog-cards__items">
-                {(isIdle || isLoading) &&
+                {isLoading &&
                   Array.from({ length: 24 }).map((_, i) => (
                     <Skeleton
                       key={i}

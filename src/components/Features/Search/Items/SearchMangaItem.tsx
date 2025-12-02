@@ -10,15 +10,14 @@ import './SearchItem.scss';
 const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
   return (
     <Link to={appPaths.mangaFull(item.mal_id)} className="search-modal__item search-item">
-      <div className="search-item__image bg">
-        <SfwImage
-          nsfw={isMangaNsfw(item)}
-          src={getImageUrl(item.images)}
-          alt="Poster"
-          loading="lazy"
-          aria-hidden
-        />
-      </div>
+      <SfwImage
+        classWrapper="search-item__image"
+        nsfw={isMangaNsfw(item)}
+        src={getImageUrl(item.images)}
+        alt="Poster"
+        loading="lazy"
+        aria-hidden
+      />
       <div className="search-item__content">
         <div className="search-item__labels">
           <Score className="search-item__label search-item__label--score" score={item.score} />

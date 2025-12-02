@@ -5,3 +5,4 @@ export * from './EmptyValueMessage';
 export * from './InfoRowWithValue';
 export * from './FormatDate';
 export * from './ReturnBack';
+export * from './TrailerButton';

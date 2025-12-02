@@ -7,6 +7,13 @@
     justify-content: space-between;
     margin-bottom: 25px;
     column-gap: 20px;
+
+    @include media-max($mobile) {
+      margin-bottom: 20px;
+    }
+    @include media-max($mobileSmall) {
+      margin-bottom: 15px;
+    }
   }
 
   &__show-filters {
@@ -21,18 +28,21 @@
         width: 14px;
         height: 14px;
       }
-      @include media-max($mobileSmall) {
-        font-size: 14px;
-        svg {
-          width: 12px;
-          height: 12px;
-        }
+    }
+    @include media-max($mobile) {
+      font-size: 14px;
+      svg {
+        width: 12px;
+        height: 12px;
       }
     }
   }
 
   &__sorting {
     margin-left: auto;
+    @include media-max($mobile) {
+      font-size: 14px;
+    }
   }
 
   &__show-filters,
@@ -99,7 +109,7 @@
       }
     }
 
-    & .card-item__image,
+    & .card-item__image-block,
     & ._skeleton {
       @include media-max($mobile) {
         max-height: 260px;

@@ -52,19 +52,21 @@ const RandomAnime: React.FC = () => {
           </h2>
 
           <div className="random-anime__body">
-            <div className="random-anime__poster bg border-opacity">
-              {item ? (
-                <SfwImage
-                  src={getImageUrl(item.images)}
-                  nsfw={isAnimeNsfw(item)}
-                  alt="Poster"
-                  loading="lazy"
-                  aria-hidden
-                />
-              ) : (
-                <Skeleton className="img" />
-              )}
-            </div>
+            {item ? (
+              <SfwImage
+                classWrapper="random-anime__poster border-opacity"
+                src={getImageUrl(item.images)}
+                nsfw={isAnimeNsfw(item)}
+                alt="Poster"
+                loading="lazy"
+                aria-hidden
+              />
+            ) : (
+              <Skeleton
+                className="img"
+                containerClassName="random-anime__poster border-opacity inline-block bg"
+              />
+            )}
 
             {/* Info about anime */}
             <div className="random-anime__content">

@@ -18,7 +18,7 @@ const ScoreStats = <T extends AnimeAndMangaType>({ type }: ScoreStatsProps<T>) =
   const { scoreStats, status } = useAppSelector((state) =>
     isAnime ? state.animeFullById : state.mangaFullById,
   );
-  const { isLoading, isSuccess, isError, isIdle } = useFetchStatus(status.scoreStats);
+  const { isLoading, isSuccess, isError, isIdle } = useFetchStatus(status.scoreStats, true);
 
   React.useEffect(() => {
     if (!isSuccess) abortableDispatch(isAnime ? fetchAnimeScoreStats : fetchMangaScoreStats);

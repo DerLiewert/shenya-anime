@@ -9,26 +9,12 @@ import { TabRoute } from '@/typescript';
 interface TabListProps {
   tabs: Array<TabRoute | { value: string; label: string }>;
   activeTab: string;
-  className?: string;
-  onTabTrigger: (value: string) => void;
+  onTabClick: (value: string) => void;
   gap?: number;
+  className?: string;
 }
 
-const updateSwiper = (wrapper: HTMLElement, swiper: ISwiper, left: number) => {
-  wrapper.style.transition = 'transform 0.3s ease 0s';
-  wrapper.dataset.left = left.toString();
-  swiper.setTranslate(left);
-  // Обновление состояния и прогресса
-  swiper.updateProgress();
-  swiper.updateActiveIndex();
-  swiper.updateSlidesClasses();
-  // Триггер событий
-  swiper.emit('setTranslate', left);
-  swiper.emit('transitionStart');
-  swiper.emit('slideChangeTransitionStart');
-};
-
-const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, className, gap = 0 }) => {
+const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabClick, className, gap = 0 }) => {
   const tabRefs = React.useRef<Array<HTMLDivElement | null>>([]);
   const swiperRef = React.useRef<ISwiper | null>(null);
 
@@ -39,7 +25,7 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>, index: number) => {
     if (e.key === 'Enter' || e.key === ' ') {
-      onTabTriggerClick(e);
+      onClick(e);
       return;
     }
 
@@ -57,10 +43,12 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
     focusTab(nextIndex);
 
     if (!swiperRef.current) return;
+
     const swiper = swiperRef.current;
     const swiperEl = swiper.el as HTMLElement;
     const wrapper = swiperEl.querySelector<HTMLElement>('.swiper-wrapper');
     if (!wrapper) return;
+
     const nextSlide = swiperEl.querySelectorAll<HTMLElement>('.swiper-slide')[nextIndex];
     if (!nextSlide) return;
 
@@ -69,19 +57,19 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
     const swiperWrapperRect = wrapper.getBoundingClientRect();
 
     if (slideRect.left <= swiperRect.left) {
-      updateSwiper(wrapper, swiper, swiperWrapperRect.left - slideRect.left);
+      updateTabListSwiper(wrapper, swiper, swiperWrapperRect.left - slideRect.left);
     } else if (slideRect.right >= swiperWrapperRect.right) {
-      updateSwiper(wrapper, swiper, swiperWrapperRect.right - slideRect.right);
+      updateTabListSwiper(wrapper, swiper, swiperWrapperRect.right - slideRect.right);
     }
   };
 
-  const onTabTriggerClick = (
+  const onClick = (
     e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
   ) => {
     const value = (e.currentTarget as HTMLElement).dataset.value;
     if (!value) return;
 
-    onTabTrigger(value);
+    onTabClick(value);
   };
 
   React.useEffect(() => {
@@ -101,15 +89,13 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
       slidesPerView="auto"
       observeParents={true}
       observeSlideChildren={true}
-      scrollbar={{ draggable: true }}
+      scrollbar={true}
       onSwiper={(swiper: ISwiper) => {
         swiperRef.current = swiper;
       }}
       freeMode>
       {tabs.map((tab, index) => (
-        <SwiperSlide
-          key={tab.value}
-          className='swiper-tab-list__trigger-wrapper'>
+        <SwiperSlide key={tab.value} className="swiper-tab-list__trigger-wrapper">
           <div
             ref={(el) => {
               tabRefs.current[index] = el;
@@ -119,7 +105,7 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
             tabIndex={activeTab === tab.value ? 0 : -1}
             aria-selected={activeTab === tab.value}
             data-value={tab.value}
-            onClick={onTabTriggerClick}
+            onClick={onClick}
             onKeyDown={(e) => handleKeyDown(e, index)}>
             {tab.label}
           </div>
@@ -130,3 +116,17 @@ const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabTrigger, classN
 };
 
 export default TabList;
+
+function updateTabListSwiper(wrapper: HTMLElement, swiper: ISwiper, left: number) {
+  wrapper.style.transition = 'transform 0.3s ease 0s';
+  wrapper.dataset.left = left.toString();
+  swiper.setTranslate(left);
+  // Обновление состояния и прогресса
+  swiper.updateProgress();
+  swiper.updateActiveIndex();
+  swiper.updateSlidesClasses();
+  // Триггер событий
+  swiper.emit('setTranslate', left);
+  swiper.emit('transitionStart');
+  swiper.emit('slideChangeTransitionStart');
+}

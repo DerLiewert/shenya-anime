@@ -3,7 +3,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
-import { AnimeCard, Pagination } from '@/components';
+import { AnimeCard, EmptyValueMessage, Pagination } from '@/components';
 import { fetchSeasonsList, fetchSeasonsAnime } from '@/store';
 import { getSeasonName, getUniqueItems, parseSeasonAnimeParams, scrollToTop } from '@/utils';
 import { seasonOptions } from '@/resources';
@@ -11,6 +11,7 @@ import Select from 'react-select';
 import isEqual from 'lodash.isequal';
 import './Seasonal.scss';
 import { animeSeasons } from '@/models';
+import { animeEmptyValueMessages, commonMessages } from '@/constants';
 
 function Seasonal() {
   const seasonalRef = React.useRef<HTMLDivElement>(null);
@@ -25,7 +26,7 @@ function Seasonal() {
   const { isSuccess: isSuccessSeasons } = useFetchStatus(seasonsStatus);
 
   const { items, pagination, status } = useAppSelector((state) => state.seasonsAnime);
-  const { isLoading: isLoadingItems } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const yearOptions = React.useMemo(
     () => seasonsList.map((obj) => ({ value: obj.year, label: obj.year })),
@@ -129,15 +130,21 @@ function Seasonal() {
         )}
       </div>
       <div className="seasonal__items ">
-        {isLoadingItems
-          ? Array.from({ length: 24 }).map((_, i) => (
-              <Skeleton
-                key={i}
-                containerClassName="seasonal__card _skeleton-container border-opacity"
-                className="_skeleton "
-              />
-            ))
-          : getUniqueItems(items).map((item) => <AnimeCard item={item} key={item.mal_id} />)}
+        {isLoading ? (
+          Array.from({ length: 24 }).map((_, i) => (
+            <Skeleton
+              key={i}
+              containerClassName="seasonal__card _skeleton-container border-opacity"
+              className="_skeleton "
+            />
+          ))
+        ) : isSuccess ? (
+          getUniqueItems(items).map((item) => <AnimeCard item={item} key={item.mal_id} />)
+        ) : (
+          <EmptyValueMessage
+            message={isError ? commonMessages.error : animeEmptyValueMessages.seasonal}
+          />
+        )}
       </div>
       {pagination && (
         <Pagination

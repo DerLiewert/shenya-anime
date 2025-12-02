@@ -30,6 +30,7 @@ export const animeEmptyValueMessages = {
     music: 'No music videos have been added for this anime.',
   },
   newEpisodes: 'No new episodes for this day.',
+  seasonal: 'No anime for this season.',
 };
 
 export const mangaEmptyValueMessages = {

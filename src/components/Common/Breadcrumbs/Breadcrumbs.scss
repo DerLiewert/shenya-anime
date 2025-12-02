@@ -7,13 +7,13 @@
     min-height: 0;
     margin-bottom: 3px !important;
   }
-  
+
   &__item {
     width: auto;
     display: flex;
     align-items: center;
     line-height: math.div(20, 16);
-    
+
     &:not(:last-child) {
       margin-right: 8px;
       &::after {
@@ -45,6 +45,8 @@
 
   &__text {
     white-space: nowrap;
+    max-width: 220px;
+    overflow: hidden;
     &--current {
       font-weight: 500;
       color: var(--primary-color);

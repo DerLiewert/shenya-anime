@@ -10,7 +10,7 @@ import {
   MangaRecommendationsTab,
 } from '@/components';
 import { fetchFullMangaById } from '@/store';
-import { appPaths } from '@/resources';
+import { appPaths, mangaTypeOptions } from '@/resources';
 import { isMangaNsfw } from '@/utils';
 import './MangaPage.scss';
 
@@ -32,12 +32,17 @@ const MangaPage = () => {
         bookmark: 'manga',
         breadcrumbs: item
           ? [
-              { label: 'Top', url: '#' },
-              { label: 'Manga', url: '#' },
-              ...(item.published.prop.from.year
-                ? [{ label: item.published.prop.from.year, url: '#' }]
-                : []),
-              ...(item.type ? [{ label: item.type, url: '#' }] : []),
+              { label: 'Top', url: appPaths.manga },
+              ...(item.type
+                ? [
+                    {
+                      label: item.type,
+                      url: appPaths.mangaWithParams({
+                        type: mangaTypeOptions.find((obj) => obj.label === item.type)?.value,
+                      }),
+                    },
+                  ]
+                : [{ label: 'Manga', url: appPaths.manga }]),
               { label: item.title, url: '#' },
             ]
           : [],

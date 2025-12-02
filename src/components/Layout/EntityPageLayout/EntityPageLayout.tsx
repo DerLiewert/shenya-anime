@@ -10,7 +10,14 @@ import {
   useYoutubeTrailerImage,
 } from '@/hooks';
 import { NotFound } from '@/pages';
-import { BookmarkButton, Breadcrumbs, PlayCircleIcon, SfwImage, TabList } from '@/components';
+import {
+  BookmarkButton,
+  Breadcrumbs,
+  PlayCircleIcon,
+  SfwImage,
+  TabList,
+  TrailerButton,
+} from '@/components';
 import { getImageUrl, renderTabRoutes, scrollToTop } from '@/utils';
 import { breakpoints } from '@/constants';
 
@@ -28,10 +35,14 @@ import type {
 
 import LightGallery from 'lightgallery/react';
 import lgVideo from 'lightgallery/plugins/video';
+import lgZoom from 'lightgallery/plugins/zoom';
+import 'lightgallery/scss/lg-zoom.scss';
 import 'lightgallery/scss/lg-video.scss';
 
 import clsx from 'clsx';
 import './EntityPageLayout.scss';
+import { useDispatch } from 'react-redux';
+import { setScrollToTop } from '@/store';
 
 //========================================================================================================================================================
 
@@ -98,13 +109,21 @@ const EntityPageLayout = <T extends ItemTypes>({
   const item = useAppSelector(selector);
   const renderItem = React.useMemo(() => render(item), [item]);
   const { src, onLoad, isFallback } = useYoutubeTrailerImage(renderItem.trailer);
-  const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status);
+  const { isLoading, isSuccess, isError } = useFetchStatus(status);
 
   const isTablet = useMatchMedia('max', breakpoints.tablet);
   const isMobile = useMatchMedia('max', breakpoints.mobile);
 
   const [activeTab, setActiveTab] = React.useState(tabSegments[0]);
   const tabsRef = React.useRef<HTMLDivElement>(null);
+
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    // dispatch(setScrollToTop(false));
+    // return () => {
+    //   dispatch(setScrollToTop(true));
+    // };
+  }, []);
 
   React.useEffect(() => {
     abortableDispatch(fetchAction, id);
@@ -113,63 +132,89 @@ const EntityPageLayout = <T extends ItemTypes>({
   React.useEffect(() => {
     if (activeTab === tabSegments[0]) return;
     setActiveTab(tabSegments[0]);
-    scrollToTop(tabsRef, true);
+    // scrollToTop(tabsRef, true);
   }, [location, renderItem.tabs]);
 
   React.useEffect(() => {
-    scrollToTop(tabsRef);
+    // scrollToTop(tabsRef);
   }, [location.pathname]);
 
   React.useEffect(() => {
-    window.scrollTo({ top: 0 });
+    // window.scrollTo({ top: 0 });
   }, [id]);
 
   // Рендер постера аниме
-  const renderPoster = () => (
-    <div className="full-page-leftside__poster image-centered border-radius">
-      {item ? (
-        <SfwImage nsfw={isNsfw(item)} src={getImageUrl(item.images)} alt="Poster" />
-      ) : (
-        // <img src={getImageUrl(item.images)} alt="Poster" />
-        <Skeleton className="full-page-skeleton__image _skeleton" />
-      )}
-    </div>
-  );
+  const renderPoster = () =>
+    item ? (
+      // <LightGallery
+      //   addClass="pictures-tab-gallery"
+      //   elementClassNames="full-page-leftside__poster"
+      //   licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
+      //   plugins={[lgZoom]}
+      //   speed={300}
+      //   thumbHeight={'60px'}
+      //   thumbWidth={80}
+      //   mobileSettings={{
+      //     showCloseIcon: true,
+      //     download: true,
+      //     controls: false,
+      //   }}>
+      //   <a href={getImageUrl(item.images)}>
+      //     {/* <SfwImage
+      //       classWrapper="full-page-leftside__poster border-radius"
+      //       nsfw={isNsfw(item)}
+      //       src={getImageUrl(item.images)}
+      //       alt="Poster"
+      //     /> */}
+      //     <SfwImage
+      //       classWrapper="border-radius"
+      //       nsfw={isNsfw(item)}
+      //       src={getImageUrl(item.images)}
+      //       alt="Poster"
+      //     />
+      //   </a>
+      // </LightGallery>
+      <SfwImage
+        classWrapper="full-page-leftside__poster border-radius"
+        nsfw={isNsfw(item)}
+        src={getImageUrl(item.images)}
+        alt="Poster"
+      />
+    ) : (
+      <Skeleton
+        className="img _skeleton"
+        containerClassName="full-page-leftside__poster border-radius"
+      />
+    );
 
   // Рендер блока ресурсов
   const renderAnimeResources = () => {
     return item ? renderItem.resources : <Skeleton className="border-radius" height="150px" />;
   };
 
-  if (
-    isError ||
-    (isSuccess && !item) ||
-    (!isLoading && !isIdle && !isValidPath(tabSegments, renderItem.tabs))
-  )
+  if (isError || (isSuccess && !item) || (!isLoading && !isValidPath(tabSegments, renderItem.tabs)))
     return <NotFound />;
 
   return (
     <div className="full-page">
-      <div className="full-page__intro full-page-intro">
-        <div className="full-page-intro__bg bg">
-          {isLoading ? (
-            <SkeletonTheme baseColor="transparent">
-              <Skeleton className="full-page-skeleton__image" />
-            </SkeletonTheme>
-          ) : !renderItem.trailer ? (
-            <img src={introBg} alt="Background image" aria-hidden />
-          ) : (
-            src && (
-              <img
-                className={clsx({ '_not-found': isFallback })}
-                src={src}
-                onLoad={onLoad}
-                alt="Background image"
-                aria-hidden
-              />
-            )
-          )}
-        </div>
+      <div className="full-page__intro full-page-intro bg">
+        {isLoading ? (
+          <SkeletonTheme baseColor="transparent">
+            <Skeleton className="img" />
+          </SkeletonTheme>
+        ) : !renderItem.trailer ? (
+          <img src={introBg} alt="Background image" aria-hidden />
+        ) : (
+          src && (
+            <img
+              className={clsx({ '_not-found': isFallback })}
+              src={src}
+              onLoad={onLoad}
+              alt="Background image"
+              aria-hidden
+            />
+          )
+        )}
 
         <div className="full-page-intro__container container">
           {isMobile && renderPoster()}
@@ -177,19 +222,21 @@ const EntityPageLayout = <T extends ItemTypes>({
             <h2 className="full-page-intro__title title title--fz-48">
               {item && renderItem.title ? renderItem.title : <Skeleton />}
             </h2>
-            {!item &&
-              Array.from({ length: 2 }).map((_, i) => (
-                <h3 key={i} className="full-page-intro__sub-title title">
-                  <Skeleton />
-                </h3>
-              ))}
-            {renderItem.subtitles &&
-              renderItem.subtitles.length > 0 &&
+            {!item ? (
+              <h3 className="full-page-intro__sub-title title">
+                <Skeleton />
+              </h3>
+            ) : (
+              renderItem.subtitles &&
               renderItem.subtitles.map((str, index) => (
-                <h3 className="full-page-intro__sub-title title" title={str} key={index}>
+                <h3
+                  className="full-page-intro__sub-title title visible-line"
+                  title={str}
+                  key={index}>
                   {str}
                 </h3>
-              ))}
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -197,33 +244,49 @@ const EntityPageLayout = <T extends ItemTypes>({
       <div className="full-page__about full-page-about">
         <div className="container">
           <div className="full-page-about__inner">
-            <div className="full-page-about__left full-page-leftside">
-              {!isMobile && renderPoster()}
-              {(renderItem.trailer || renderItem.bookmark) && (
-                <div className="full-page-leftside__buttons">
-                  {renderItem.trailer &&
-                    renderItem.trailer.embed_url &&
-                    (item ? (
-                      <TrailerButton trailer={renderItem.trailer} />
-                    ) : (
-                      <Skeleton height="40px" className="border-radius" />
-                    ))}
+            {/* Если isMobile (window < 768px), то в full-page-leftside остаются только кнопки, поэтому при isMobile рендерим блок только если есть кнопки, иначе он пустой */}
+            {(!isMobile || (isMobile && (renderItem.trailer || renderItem.bookmark))) && (
+              <div className="full-page-about__left full-page-leftside">
+                {!isMobile && renderPoster()}
+                {(renderItem.trailer || renderItem.bookmark) && (
+                  <div className="full-page-leftside__buttons">
+                    {/* {renderItem.trailer &&
+                      renderItem.trailer.embed_url &&
+                      (item ? (
+                        <TrailerButton trailer={renderItem.trailer} />
+                      ) : (
+                        <Skeleton height="40px" className="border-radius" />
+                      ))} */}
 
-                  {renderItem.bookmark &&
-                    (item ? (
-                      <BookmarkButton
-                        item={item as any}
-                        type={renderItem.bookmark}
-                        className="full-page-leftside__btn btn btn--upper btn--icon btn--stroke btn--white"
-                        bookmarkedClassName="btn--fill"
-                      />
-                    ) : (
-                      <Skeleton height="40px" className="border-radius" />
-                    ))}
-                </div>
-              )}
-              {!isTablet && renderAnimeResources()}
-            </div>
+                    {(renderItem.trailer || renderItem.trailer === null) &&
+                      (!item ? (
+                        <Skeleton height="40px" className="border-radius" />
+                      ) : (
+                        (renderItem.trailer as any).embed_url && (
+                          <TrailerButton
+                            trailer={renderItem.trailer as any}
+                            lightGalleryClass="full-page-video-trailer"
+                            className="full-page-leftside__btn"
+                          />
+                        )
+                      ))}
+
+                    {renderItem.bookmark &&
+                      (item ? (
+                        <BookmarkButton
+                          item={item as any}
+                          type={renderItem.bookmark}
+                          className="full-page-leftside__btn btn btn--upper btn--icon btn--stroke btn--white"
+                          bookmarkedClassName="btn--fill"
+                        />
+                      ) : (
+                        <Skeleton height="40px" className="border-radius" />
+                      ))}
+                  </div>
+                )}
+                {!isTablet && renderAnimeResources()}
+              </div>
+            )}
 
             <div className="full-page-about__body">
               {renderItem.breadcrumbs &&
@@ -245,7 +308,7 @@ const EntityPageLayout = <T extends ItemTypes>({
                   <TabList
                     tabs={renderItem.tabs}
                     activeTab={activeTab}
-                    onTabTrigger={(value) => navigate(`${basePath}/${value}`)}
+                    onTabClick={(value) => navigate(`${basePath}/${value}`)}
                   />
                   <div className="full-page-tabs__body">
                     <Routes>
@@ -271,34 +334,3 @@ const EntityPageLayout = <T extends ItemTypes>({
 };
 
 export default EntityPageLayout;
-
-//========================================================================================================================================================
-
-const TrailerButton: React.FC<{ trailer: AnimeYoutubeVideo }> = ({ trailer }) => {
-  return (
-    <LightGallery
-      addClass="full-page-video-trailer"
-      licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
-      plugins={[lgVideo]}
-      download={false}
-      controls={false}
-      counter={false}
-      youTubePlayerParams={{
-        rel: 0,
-        autoplay: 1,
-        mute: 0,
-      }}
-      mobileSettings={{
-        showCloseIcon: true,
-        download: false,
-        controls: false,
-      }}>
-      <button
-        className="full-page-leftside__btn btn btn--upper btn--icon btn--stroke"
-        data-src={trailer.url || trailer.embed_url}>
-        <PlayCircleIcon />
-        watch trailer
-      </button>
-    </LightGallery>
-  );
-};

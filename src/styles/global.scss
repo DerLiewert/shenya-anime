@@ -15,8 +15,14 @@
   align-items: stretch;
 }
 
-body.menu-open {
-  overflow: hidden;
+body {
+  &.menu-open {
+    overflow: hidden;
+  }
+
+  &._lock {
+    overflow: hidden;
+  }
 }
 
 .wrapper {

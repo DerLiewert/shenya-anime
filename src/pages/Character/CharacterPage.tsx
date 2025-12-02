@@ -21,69 +21,81 @@ const CharacterPage = () => {
       status={(state) => state.characterFullById.status.item}
       getBasePath={(id) => appPaths.characterFull(id)}
       introBg={BG}
-      render={(item) => ({
-        title: item && item.name,
-        subtitles: item && item.name_kanji ? [item.name_kanji] : [],
-        resources: item && <AdditionalInfo item={item} />,
-        breadcrumbs: item
-          ? [
-              ...(item.anime[0]
-                ? [
-                    {
-                      label: item.anime[0].anime.title,
-                      url: appPaths.animeFull(item.anime[0].anime.mal_id),
-                    },
-                  ]
-                : item.manga[0]
-                ? [
-                    {
-                      label: item.manga[0].manga.title,
-                      url: appPaths.mangaFull(item.manga[0].manga.mal_id),
-                    },
-                  ]
-                : []),
-              {
-                label: 'Characters',
-                url: item.anime[0]
-                  ? appPaths.animeFull(item.anime[0].anime.mal_id) + '/characters'
-                  : item.manga[0]
-                  ? appPaths.mangaFull(item.manga[0].manga.mal_id) + '/characters'
-                  : '',
-              },
-              { label: item.name, url: '#' },
-            ]
-          : [],
+      render={(item) => {
+        const anime = item && item.anime[0] && item.anime[0].anime;
+        const manga = item && item.manga[0] && item.manga[0].manga;
+        return {
+          title: item && item.name,
+          subtitles: item && item.name_kanji ? [item.name_kanji] : [],
+          resources: item && <AdditionalInfo item={item} />,
+          breadcrumbs: item
+            ? [
+                ...(anime
+                  ? [
+                     {
+                        label: "Anime",
+                        url: appPaths.anime,
+                      },
+                      {
+                        label: anime.title,
+                        url: appPaths.animeFull(anime.mal_id),
+                      },
+                    ]
+                  : manga
+                  ? [
+                     {
+                        label: "Manga",
+                        url: appPaths.manga,
+                      },
+                      {
+                        label: manga.title,
+                        url: appPaths.mangaFull(manga.mal_id),
+                      },
+                    ]
+                  : []),
+                {
+                  label: 'Characters',
+                  url: anime
+                    ? appPaths.animeFull(anime.mal_id) + '/characters'
+                    : manga
+                    ? appPaths.mangaFull(manga.mal_id) + '/characters'
+                    : '',
+                },
+                { label: item.name, url: '#' },
+              ]
+            : [],
 
-        tabs: item
-          ? [
-              {
-                value: 'about',
-                label: 'About',
-                element: <CharacterAboutTab item={item} />,
-              },
-              {
-                value: 'anime',
-                label: 'Anime',
-                element: <CharacterAnimeTab />,
-              },
-              {
-                value: 'manga',
-                label: 'Manga',
-                element: <CharacterMangaTab />,
-              },
-              {
-                value: 'voices',
-                label: 'Voices',
-                element: <CharacterVoicesTab />,
-              },
-              {
-                value: 'pictures',
-                label: 'Pictures',
-                element: <CharacterPicturesTab />,
-              },
-            ]
-          : [],
-      })}
+          tabs: item
+            ? [
+                {
+                  value: 'about',
+                  label: 'About',
+                  element: <CharacterAboutTab item={item} />,
+                },
+                {
+                  value: 'anime',
+                  label: 'Anime',
+                  element: <CharacterAnimeTab />,
+                },
+                {
+                  value: 'manga',
+                  label: 'Manga',
+                  element: <CharacterMangaTab />,
+                },
+                {
+                  value: 'voices',
+                  label: 'Voices',
+                  element: <CharacterVoicesTab />,
+                },
+                {
+                  value: 'pictures',
+                  label: 'Pictures',
+                  element: <CharacterPicturesTab />,
+                },
+              ]
+            : [],
+        };
+      }}
     />
   );
 };

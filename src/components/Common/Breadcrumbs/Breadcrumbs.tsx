@@ -32,12 +32,9 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
       slidesPerView="auto"
       freeMode={true}
       grabCursor={true}
-      scrollbar={{
-        draggable: true,
-        className: '_draggable',
-      }}>
+      scrollbar={true}>
       {items.map((item, index, arr) => (
-        <SwiperSlide className="breadcrumbs__item" tag="li" key={item.label}>
+        <SwiperSlide className="breadcrumbs__item" tag="li" key={item.label + '_' + item.url}>
           {isCurrentLast && index === arr.length - 1 ? (
             <p className="breadcrumbs__text breadcrumbs__text--current">{item.label}</p>
           ) : (

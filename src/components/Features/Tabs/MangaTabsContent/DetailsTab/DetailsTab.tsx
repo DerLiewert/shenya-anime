@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useShowMoreMap } from '@/hooks';
+import { useMatchMedia, useShowMoreMap } from '@/hooks';
 import { formattedScore, splitText } from '@/utils';
 import { appPaths, mangaTypeOptions } from '@/resources';
-import { mangaEmptyValueMessages, specialStatus } from '@/constants';
+import { breakpoints, mangaEmptyValueMessages, specialStatus } from '@/constants';
 import { AnimeStatus, MangaFull } from '@/models';
 import {
   AnimeTooltip,
@@ -22,6 +22,7 @@ import './DetailsTab.scss';
 
 const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
   const { visibleCounts, initShowMore, showMore } = useShowMoreMap(6);
+  const isMobile = useMatchMedia('max', breakpoints.mobile);
 
   React.useEffect(() => {
     if (item && item.relations) {
@@ -149,10 +150,13 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
             )}
           </div>
         </div>
-        <div className="anime-details__score-stats">
-          <div className="anime-details__score-stats-title">Score Status</div>
-          <ScoreStats type="manga" />
-        </div>
+
+        {!isMobile && (
+          <div className="anime-details__score-stats">
+            <div className="anime-details__score-stats-title">Score Status</div>
+            <ScoreStats type="manga" />
+          </div>
+        )}
       </div>
       <div className="anime-details__synopsis">
         <SectionHeader title="Synopsis" className="anime-details__synopsis-header" />
@@ -164,16 +168,6 @@ const DetailsTab: React.FC<{ item: MangaFull | null }> = ({ item }) => {
           )}
         </div>
       </div>
-      {/* <div className="anime-details__synopsis">
-        <SectionHeader title="Background" className="anime-details__synopsis-header" />
-        <div className="anime-details__text fz-16">
-          {item.background ? (
-            splitText(item.background).map((string, index) => <p key={index}>{string}</p>)
-          ) : (
-            <EmptyValueMessage message={mangaEmptyValueMessages.background} />
-          )}
-        </div>
-      </div> */}
       <div className="anime-details__related">
         <SectionHeader title="Related Entries" className="anime-details__related-header" />
         {item.relations && item.relations.length > 0 ? (

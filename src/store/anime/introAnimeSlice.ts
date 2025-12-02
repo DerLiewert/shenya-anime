@@ -2,7 +2,7 @@ import { getResource } from '@/api/client/api.client';
 import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { Anime } from '@/models';
-import { TopEndpoints } from '@/api';
+import { SchedulesEndpoints, TopEndpoints } from '@/api';
 
 export const fetchIntroAnime = createAsyncThunk<Anime[], undefined>(
   'intro-anime/fetchAnimeItems',

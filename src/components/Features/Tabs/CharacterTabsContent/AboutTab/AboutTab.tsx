@@ -10,8 +10,8 @@ const AboutTab = ({ item }: { item: CharacterFull }) => {
   return (
     <div className="about-tab">
       {item.about ? (
-        splitText(item.about).map((str) => (
-          <p className={clsx('about-tab__text', { _empty: str === '' })}>{str}</p>
+        splitText(item.about).map((str, index) => (
+          <p className={clsx('about-tab__text', { _empty: str === '' })} key={index}>{str}</p>
         ))
       ) : (
         <EmptyValueMessage message={characterEmptyValueMessages.about} />

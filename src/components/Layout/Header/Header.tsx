@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useMatchMedia, usePathSegments } from '@/hooks';
+import { useMatchMedia } from '@/hooks';
 import { BookmarkIcon, SearchIcon, SfwOffIcon, SfwOnIcon } from '@/components';
 import { breakpoints } from '@/constants';
 import { appPaths } from '@/resources';
@@ -9,6 +9,7 @@ import { toggleSfw } from '@/store';
 import logo from '@/assets/logo.svg';
 import clsx from 'clsx';
 import './Header.scss';
+import { scrollToTop } from '@/utils';
 
 const links = [
   { path: appPaths.home, label: 'Home' },
@@ -33,6 +34,7 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
 
   React.useEffect(() => {
     document.body.classList.toggle('menu-open', isMenuOpen);
+    if(isMenuOpen) scrollToTop(headerRef)
 
     return () => {
       document.body.classList.remove('menu-open');
@@ -56,7 +58,7 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
 
   return (
     <header className="header" ref={headerRef}>
-      <div className="container">
+      <div className="header__container container">
         <div className="header__body">
           <Link to={appPaths.home} className="header__logo">
             <img src={logo} alt="Shenya anime logo" />

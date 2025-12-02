@@ -1,7 +1,6 @@
 .header {
   position: relative;
   z-index: var(--z-index-header);
-  padding: 25px 0;
 
   // &._absolute {
   //   position: absolute;
@@ -9,16 +8,30 @@
   //   left: 0;
   //   right: 0;
   // }
+  background-color: rgba(var(--bg-color-rgb), 0);
+  transition: background-color 0.2s ease 0s;
 
-  @include media-max($tablet) {
-    padding: 20px 0;
+  .menu-open & {
+    background-color: rgba(var(--bg-color-rgb), 1);
+  }
+
+  &__container {
+    position: relative;
+    z-index: 1;
   }
 
   &__body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 25px 0;
     column-gap: 50px;
+    @include media-max($tablet) {
+      padding: 20px 0;
+    }
+    @include media-max($mobile) {
+      padding: 15px 0;
+    }
     @include media-max($mobileSmall) {
       column-gap: 15px;
     }

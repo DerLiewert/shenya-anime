@@ -19,10 +19,15 @@ export const RecommendationCard = React.forwardRef<HTMLAnchorElement, Recommenda
     const { images, title } = item;
     return (
       <Link to={linkPath} ref={ref} className={clsx(className, 'card-item border-opacity')}>
-        <div className="card-item__image bg bg--dark">
-          <SfwImage src={getImageUrl(images)} alt="Poster" loading="lazy" nsfw={nsfw} />
-          {/* <img src={getImageUrl(images)} alt="Poster" loading="lazy" /> */}
-        </div>
+        <SfwImage
+          classWrapper="card-item__image-block border-radius"
+          src={getImageUrl(images)}
+          alt="Poster"
+          loading="lazy"
+          nsfw={nsfw}
+          isBgColorDark
+        />
+
         <div className="card-item__content">
           <h3 className="card-item__title title title--fz-14 visible-line" title={title}>
             {title}

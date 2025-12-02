@@ -10,6 +10,8 @@ import {
   fetchSearchAnime,
   fetchSearchCharacter,
   fetchSearchManga,
+  minusOpenModal,
+  plusOpenModal,
   resetSearchState,
   SearchMap,
 } from '@/store';
@@ -24,7 +26,7 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const { items, pagination, status, type, value } = useAppSelector((state) => state.search);
-  const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status);
+  const { isIdle, isLoading, isSuccess, isError } = useFetchStatus(status, true);
 
   const { visibleCount, showMore } = useShowMore(25);
 
@@ -61,6 +63,8 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
 
   // Закрытие модального окна
   React.useEffect(() => {
+    dispatch(plusOpenModal());
+
     const closeModal = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target === modalInnerRef.current || target.closest('.search-item')) onSearchClose();
@@ -69,6 +73,7 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
     document.addEventListener('click', closeModal);
     return () => {
       document.removeEventListener('click', closeModal);
+      dispatch(minusOpenModal());
     };
   }, []);
 
@@ -149,36 +154,34 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
               <div className="search-modal__message fz-16">
                 Enter a search term to find {selectedType.value}.
               </div>
-            ) : isLoading ? (
-              <div className="search-modal__message fz-16">
-                <Loading />
-              </div>
             ) : isError ? (
               <div className="search-modal__message fz-16">{commonMessages.error}</div>
             ) : isSuccess && items.length === 0 ? (
               <div className="search-modal__message fz-16">No search results found.</div>
             ) : (
               <>
-                <div className="search-modal__items">
-                  {type === 'anime' &&
-                    getUniqueItems(items)
-                      .slice(0, visibleCount)
-                      .map((item) => <SearchAnimeItem key={item.mal_id} item={item} />)}
+                {items.length > 0 && (
+                  <div className="search-modal__items">
+                    {type === 'anime' &&
+                      getUniqueItems(items)
+                        .slice(0, visibleCount)
+                        .map((item) => <SearchAnimeItem key={item.mal_id} item={item} />)}
 
-                  {type === 'manga' &&
-                    getUniqueItems(items)
-                      .slice(0, visibleCount)
-                      .map((item) => <SearchMangaItem key={item.mal_id} item={item} />)}
+                    {type === 'manga' &&
+                      getUniqueItems(items)
+                        .slice(0, visibleCount)
+                        .map((item) => <SearchMangaItem key={item.mal_id} item={item} />)}
 
-                  {type === 'character' &&
-                    getUniqueItems(items)
-                      .slice(0, visibleCount)
-                      .map((item) => <SearchCharacterItem key={item.mal_id} item={item} />)}
+                    {type === 'character' &&
+                      getUniqueItems(items)
+                        .slice(0, visibleCount)
+                        .map((item) => <SearchCharacterItem key={item.mal_id} item={item} />)}
 
-                  <div ref={ref} style={{ height: 1 }} />
-                </div>
+                    <div ref={ref} style={{ height: 1 }} />
+                  </div>
+                )}
                 {isLoading && (
-                  <div className="search-modal__message">
+                  <div className="search-modal__message fz-16">
                     <Loading />
                   </div>
                 )}

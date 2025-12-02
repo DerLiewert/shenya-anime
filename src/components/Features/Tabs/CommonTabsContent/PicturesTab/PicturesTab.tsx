@@ -65,11 +65,15 @@ const PicturesTab: React.FC<ImagesTabProps> = ({
             <a
               key={picture.jpg.image_url}
               href={getImageUrl(picture)}
-              className={clsx('pictures-tab__item bg bg--dark border')} // 'pictures-tab__item--nsfw': nsfw,
-              onClick={(e) => {
-                nsfw && e.preventDefault();
-              }}>
-              <SfwImage nsfw={nsfw} src={getImageUrl(picture)} alt={`${i}`} loading="lazy" />
+              className={clsx('pictures-tab__item border')} // 'pictures-tab__item--nsfw': nsfw,
+            >
+              <SfwImage
+                classWrapper="pictures-tab__image"
+                nsfw={nsfw}
+                src={getImageUrl(picture)}
+                alt={`${i}`}
+                loading="lazy"
+              />
             </a>
           ))}
         </LightGallery>

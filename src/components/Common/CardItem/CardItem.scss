@@ -1,59 +1,73 @@
 .card-item {
   $self: &;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   position: relative;
 
   &__bookmark {
-    opacity: 0;
-    &._bookmarked {
-      opacity: 1;
+    position: absolute;
+    top: 6px;
+    right: 4px;
+    z-index: 10;
+    width: 26px;
+    height: 26px;
+    padding: unset;
+    transition: opacity 0.3s ease 0s;
+
+    @media (any-hover: hover) {
+      opacity: 0;
     }
 
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    z-index: 10;
+    @include media-max($mobile) {
+      top: 8px;
+      width: 22px;
+      height: 22px;
+    }
 
-    // display: flex;
-    // align-items: center;
-    // justify-content: center;
-    // border-radius: 8px;
-    // background-color: var(--main-color);
-    width: 32px;
-    height: 32px;
-    padding: unset;
-    // svg {
-    //   width: 70%;
-    //   height: 70%;
-    //   stroke: var(--bg-color);
-    // }
+    svg {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      stroke-width: 2px;
+      stroke: #474747;
+      fill: #474747;
+      transition: stroke 0.3s ease 0s, fill 0.3s ease 0s;
 
-    // &._bookmarked {
-    //   background-color: var(--primary-color);
-    //   svg path {
-    //     stroke: var(--main-color);
-    //   }
-    // }
+      filter: drop-shadow(0px 0px 2px #fff);
+      path {
+        filter: drop-shadow(0px 0px 1px #fff);
+      }
+    }
 
-    // @media (any-hover: hover) {
-    //   transition: background-color 0.3s ease 0s;
-    //   svg path {
-    //     transition: stroke 0.3s ease 0s;
-    //   }
+    @media (any-hover: hover) {
+      &:hover {
+        svg {
+          stroke: #383838;
+          fill: #383838;
+        }
+      }
+    }
 
-    //   &:hover {
-    //     background-color: var(--primary-color-dark);
-    //     svg path {
-    //       stroke: var(--main-color);
-    //     }
-    //   }
-    // }
+    &._bookmarked {
+      @media (any-hover: hover) {
+        opacity: 1;
+      }
+      svg {
+        stroke: var(--primary-color-dark);
+        fill: var(--primary-color-dark);
+      }
 
-    // @include media-max($mobile) {
-    //   width: 28px;
-    //   height: 28px;
-    // }
+      @media (any-hover: hover) {
+        &:hover {
+          svg {
+            stroke: var(--primary-color);
+            fill: var(--primary-color);
+          }
+        }
+      }
+    }
   }
 
   @media (any-hover: hover) {
@@ -67,19 +81,25 @@
     border-radius: inherit;
   }
 
-  &__image {
+  &__image-block {
     width: 100%;
     min-height: 100px;
     max-height: 300px;
     aspect-ratio: 2.2 / 3;
     border-radius: inherit;
     position: relative;
+    overflow: hidden;
+  }
 
+  &__image {
+    width: 100%;
+    height: 100%;
     img {
+      transform: scale(1.001);
       @media (any-hover: hover) {
         transition: transform 0.3s ease 0s;
         #{$self}:hover & {
-          transform: scale(1.02);
+          transform: scale(1.018);
         }
       }
     }
@@ -92,14 +112,21 @@
     z-index: 1;
   }
 
+  &__bookmark {
+    z-index: 2;
+  }
+
   &__status {
     top: 10px;
     left: 10px;
+    max-width: calc(100% - 20px);
   }
 
   &__score {
     bottom: 10px;
     right: 10px;
+    max-width: calc(100% - 20px);
+
     @include media-max($mobile) {
       font-size: 12px;
       &::before {
