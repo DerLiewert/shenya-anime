@@ -10,6 +10,8 @@ import { appPaths } from '@/resources';
 import { usePathSegments } from '@/hooks';
 import { renderTabRoutes } from '@/utils';
 import './Schedules.scss';
+import { setScrollToTop } from '@/store';
+import { useDispatch } from 'react-redux';
 
 const routeItems: TabRoute[] = [
   { label: 'Currently Airing', value: 'broadcast', element: <Broadcast /> },
@@ -21,6 +23,14 @@ const pagePath = appPaths.schedules;
 function Schedules() {
   const navigate = useNavigate();
   const tabSegments = usePathSegments(pagePath);
+
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    dispatch(setScrollToTop(false));
+    return () => {
+      dispatch(setScrollToTop(true));
+    };
+  }, []);
 
   if (tabSegments.length > 0 && !routeItems.find((obj) => obj.value === tabSegments[0]))
     return <NotFound />;

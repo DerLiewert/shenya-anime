@@ -99,11 +99,18 @@ const AnimeCatalogPage: React.FC = () => {
     };
   }, [location.search]);
 
+  const openFilters = () => {
+    dispatch(plusOpenModal());
+    setIsShowFilters(true);
+  };
+
+  const closeFilters = () => {
+    dispatch(minusOpenModal());
+    setIsShowFilters(false);
+  };
+
   React.useEffect(() => {
-    if (!isTablet && isShowFilters) {
-      dispatch(minusOpenModal());
-      setIsShowFilters(false);
-    }
+    if (!isTablet && isShowFilters) closeFilters();
   }, [isTablet]);
 
   // Получение даных об аниме по выбраным параметрам
@@ -136,10 +143,7 @@ const AnimeCatalogPage: React.FC = () => {
           <div className="catalog-cards__top">
             <button
               className="catalog-cards__show-filters btn btn--icon btn--fill"
-              onClick={() => {
-                dispatch(plusOpenModal());
-                setIsShowFilters(true);
-              }}>
+              onClick={openFilters}>
               <FilterIcon />
               Filters
             </button>
@@ -185,16 +189,12 @@ const AnimeCatalogPage: React.FC = () => {
                   page: undefined,
                 });
 
-                dispatch(minusOpenModal());
-                setIsShowFilters(false);
+                closeFilters();
               }}
               onReset={() => {
                 appNavigate({ order_by: searchParams.order_by });
               }}
-              onClose={() => {
-                dispatch(minusOpenModal());
-                setIsShowFilters(false);
-              }}
+              onClose={closeFilters}
             />
             <div className="catalog-cards__content">
               <div className="catalog-cards__items">
@@ -284,6 +284,7 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
   const { isLoading: isGenresLoading, isSuccess: isGenresSuccess } = useFetchStatus(genresStatus);
 
   const filterRef = React.useRef<HTMLFormElement>(null);
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
 
   const animeGenresOptions = React.useMemo(() => {
     return genres.length > 0
@@ -313,6 +314,21 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
           : [],
     };
   }
+
+  // Закрытие модального окна
+  React.useEffect(() => {
+    if (!onClose) return;
+
+    const closeModal = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target === sidebarRef.current) onClose();
+    };
+
+    document.addEventListener('click', closeModal);
+    return () => {
+      document.removeEventListener('click', closeModal);
+    };
+  }, []);
 
   React.useEffect(() => {
     // Получить жанры аниме, если их нет
@@ -369,7 +385,7 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
   }
 
   return (
-    <aside className={clsx(className, 'catalog-sidebar', { _show: isOpen, _modal: isModal })}>
+    <aside ref={sidebarRef} className={clsx(className, 'catalog-sidebar', { _show: isOpen, _modal: isModal })}>
       <div className="catalog-sidebar__inner">
         <div className="catalog-sidebar__header">
           <div className="catalog-sidebar__title">Filters</div>

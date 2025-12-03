@@ -34,12 +34,16 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
 
   React.useEffect(() => {
     document.body.classList.toggle('menu-open', isMenuOpen);
-    if(isMenuOpen) scrollToTop(headerRef)
+    if (isMenuOpen) scrollToTop(headerRef);
 
     return () => {
       document.body.classList.remove('menu-open');
     };
   }, [isMenuOpen]);
+
+  React.useEffect(() => {
+    if (isMenuOpen) document.body.classList.remove('menu-open');
+  }, [location]);
 
   React.useEffect(() => {
     const header = headerRef.current;
@@ -74,8 +78,7 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
                       to={link.path}
                       className={clsx('menu__link', {
                         _active: activeLink === index,
-                      })}
-                      onClick={() => setIsMenuOpen(false)}>
+                      })}>
                       {link.label}
                     </Link>
                   </li>

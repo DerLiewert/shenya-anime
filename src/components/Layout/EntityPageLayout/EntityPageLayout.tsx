@@ -119,10 +119,10 @@ const EntityPageLayout = <T extends ItemTypes>({
 
   const dispatch = useDispatch();
   React.useEffect(() => {
-    // dispatch(setScrollToTop(false));
-    // return () => {
-    //   dispatch(setScrollToTop(true));
-    // };
+    dispatch(setScrollToTop(false));
+    return () => {
+      dispatch(setScrollToTop(true));
+    };
   }, []);
 
   React.useEffect(() => {

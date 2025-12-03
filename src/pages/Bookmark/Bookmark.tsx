@@ -8,6 +8,8 @@ import { appPaths } from '@/resources';
 import { usePathSegments } from '@/hooks';
 import './Bookmark.scss';
 import { RootState } from '@/app/store';
+import { useDispatch } from 'react-redux';
+import { setScrollToTop } from '@/store';
 
 const routeItems: TabRoute[] = [
   {
@@ -27,6 +29,14 @@ const pagePath = appPaths.bookmark;
 const Bookmark = () => {
   const navigate = useNavigate();
   const tabSegments = usePathSegments(pagePath);
+
+  const dispatch = useDispatch();
+  React.useEffect(() => {
+    dispatch(setScrollToTop(false));
+    return () => {
+      dispatch(setScrollToTop(true));
+    };
+  }, []);
 
   if (tabSegments.length > 0 && !routeItems.find((obj) => obj.value === tabSegments[0]))
     return <NotFound />;
