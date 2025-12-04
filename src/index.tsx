@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './app/store';
 
@@ -17,12 +17,14 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   // <React.StrictMode>
   <Router basename="/shenya-anime/">
-  {/* <Router> */}
-    <Provider store={store}>
-      <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
-        <App />
-      </SkeletonTheme>
-    </Provider>
+    {/* <Router> */}
+    <HashRouter>
+      <Provider store={store}>
+        <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
+          <App />
+        </SkeletonTheme>
+      </Provider>
+    </HashRouter>
   </Router>,
   // </React.StrictMode>,
 );
