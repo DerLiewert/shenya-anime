@@ -15,16 +15,13 @@ import { SkeletonTheme } from 'react-loading-skeleton';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
-  // <React.StrictMode>
-  // <Router basename="/shenya-anime/">
-
-  <HashRouter>
-    <Provider store={store}>
-      <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
-        <App />
-      </SkeletonTheme>
-    </Provider>
-  </HashRouter>,
-  // </Router>,
-  // </React.StrictMode>,
+  // <HashRouter>
+    <Router>
+      <Provider store={store}>
+        <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
+          <App />
+        </SkeletonTheme>
+      </Provider>
+    </Router>
+  // </HashRouter>,
 );

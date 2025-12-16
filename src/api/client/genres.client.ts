@@ -1,4 +1,4 @@
-import { Genre } from '@/models';
+import { Genre } from '@/typescript';
 import { getResource } from './api.client';
 import { GenresEndpoints } from '../endpoints/genres.endpoints';
 

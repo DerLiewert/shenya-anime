@@ -10,7 +10,7 @@ import { seasonOptions } from '@/resources';
 import Select from 'react-select';
 import isEqual from 'lodash.isequal';
 import './Seasonal.scss';
-import { animeSeasons } from '@/models';
+import { animeSeasons } from '@/typescript';
 import { animeEmptyValueMessages, commonMessages } from '@/constants';
 
 function Seasonal() {
@@ -61,8 +61,10 @@ function Seasonal() {
 
   function getSearchParams() {
     const urlParams = parseSearchParams(location.search);
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
     const defaultParams = {
-      year: new Date().getFullYear(),
+      year: currentMonth === 11 ? currentYear + 1 : currentYear, // если декабрь, то это уже сезон следующего года (декабрь 2025 - зима 2026)
       season: getSeasonName(),
       page: undefined,
     };

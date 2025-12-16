@@ -1,13 +1,12 @@
-// В трейлере может вместо картинки maximum_image_url быть серая заглушка от ютуб.
-// Поэтому проверяем, если нет maximum_image_url или заглушка, то отображаем large_image_url если есть, иначе свою картинку not-found.jpg
-import React from 'react';
-import { AnimeYoutubeVideo } from '@/models';
-import notFoundImage from '@/assets/not-found.jpg';
+/* 
+  В трейлере вместо картинки может быть серая заглушка от ютуб.
+  Поэтому проверяем, если нет maximum_image_url или large_image_url или вместо них заглушка, то отображаем свою картинку not-found.jpg
+*/
 
-const isYoutubePlaceholder = (img: HTMLImageElement): boolean => {
-  if (!img.src.includes('img.youtube.com')) return false;
-  return img.naturalWidth === 120 && img.naturalHeight === 90;
-};
+import React from 'react';
+import { AnimeYoutubeVideo } from '@/typescript';
+import notFoundImage from '@/assets/bg/not-found.jpg';
+import { getYoutubeImageUrls, isYoutubePlaceholder } from '@/utils';
 
 export const useYoutubeTrailerImage = (item: AnimeYoutubeVideo | null | undefined) => {
   const [currentUrl, setCurrentUrl] = React.useState<string | null>(null);
@@ -20,14 +19,9 @@ export const useYoutubeTrailerImage = (item: AnimeYoutubeVideo | null | undefine
     if (item.images.maximum_image_url || item.images.large_image_url) return item.images;
     if (!item.embed_url) return null;
 
-    const videoId = item.embed_url
-      .replace('https://www.youtube-nocookie.com/embed/', '')
-      .split('?')[0];
-
-    return {
-      maximum_image_url: `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
-      large_image_url: `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,
-    };
+    // В один момент в самом API для AnimeYoutubeVideo все поля в images стали null.
+    // Для решения проблемы было принято решение сформировать свой объект images с нужными полями
+    return getYoutubeImageUrls(item.embed_url);
   }, [item]);
 
   React.useEffect(() => {
@@ -55,7 +49,7 @@ export const useYoutubeTrailerImage = (item: AnimeYoutubeVideo | null | undefine
         return;
       }
 
-      // Если максимальное изображение загрузилось и не заглушка — всё ок
+      // Если максимальное изображение загрузилось и это не заглушка — всё ок
       if (url === images.maximum_image_url) {
         if (!isYoutubePlaceholder(img)) {
           setIsLoading(false);
@@ -67,13 +61,13 @@ export const useYoutubeTrailerImage = (item: AnimeYoutubeVideo | null | undefine
         }
       }
 
-      // Иначе, если не пробовали fallback и есть large_image_url — переключаемся на него
+      // Если не пробовали fallback и есть large_image_url — переключаемся на него
       if (url === images.large_image_url && !isYoutubePlaceholder(img)) {
         setIsLoading(false);
         return;
       }
 
-      // Если и large_image_url уже пробовали или нет — показываем заглушку
+      // Если и large_image_url уже пробовали или он null — показываем заглушку
       setCurrentUrl(notFoundImage);
       setIsLoading(false);
     },

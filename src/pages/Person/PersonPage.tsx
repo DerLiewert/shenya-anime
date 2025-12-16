@@ -1,5 +1,5 @@
 import React from 'react';
-import BG from '@/assets/people-bg.jpg';
+import BG from '@/assets/bg/people-bg.jpg';
 import {
   PersonAnimeTab,
   PersonMangaTab,
@@ -8,7 +8,7 @@ import {
   PersonAboutTab,
   EntityPageLayout,
 } from '@/components';
-import { PersonFull } from '@/models';
+import { PersonFull } from '@/typescript';
 import { appPaths } from '@/resources';
 import { fetchPersonFullById } from '@/store';
 import './PersonPage.scss';

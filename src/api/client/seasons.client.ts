@@ -4,7 +4,7 @@ import {
   JikanPaginationPlus,
   JikanSeasonsParams,
   SeasonsListData,
-} from '@/models';
+} from '@/typescript';
 import { getResource } from './api.client';
 import { SeasonsEndpoints } from '../endpoints/seasons.endpoints';
 

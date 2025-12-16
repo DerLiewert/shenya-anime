@@ -1,15 +1,6 @@
 import { getSeason } from '@/api';
-import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Anime, AnimeSeasons, JikanPaginationPlus, JikanResponse } from '../../models';
-
-export const fetchSeasonsAnime = createAsyncThunk<
-  JikanResponse<Anime[], JikanPaginationPlus>,
-  { year: number; season: AnimeSeasons; page?: number | undefined }
->('seasons-anime/fetchAnimeItems', async ({ year, season, page = 1 }, { signal }) => {
-  const data = await getSeason({ year, season, queryParams: { page, limit: 24 } }, signal);
-  return data;
-});
+import { Anime, AnimeSeasons, JikanPaginationPlus, JikanResponse, FetchStatus } from '@/typescript';
 
 interface SeasonsAnimeState {
   items: Anime[];
@@ -50,5 +41,14 @@ export const seasonsAnimeSlice = createSlice({
 });
 
 // export const {  } = seasonsAnimeSlice.actions;
-
 export default seasonsAnimeSlice.reducer;
+
+//========================================================================================================================================================
+export const fetchSeasonsAnime = createAsyncThunk<
+  JikanResponse<Anime[], JikanPaginationPlus>,
+  { year: number; season: AnimeSeasons; page?: number | undefined }
+>(
+  'seasons-anime/fetchAnimeItems',
+  async ({ year, season, page = 1 }, { signal }) =>
+    await getSeason({ year, season, queryParams: { page, limit: 24 } }, signal),
+);

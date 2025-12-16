@@ -8,10 +8,10 @@ import Broadcast from '@/components/Sections/Broadcast/Broadcast';
 import Seasonal from '@/components/Sections/Seasonal/Seasonal';
 import { appPaths } from '@/resources';
 import { usePathSegments } from '@/hooks';
-import { renderTabRoutes } from '@/utils';
-import './Schedules.scss';
+import { generateRoutes } from '@/utils';
 import { setScrollToTop } from '@/store';
 import { useDispatch } from 'react-redux';
+import './Schedules.scss';
 
 const routeItems: TabRoute[] = [
   { label: 'Currently Airing', value: 'broadcast', element: <Broadcast /> },
@@ -55,7 +55,7 @@ function Schedules() {
             ))}
           </div>
           <div className="schedules-tabs__content">
-            <Routes>{renderTabRoutes(routeItems)}</Routes>
+            <Routes>{generateRoutes(routeItems)}</Routes>
           </div>
         </div>
       </div>

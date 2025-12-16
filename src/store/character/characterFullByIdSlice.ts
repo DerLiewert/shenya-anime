@@ -1,10 +1,9 @@
-import { getCharacterFullById, getCharacterPictures } from '@/api/client/character.client';
-import { CharacterFull, JikanImages } from '@/models';
-import { FetchStatus } from '@/typescript';
-import { createCharacterThunkWithId, createHandle } from '@/utils';
-import { AsyncThunk, CaseReducer, createAsyncThunk, createSlice, Draft } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getCharacterFullById, getCharacterPictures } from '@/api';
+import { CharacterFull, JikanImages, FetchStatus } from '@/typescript';
+import { createCharacterThunkWithId, bilderHandleAsync } from '@/utils';
 
-type DataKeys = Exclude<keyof CharacterFullState, 'isLoading' | 'error'>;
+type DataKeys = Exclude<keyof CharacterFullState, 'status'>;
 
 interface CharacterFullState {
   item: CharacterFull | null;
@@ -23,7 +22,7 @@ const characterFullByIdSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const handleAsync = createHandle(builder, initialState);
+    const handleAsync = bilderHandleAsync(builder, initialState);
     handleAsync('item', fetchCharacterFullById);
     handleAsync('pictures', fetchCharacterPictures);
   },
@@ -35,12 +34,10 @@ export default characterFullByIdSlice.reducer;
 
 export const fetchCharacterFullById = createAsyncThunk<CharacterFull, number>(
   'character-full/fetchFullById',
-  async (id, { signal }) => {
-    return (await getCharacterFullById(id, signal)).data;
-  },
+  async (id, { signal }) => (await getCharacterFullById(id, signal)).data,
 );
 
 export const fetchCharacterPictures = createCharacterThunkWithId<JikanImages[]>(
   'character-full/fetchPictures',
-  (id, _, signal) => getCharacterPictures(id, signal).then((res) => res.data),
+  async (id, _, signal) => (await getCharacterPictures(id, signal)).data,
 );

@@ -1,7 +1,6 @@
 import { getMangaGenres } from '@/api';
-import { Genre } from '@/models';
-import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Genre, FetchStatus } from '@/typescript';
 
 interface InitialState {
   items: Genre[];
@@ -22,7 +21,7 @@ const mangaGenresSlice = createSlice({
       state.status = FetchStatus.LOADING;
     });
     builder.addCase(fetchMangaGenres.fulfilled, (state, action) => {
-        state.items = action.payload.sort((obj1, obj2) => {
+      state.items = action.payload.sort((obj1, obj2) => {
         if (obj1.name < obj2.name) return -1;
         if (obj1.name > obj2.name) return 1;
         return 0;
@@ -35,11 +34,10 @@ const mangaGenresSlice = createSlice({
   },
 });
 
-export const fetchMangaGenres = createAsyncThunk<Genre[]>(
-  'manga-genres/fetchMangaGenres',
-  async () => {
-    return (await getMangaGenres()).data;
-  },
-);
-
 export default mangaGenresSlice.reducer;
+
+//========================================================================================================================================================
+export const fetchMangaGenres = createAsyncThunk<Genre[]>(
+  'manga-genres/fetchGenres',
+  async () => (await getMangaGenres()).data,
+);

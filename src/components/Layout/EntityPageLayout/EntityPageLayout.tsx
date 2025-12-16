@@ -18,7 +18,7 @@ import {
   TabList,
   TrailerButton,
 } from '@/components';
-import { getImageUrl, renderTabRoutes, scrollToTop } from '@/utils';
+import { getImageUrl, generateRoutes } from '@/utils';
 import { breakpoints } from '@/constants';
 
 import type { AsyncThunk } from '@reduxjs/toolkit';
@@ -31,7 +31,7 @@ import type {
   MangaFull,
   PersonFull,
   ProducerFull,
-} from '@/models';
+} from '@/typescript';
 
 import LightGallery from 'lightgallery/react';
 import lgVideo from 'lightgallery/plugins/video';
@@ -115,6 +115,7 @@ const EntityPageLayout = <T extends ItemTypes>({
   const isMobile = useMatchMedia('max', breakpoints.mobile);
 
   const [activeTab, setActiveTab] = React.useState(tabSegments[0]);
+  const [isPosterLoading, setIsPosterLoading] = React.useState(true);
   const tabsRef = React.useRef<HTMLDivElement>(null);
 
   const dispatch = useDispatch();
@@ -142,6 +143,10 @@ const EntityPageLayout = <T extends ItemTypes>({
   React.useEffect(() => {
     // window.scrollTo({ top: 0 });
   }, [id]);
+
+  React.useEffect(() => {
+    setIsPosterLoading(true);
+  }, [item]);
 
   // Рендер постера аниме
   const renderPoster = () =>
@@ -175,10 +180,15 @@ const EntityPageLayout = <T extends ItemTypes>({
       //   </a>
       // </LightGallery>
       <SfwImage
-        classWrapper="full-page-leftside__poster border-radius"
+        classWrapper={clsx('full-page-leftside__poster border-radius', {
+          'full-page-leftside__poster--loading': isPosterLoading,
+        })}
         nsfw={isNsfw(item)}
         src={getImageUrl(item.images)}
         alt="Poster"
+        onLoad={() => {
+          setIsPosterLoading(false);
+        }}
       />
     ) : (
       <Skeleton
@@ -312,7 +322,7 @@ const EntityPageLayout = <T extends ItemTypes>({
                   />
                   <div className="full-page-tabs__body">
                     <Routes>
-                      {renderTabRoutes(renderItem.tabs)}
+                      {generateRoutes(renderItem.tabs)}
                       <Route path="*" element={<NotFound />} />
                     </Routes>
                   </div>

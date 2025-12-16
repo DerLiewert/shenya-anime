@@ -1,4 +1,4 @@
-import { SchedulesFilter, schedulesFilter, SchedulesParams } from '@/models';
+import { SchedulesFilter, schedulesFilter, SchedulesParams } from '@/typescript';
 import {
   AllowedParams,
   commonParamsValidators,

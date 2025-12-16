@@ -1,9 +1,11 @@
+import { PlayCircleIcon } from '@/components';
+import { AnimeYoutubeVideo } from '@/typescript';
+
 import LightGallery from 'lightgallery/react';
 import lgVideo from 'lightgallery/plugins/video';
-import { PlayCircleIcon } from '@/components/Icons';
-import { AnimeYoutubeVideo } from '@/models';
 import 'lightgallery/scss/lg-zoom.scss';
 import 'lightgallery/scss/lg-video.scss';
+
 import clsx from 'clsx';
 
 interface TrailerButton {

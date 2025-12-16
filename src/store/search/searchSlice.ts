@@ -1,4 +1,5 @@
 import { getAnimeSearch, getCharacterSearch, getMangaSearch } from '@/api';
+import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   Anime,
   AnimeSearchParams,
@@ -8,9 +9,9 @@ import {
   JikanResponse,
   Manga,
   MangaSearchParams,
-} from '@/models';
-import { EntityMap, FetchStatus } from '@/typescript';
-import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+  EntityMap,
+  FetchStatus,
+} from '@/typescript';
 
 export type SearchMap = Pick<EntityMap, 'anime' | 'manga' | 'character'>;
 
@@ -40,9 +41,7 @@ const searchSlice = createSlice({
     setSearchValue(state, action: PayloadAction<string>) {
       state.value = action.payload;
     },
-    resetSearchState() {
-      return initialState;
-    },
+    resetSearchState: () => initialState,
   },
   extraReducers: (builder) => {
     function commonBuilder<T extends keyof SearchMap>(
@@ -84,26 +83,21 @@ const searchSlice = createSlice({
   },
 });
 
+export const { setSearchValue, resetSearchState } = searchSlice.actions;
+export default searchSlice.reducer;
+
+//========================================================================================================================================================
 export const fetchSearchAnime = createAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
   Partial<AnimeSearchParams>
->('search/fetchSearchAnime', async (qearyParams) => {
-  return await getAnimeSearch(qearyParams);
-});
+>('search/fetchSearchAnime', async (qearyParams) => await getAnimeSearch(qearyParams));
 
 export const fetchSearchManga = createAsyncThunk<
   JikanResponse<Manga[], JikanPaginationPlus>,
   Partial<MangaSearchParams>
->('search/fetchSearchManga', async (qearyParams) => {
-  return await getMangaSearch(qearyParams);
-});
+>('search/fetchSearchManga', async (qearyParams) => await getMangaSearch(qearyParams));
 
 export const fetchSearchCharacter = createAsyncThunk<
   JikanResponse<Character[], JikanPaginationPlus>,
   Partial<CharactersSearchParams>
->('search/fetchSearchCharacter', async (qearyParams) => {
-  return await getCharacterSearch(qearyParams);
-});
-
-export const { setSearchValue, resetSearchState } = searchSlice.actions;
-export default searchSlice.reducer;
+>('search/fetchSearchCharacter', async (qearyParams) => await getCharacterSearch(qearyParams));

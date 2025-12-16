@@ -1,4 +1,4 @@
-import { Anime, AnimeFull, Character, Manga, MangaFull } from '@/models';
+import { Anime, AnimeFull, Character, Manga, MangaFull } from '@/typescript';
 
 export type EntityMap = {
   anime: Anime;

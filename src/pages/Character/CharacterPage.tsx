@@ -1,5 +1,5 @@
 import React from 'react';
-import BG from '@/assets/character-bg.webp';
+import BG from '@/assets/bg/character-bg.webp';
 import {
   CharacterAnimeTab,
   CharacterMangaTab,
@@ -8,7 +8,7 @@ import {
   CharacterAboutTab,
   EntityPageLayout,
 } from '@/components';
-import { CharacterFull } from '@/models';
+import { CharacterFull } from '@/typescript';
 import { fetchCharacterFullById } from '@/store';
 import { appPaths } from '@/resources';
 import './CharacterPage.scss';
@@ -32,8 +32,8 @@ const CharacterPage = () => {
             ? [
                 ...(anime
                   ? [
-                     {
-                        label: "Anime",
+                      {
+                        label: 'Anime',
                         url: appPaths.anime,
                       },
                       {
@@ -43,8 +43,8 @@ const CharacterPage = () => {
                     ]
                   : manga
                   ? [
-                     {
-                        label: "Manga",
+                      {
+                        label: 'Manga',
                         url: appPaths.manga,
                       },
                       {

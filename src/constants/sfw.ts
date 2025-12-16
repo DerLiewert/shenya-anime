@@ -1,4 +1,4 @@
-import { Anime, AnimeFull, AnimeSearchRating } from '@/models';
+import { Anime, AnimeFull, AnimeSearchRating } from '@/typescript';
 
 export const adultAnimeGenres = [12];
 export const adultAnimeRating: AnimeSearchRating[] = ['rx'];
@@ -12,5 +12,5 @@ function isAdultRating(id: AnimeSearchRating) {
   return adultAnimeRating.includes(id);
 }
 function isAdultAnime(item: Anime | AnimeFull) {
-  return item.genres.find(obj => isAdultGenre(obj.mal_id)) //|| isAdultRating(item.rating);
+  return item.genres.find((obj) => isAdultGenre(obj.mal_id)); //|| isAdultRating(item.rating);
 }

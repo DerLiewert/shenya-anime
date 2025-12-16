@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { AnimeTooltip, MangaTooltip, SfwImage } from '@/components';
 import { getImageUrl } from '@/utils';
 import { appPaths } from '@/resources';
-import { RecommendationEntry } from '@/models';
+import { RecommendationEntry } from '@/typescript';
 import clsx from 'clsx';
 import './CardItem.scss';
 

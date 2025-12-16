@@ -1,7 +1,13 @@
-import { getMangaSearch } from '@/api/client/manga.client';
-import { JikanPaginationPlus, JikanResponse, Manga, MangaSearchParams } from '@/models';
-import { FetchStatus } from '@/typescript';
+import { getMangaSearch } from '@/api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import {
+  JikanPaginationPlus,
+  JikanResponse,
+  Manga,
+  MangaSearchParams,
+  FetchStatus,
+} from '@/typescript';
+
 import axios from 'axios';
 
 interface InitialState {
@@ -39,17 +45,11 @@ const mangaCatalogSlice = createSlice({
 
 export default mangaCatalogSlice.reducer;
 
+//========================================================================================================================================================
 export const fetchMangaByParams = createAsyncThunk<
   JikanResponse<Manga[], JikanPaginationPlus>,
-  MangaSearchParams,
-  { rejectValue: any }
->('manga-catalog/fetchMangaByParams', async (queryParams, { signal, rejectWithValue }) => {
-  try {
-    return await getMangaSearch({ ...queryParams, limit: 24 }, signal);
-  } catch (error: any) {
-    if (axios.isAxiosError(error) && error.response?.data) {
-      return rejectWithValue(error.response.data);
-    }
-    throw error;
-  }
-});
+  MangaSearchParams
+>(
+  'manga-catalog/fetchMangaByParams',
+  async (queryParams, { signal }) => await getMangaSearch({ limit: 24, ...queryParams}, signal),
+);

@@ -403,7 +403,7 @@ class RequestLimiter {
   }
 }
 
-const limiter = new RequestLimiter(2); // 2 запроса в секунду (1 каждые ~333мс)
+const limiter = new RequestLimiter(3); // 2 запроса в секунду (1 каждые ~333мс)
 export default limiter;
 
 export function limitedAxios<T = any>(config: AxiosRequestConfig): Promise<AxiosResponse<T>> {

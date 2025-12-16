@@ -6,8 +6,8 @@ import {
   AnimeSearchType,
   AnimeStatus,
   AnimeType,
-} from '@/models';
-import { SelectOption } from '@/typescript';
+  SelectOption,
+} from '@/typescript';
 
 export const animeTypeOptions: Array<SelectOption<AnimeSearchType, AnimeType>> = [
   { value: 'tv', label: 'TV' },

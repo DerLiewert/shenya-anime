@@ -12,7 +12,7 @@ import 'swiper/scss';
 import 'swiper/scss/effect-fade';
 import 'swiper/scss/autoplay';
 
-import mainBg from '@/assets/main-bg.jpg';
+import mainBg from '@/assets/bg/main-bg.jpg';
 
 import clsx from 'clsx';
 import './MainIntro.scss';

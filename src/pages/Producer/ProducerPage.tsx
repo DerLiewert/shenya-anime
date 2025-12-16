@@ -1,6 +1,6 @@
 import React from 'react';
-import BG from '@/assets/people-bg.jpg';
-import { ProducerFull } from '@/models';
+import BG from '@/assets/bg/people-bg.jpg';
+import { ProducerFull } from '@/typescript';
 import { fetchProducerFullById } from '@/store/producer/producerFullByIdSlice';
 import { ProducerAboutTab, EntityPageLayout } from '@/components';
 import { appPaths } from '@/resources';

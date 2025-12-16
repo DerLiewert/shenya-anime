@@ -4,7 +4,7 @@ import {
   JikanSeasonsPlusParams,
   seasonAnimeType,
   SeasonAnimeType,
-} from '@/models';
+} from '@/typescript';
 import {
   AllowedParams,
   commonParamsValidators,

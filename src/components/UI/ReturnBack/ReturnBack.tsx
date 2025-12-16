@@ -14,7 +14,7 @@ const ReturnBack: React.FC<ReturnBackProps> = ({ toLink, textBackTo, className }
   return (
     <Link to={toLink ? toLink : '..'} className={clsx(className, 'back-link')}>
       <LongArrowIcon />
-      Back {textBackTo && 'to ' + textBackTo}
+      Back {textBackTo && `to ${textBackTo}`}
     </Link>
   );
 };

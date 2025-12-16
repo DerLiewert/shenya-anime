@@ -21,9 +21,9 @@ import {
   JikanNews,
   Recommendation,
   StatisticsScore,
-} from '@/models';
+} from '@/typescript';
 import { DataWithExtendedBasicPagination, FetchStatus } from '@/typescript';
-import { createAnimeThunkWithId, createHandle, toDataWithExtendedBasicPagination } from '@/utils';
+import { createAnimeThunkWithId, bilderHandleAsync, toDataWithExtendedBasicPagination } from '@/utils';
 
 type DataKeys = Exclude<keyof AnimeFullState, 'status'>;
 
@@ -71,7 +71,7 @@ export const animeFullByIdSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    const handleAsync = createHandle(builder, initialState);
+    const handleAsync = bilderHandleAsync(builder, initialState);
 
     handleAsync('item', fetchFullAnimeById);
     handleAsync('scoreStats', fetchAnimeScoreStats);

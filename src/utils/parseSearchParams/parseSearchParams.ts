@@ -1,4 +1,4 @@
-import { JikanSearchParams, sortOptions, SortOptions } from '@/models';
+import { JikanSearchParams, sortOptions, SortOptions } from '@/typescript';
 
 const validateScore = (value: string | number): number | undefined => {
   const number = Number(value);

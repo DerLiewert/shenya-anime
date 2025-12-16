@@ -1,8 +1,12 @@
-import { getAnimeSearch } from '@/api/client/anime.client';
-import { RootState } from '@/app/store';
-import { Anime, AnimeSearchParams, JikanPaginationPlus, JikanResponse } from '@/models';
-import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { getAnimeSearch } from '@/api';
+import {
+  Anime,
+  AnimeSearchParams,
+  JikanPaginationPlus,
+  JikanResponse,
+  FetchStatus,
+} from '@/typescript';
 
 interface InitialState {
   items: Anime[];
@@ -39,12 +43,10 @@ const animeCatalogSlice = createSlice({
 
 export default animeCatalogSlice.reducer;
 
+//========================================================================================================================================================
 export const fetchAnimeByParams = createAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
-  AnimeSearchParams,
-  { rejectValue: any }
->('anime-catalog/fetchAnimeByParams', async (queryParams, { signal, getState }) => {
-  // const { sfw } = (getState() as RootState).settings;
-  // return await getAnimeSearch({ limit: 24, ...queryParams, sfw }, signal);
-  return await getAnimeSearch({ limit: 24, ...queryParams }, signal);
-});
+  AnimeSearchParams
+>('anime-catalog/fetchAnimeByParams', async (queryParams, { signal }) =>
+  getAnimeSearch({ limit: 24, ...queryParams }, signal),
+);

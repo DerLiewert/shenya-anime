@@ -1,7 +1,6 @@
 import { getAnimeGenres } from '@/api';
-import { Genre } from '@/models';
-import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { Genre, FetchStatus } from '@/typescript';
 
 interface InitialState {
   items: Genre[];
@@ -35,11 +34,10 @@ const animeGenresSlice = createSlice({
   },
 });
 
-export const fetchAnimeGenres = createAsyncThunk<Genre[]>(
-  'anime-genres/fetchAnimeGenres',
-  async () => {
-    return (await getAnimeGenres()).data;
-  },
-);
-
 export default animeGenresSlice.reducer;
+
+//========================================================================================================================================================
+export const fetchAnimeGenres = createAsyncThunk<Genre[]>(
+  'anime-genres/fetchGenres',
+  async () => (await getAnimeGenres()).data,
+);

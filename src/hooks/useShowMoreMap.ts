@@ -1,20 +1,22 @@
 import { useState } from 'react';
 
-export const useShowMoreMap = (step = 10) => {
-  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+type VisibleCountsMap = Record<string, number>;
+
+export const useShowMoreMap = (step: number = 10) => {
+  const [visibleCountsMap, setVisibleCountsMap] = useState<VisibleCountsMap>({});
 
   const initShowMore = (keys: string[]) => {
-    const initialCounts: Record<string, number> = {};
+    const initialCounts: VisibleCountsMap = {};
 
     keys.forEach((key) => {
       initialCounts[key] = step;
     });
 
-    setVisibleCounts(initialCounts);
+    setVisibleCountsMap(initialCounts);
   };
 
   const reset = (keys: string[] = []) => {
-    const resetCounts: Record<string, number> = { ...visibleCounts };
+    const resetCounts: VisibleCountsMap = { ...visibleCountsMap };
 
     if (keys.length === 0) {
       for (const key in resetCounts) {
@@ -26,12 +28,12 @@ export const useShowMoreMap = (step = 10) => {
       });
     }
 
-    setVisibleCounts(resetCounts);
+    setVisibleCountsMap(resetCounts);
   };
 
   const showMore = (key: string) => {
-    setVisibleCounts((prev) => ({ ...prev, [key]: prev[key] + step }));
+    setVisibleCountsMap((prev) => ({ ...prev, [key]: prev[key] + step }));
   };
 
-  return { visibleCounts, initShowMore, reset, showMore };
+  return { visibleCountsMap, initShowMore, reset, showMore };
 };

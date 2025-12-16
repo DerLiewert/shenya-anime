@@ -1,3 +1,4 @@
+export * from './anime';
 export * from './weekDays';
 export * from './monthNames';
 export * from './breakpoints';

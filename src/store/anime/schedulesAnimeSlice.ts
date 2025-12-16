@@ -1,19 +1,23 @@
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { SchedulesEndpoints } from '@/api';
 import { getResource } from '@/api/client/api.client';
-import { AsyncThunkConfig, FetchStatus } from '@/typescript';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Anime, JikanPaginationPlus, JikanResponse, SchedulesFilter } from '../../models';
+import {
+  Anime,
+  JikanPaginationPlus,
+  JikanResponse,
+  SchedulesFilter,
+  AsyncThunkConfig,
+  FetchStatus,
+} from '@/typescript';
 
 interface SchedulesAnimeState {
   items: Anime[];
-  filter: SchedulesFilter | null;
   pagination: JikanPaginationPlus | null;
   status: FetchStatus | null;
 }
 
 const initialState: SchedulesAnimeState = {
   items: [],
-  filter: null,
   pagination: null,
   status: null,
 };

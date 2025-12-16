@@ -11,7 +11,7 @@ import {
   AnimeSearchParams,
   JikanPaginationPlus,
   AnimeFull,
-} from '@/models';
+} from '@/typescript';
 import { getResource } from './api.client';
 import { AnimeEndpoints } from '../endpoints/anime.endpoints';
 

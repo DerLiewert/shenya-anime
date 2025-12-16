@@ -8,7 +8,7 @@ import {
   MangaSearchParams,
   Recommendation,
   Statistics,
-} from '@/models';
+} from '@/typescript';
 import { getResource } from './api.client';
 import { MangaEndpoints } from '../endpoints/manga.endpoints';
 

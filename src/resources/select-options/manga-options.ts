@@ -4,8 +4,8 @@ import {
   MangaSearchType,
   MangaStatus,
   MangaType,
-} from '@/models';
-import { SelectOption } from '@/typescript';
+  SelectOption,
+} from '@/typescript';
 
 export const mangaTypeOptions: Array<SelectOption<MangaSearchType, MangaType>> = [
   { value: 'manga', label: 'Manga' },

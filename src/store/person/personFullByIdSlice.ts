@@ -1,8 +1,7 @@
-import { getPersonFullById, getPersonPictures } from '@/api/client/person.client';
-import { JikanImages, PersonFull } from '@/models';
-import { FetchStatus } from '@/typescript';
-import { createHandle, createPersonThunkWithId } from '@/utils';
+import { getPersonFullById, getPersonPictures } from '@/api';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { JikanImages, PersonFull, FetchStatus } from '@/typescript';
+import { bilderHandleAsync, createPersonThunkWithId } from '@/utils';
 
 type DataKeys = Exclude<keyof PersonFullState, 'status'>;
 
@@ -23,7 +22,7 @@ const personFullByIdSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const handleAsync = createHandle(builder, initialState);
+    const handleAsync = bilderHandleAsync(builder, initialState);
 
     handleAsync('item', fetchPersonFullById);
     handleAsync('pictures', fetchPersonPictures);
@@ -35,12 +34,10 @@ export default personFullByIdSlice.reducer;
 //========================================================================================================================================================
 export const fetchPersonFullById = createAsyncThunk<PersonFull, number>(
   'person-full/fetchFullById',
-  async (id, { signal }) => {
-    return (await getPersonFullById(id, signal)).data;
-  },
+  async (id, { signal }) => (await getPersonFullById(id, signal)).data,
 );
 
 export const fetchPersonPictures = createPersonThunkWithId<JikanImages[]>(
   'person-full/fetchPictures',
-  (id, _, signal) => getPersonPictures(id, signal).then((res) => res.data),
+  async (id, _, signal) => (await getPersonPictures(id, signal)).data,
 );

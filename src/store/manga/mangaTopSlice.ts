@@ -2,7 +2,7 @@ import { TopEndpoints } from '@/api';
 import { getResource } from '@/api/client/api.client';
 import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Manga } from '@/models';
+import { Manga } from '@/typescript';
 
 export const fetchTopManga = createAsyncThunk<Manga[]>(
   'top-manga/fetchTopManga',

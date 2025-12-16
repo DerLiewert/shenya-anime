@@ -1,15 +1,15 @@
 import React from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
 import { AnimeCard, CommonIntro, EmptyValueMessage, MangaCard } from '@/components';
 import { AnimeAndMangaOf, AnimeAndMangaType, TabRoute } from '@/typescript';
-import NotFound from '../NotFound/NotFound';
 import { appPaths } from '@/resources';
 import { usePathSegments } from '@/hooks';
-import './Bookmark.scss';
-import { RootState } from '@/app/store';
-import { useDispatch } from 'react-redux';
 import { setScrollToTop } from '@/store';
+import NotFound from '../NotFound/NotFound';
+import './Bookmark.scss';
 
 const routeItems: TabRoute[] = [
   {

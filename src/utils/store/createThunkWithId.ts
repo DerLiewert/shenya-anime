@@ -1,5 +1,5 @@
-import { AsyncThunk, createAsyncThunk } from '@reduxjs/toolkit';
-import { AsyncThunkConfig, IdSelector } from '@/typescript';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import { AsyncThunkConfig, ItemIdSelector } from '@/typescript';
 
 type ThunkWithIdCallback<Returned, Arg = undefined> = (
   id: number,
@@ -7,65 +7,37 @@ type ThunkWithIdCallback<Returned, Arg = undefined> = (
   signal: AbortSignal,
 ) => Promise<Returned>;
 
-export function createThunkWithId<Returned, Arg = undefined>(
-  typePrefix: string,
-  getIdFromState: IdSelector,
-  callback: ThunkWithIdCallback<Returned, Arg>,
-): AsyncThunk<Returned, Arg, AsyncThunkConfig> {
-  return createAsyncThunk<Returned, Arg, AsyncThunkConfig>(
-    typePrefix,
-    async (arg, { getState, signal, rejectWithValue }) => {
-      const id = getIdFromState(getState());
-      if (!id) return rejectWithValue(`${typePrefix}: ID is missing`);
-      return callback(id, arg, signal);
-    },
-  );
+function createThunkWithId(getIdFromState: ItemIdSelector) {
+  return function <Returned, Arg = void>(
+    typePrefix: string,
+    callback: ThunkWithIdCallback<Returned, Arg>,
+  ) {
+    return createAsyncThunk<Returned, Arg, AsyncThunkConfig>(
+      typePrefix,
+      async (arg, { getState, signal, rejectWithValue }) => {
+        const id = getIdFromState(getState()) ?? null;
+        return id ? callback(id, arg, signal) : rejectWithValue(`${typePrefix}: ID is missing`);
+      },
+    );
+  };
 }
 
 /* ========== Anime ============ */
-export function createAnimeThunkWithId<Returned, Arg = undefined>(
-  typePrefix: string,
-  callback: ThunkWithIdCallback<Returned, Arg>,
-): AsyncThunk<Returned, Arg, AsyncThunkConfig> {
-  return createThunkWithId<Returned, Arg>(
-    typePrefix,
-    (state) => state.animeFullById.item?.mal_id,
-    callback,
-  );
-}
+export const createAnimeThunkWithId = createThunkWithId(
+  (state) => state.animeFullById.item?.mal_id,
+);
 
 /* ========== Manga ============ */
-export function createMangaThunkWithId<Returned, Arg = undefined>(
-  typePrefix: string,
-  callback: ThunkWithIdCallback<Returned, Arg>,
-): AsyncThunk<Returned, Arg, AsyncThunkConfig> {
-  return createThunkWithId<Returned, Arg>(
-    typePrefix,
-    (state) => state.mangaFullById.item?.mal_id,
-    callback,
-  );
-}
+export const createMangaThunkWithId = createThunkWithId(
+  (state) => state.mangaFullById.item?.mal_id,
+);
 
 /* ========== Character ============ */
-export function createCharacterThunkWithId<Returned, Arg = undefined>(
-  typePrefix: string,
-  callback: ThunkWithIdCallback<Returned, Arg>,
-): AsyncThunk<Returned, Arg, AsyncThunkConfig> {
-  return createThunkWithId<Returned, Arg>(
-    typePrefix,
-    (state) => state.characterFullById.item?.mal_id,
-    callback,
-  );
-}
+export const createCharacterThunkWithId = createThunkWithId(
+  (state) => state.characterFullById.item?.mal_id,
+);
 
 /* ========== Person ============ */
-export function createPersonThunkWithId<Returned, Arg = undefined>(
-  typePrefix: string,
-  callback: ThunkWithIdCallback<Returned, Arg>,
-): AsyncThunk<Returned, Arg, AsyncThunkConfig> {
-  return createThunkWithId<Returned, Arg>(
-    typePrefix,
-    (state) => state.personFullById.item?.mal_id,
-    callback,
-  );
-}
+export const createPersonThunkWithId = createThunkWithId(
+  (state) => state.personFullById.item?.mal_id,
+);

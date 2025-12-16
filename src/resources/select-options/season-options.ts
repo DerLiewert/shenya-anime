@@ -1,5 +1,4 @@
-import { animeSeasons, SeasonAnimeType } from '@/models';
-import { SelectOption } from '@/typescript';
+import { animeSeasons, SeasonAnimeType, SelectOption } from '@/typescript';
 
 export const seasonOptions: Array<SelectOption<SeasonAnimeType>> = animeSeasons.map((season) => ({
   value: season,

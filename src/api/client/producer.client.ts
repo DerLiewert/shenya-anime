@@ -1,5 +1,5 @@
 import { getResource } from './api.client';
-import { ProducerFull, Producer, ProducerSearchParams } from '@/models';
+import { ProducerFull, Producer, ProducerSearchParams } from '@/typescript';
 import { ProducerEndpoints } from '../endpoints/producer.endpoints';
 
 export const getProducerFullById = (id: number, signal?: AbortSignal) => {

@@ -1,8 +1,8 @@
 import React from 'react';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
-import { useForm, Controller } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
+import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
 import { breakpoints } from '@/constants';
@@ -20,8 +20,9 @@ import {
   AnimeSearchStatus,
   AnimeSearchType,
   SortOptions,
-} from '@/models';
-import { ExtractOptionValue, SelectOption } from '@/typescript';
+  ExtractOptionValue,
+  SelectOption,
+} from '@/typescript';
 import { AnimeCard, CommonIntro, EmptyValueMessage, FilterIcon, Pagination } from '@/components';
 import { fetchAnimeByParams, fetchAnimeGenres, minusOpenModal, plusOpenModal } from '@/store';
 import clsx from 'clsx';
@@ -36,17 +37,6 @@ const setSortForOrderBy = (param: AnimeSearchOrder | undefined): SortOptions | u
   };
   return param ? sort[param] : undefined;
 };
-
-function createDefaultSearchParams(): AnimeSearchParams {
-  const order_by = 'score';
-
-  return {
-    order_by,
-    sort: setSortForOrderBy(order_by),
-  };
-}
-
-const defaultSearchParams = createDefaultSearchParams();
 
 //========================================================================================================================================================
 const AnimeCatalogPage: React.FC = () => {
@@ -86,16 +76,15 @@ const AnimeCatalogPage: React.FC = () => {
     [genres, pagination?.last_visible_page],
   );
 
-  const appNavigate = useAppNavigate(parseSearchParams, defaultSearchParams);
+  const appNavigate = useAppNavigate(parseSearchParams);
 
   const searchParams = React.useMemo<AnimeSearchParams>(() => {
+    const defaultParams: AnimeSearchParams = { order_by: 'score' };
     const urlParams = parseSearchParams(location.search);
     return {
-      ...defaultSearchParams,
+      ...defaultParams,
       ...urlParams,
-      sort: setSortForOrderBy(
-        urlParams.order_by ? urlParams.order_by : defaultSearchParams.order_by,
-      ),
+      sort: setSortForOrderBy(urlParams.order_by || defaultParams.order_by),
     };
   }, [location.search]);
 
@@ -116,9 +105,8 @@ const AnimeCatalogPage: React.FC = () => {
   // Получение даных об аниме по выбраным параметрам
   React.useEffect(() => {
     if (isGenresLoading) return;
-
     abortableDispatch(fetchAnimeByParams, searchParams);
-  }, [searchParams, genresStatus]);
+  }, [searchParams, genresStatus]); // maybe genres
 
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
@@ -385,7 +373,9 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
   }
 
   return (
-    <aside ref={sidebarRef} className={clsx(className, 'catalog-sidebar', { _show: isOpen, _modal: isModal })}>
+    <aside
+      ref={sidebarRef}
+      className={clsx(className, 'catalog-sidebar', { _show: isOpen, _modal: isModal })}>
       <div className="catalog-sidebar__inner">
         <div className="catalog-sidebar__header">
           <div className="catalog-sidebar__title">Filters</div>

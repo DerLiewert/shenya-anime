@@ -1,4 +1,4 @@
-import type { JikanImages } from '@/models';
+import type { JikanImages } from '@/typescript';
 
 export const getImageUrl = (images: JikanImages | null) => {
   if (!images) return;

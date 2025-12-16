@@ -1,7 +1,6 @@
 import { getSeasonsList } from '@/api';
-import { SeasonsListData } from '@/models';
-import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { SeasonsListData,FetchStatus } from '@/typescript';
 
 interface InitialState {
   items: SeasonsListData[];
@@ -31,9 +30,11 @@ const seasonsListSlice = createSlice({
   },
 });
 
+export default seasonsListSlice.reducer;
+
+//========================================================================================================================================================
 export const fetchSeasonsList = createAsyncThunk<SeasonsListData[]>(
   'seasons-list/fetchSeasonsListData',
   async () => (await getSeasonsList()).data,
 );
 
-export default seasonsListSlice.reducer;

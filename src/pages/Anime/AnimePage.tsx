@@ -1,6 +1,6 @@
 import React from 'react';
 import { fetchFullAnimeById } from '@/store';
-import { AnimeFull, JikanNamedResource } from '@/models';
+import { AnimeFull, JikanNamedResource } from '@/typescript';
 import {
   AnimeCharacterTab,
   AnimeNewsTab,

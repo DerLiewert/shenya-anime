@@ -1,4 +1,4 @@
-import { Anime, Manga } from '@/models';
+import { Anime, Manga } from '@/typescript';
 
 const isGenreNsfw = (item: Anime | Manga) => {
   const nsfwGenres = [12, 49];

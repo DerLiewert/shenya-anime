@@ -2,7 +2,7 @@ import { getAnimeSearch } from '@/api';
 import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '@/app/store';
-import { Anime } from '@/models';
+import { Anime } from '@/typescript';
 import { randomInteger } from '@/utils';
 
 interface randomAnimeState {
@@ -41,11 +41,10 @@ export const { clearRandomAnimeState } = randomAnimeSlice.actions;
 
 export default randomAnimeSlice.reducer;
 
-export const fetchRandomAnime = createAsyncThunk<Anime, void, { state: RootState }>(
+//========================================================================================================================================================
+export const fetchRandomAnime = createAsyncThunk<Anime, number, { state: RootState }>(
   'random-anime/fetchRandomAnime',
-  async (_, thunkAPI) => {
-    const minScore = 8;
-
+  async (minScore = 8, thunkAPI) => {
     // Получаем количество страниц
     const firstResponse = await getAnimeSearch({ min_score: minScore, limit: 1 }, thunkAPI.signal);
 

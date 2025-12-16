@@ -1,8 +1,8 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import isEqual from 'lodash.isequal';
+import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/app/hooks';
 import { fetchSchedulesAnime } from '@/store';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
@@ -10,7 +10,7 @@ import { animeEmptyValueMessages, commonMessages } from '@/constants';
 import { scrollToTop, getUniqueItems, parseBroadcastAnimeParams } from '@/utils';
 import { weekDaysOptions } from '@/resources';
 import { BroadcastItem, EmptyValueMessage, Pagination } from '@/components';
-import { schedulesFilter } from '@/models';
+import { schedulesFilter } from '@/typescript';
 
 import './Broadcast.scss';
 

@@ -4,11 +4,7 @@ import { FetchStatus } from '@/typescript';
 
 type Status = FetchStatus | undefined | null;
 type StatusSelector = (state: RootState) => Status;
-type ReturnedBase = {
-  isLoading: boolean;
-  isSuccess: boolean;
-  isError: boolean;
-};
+type ReturnedBase = Record<'isIdle' | 'isLoading' | 'isSuccess' | 'isError', boolean>;
 
 export function useFetchStatus(
   statusOrSelector: StatusSelector | Status,

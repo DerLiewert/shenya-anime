@@ -1,7 +1,7 @@
 import React from 'react';
 import { CardItem, MangaTooltip } from '@/components';
 import { appPaths } from '@/resources';
-import { Manga } from '@/models';
+import { Manga } from '@/typescript';
 import { isMangaNsfw } from '@/utils';
 
 interface MangaCardProps {

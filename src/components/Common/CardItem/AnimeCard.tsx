@@ -1,7 +1,7 @@
 import React from 'react';
 import { AnimeTooltip, CardItem } from '@/components';
 import { appPaths } from '@/resources';
-import { Anime } from '@/models';
+import { Anime } from '@/typescript';
 import { isAnimeNsfw } from '@/utils';
 
 interface AnimeCardProps {

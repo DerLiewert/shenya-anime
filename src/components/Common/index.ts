@@ -4,4 +4,6 @@ export * from './Breadcrumbs';
 export * from './EntityTabItem';
 export * from './BroadcastItem';
 export * from './CommonIntro';
-export * from './SfwImage';
+export * from './Pagination';
+export * from './ScoreStats';
+export * from './Tooltip';

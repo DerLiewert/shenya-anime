@@ -1,5 +1,5 @@
 import React from 'react';
-import { AnimeStatus, MangaStatus } from '@/models';
+import { AnimeStatus, MangaStatus } from '@/typescript';
 import { getStatusClassName, valueOrDefault } from '@/utils';
 import clsx from 'clsx';
 import './Status.scss';

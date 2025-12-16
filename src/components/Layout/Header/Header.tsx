@@ -93,7 +93,7 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
             <button className="header__action-btn" aria-label="Search" onClick={onSearchOpen}>
               <SearchIcon />
             </button>
-            <Link className="header__action-btn" to={appPaths.bookmark}>
+            <Link className="header__action-btn" to={appPaths.bookmark} >
               <BookmarkIcon />
             </Link>
             <button

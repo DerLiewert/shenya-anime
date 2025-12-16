@@ -6,7 +6,7 @@ import {
   MangaFull,
   Recommendation,
   StatisticsScore,
-} from '@/models';
+} from '@/typescript';
 import { DataWithExtendedBasicPagination, FetchStatus } from '@/typescript';
 import {
   getMangaCharacters,
@@ -16,7 +16,7 @@ import {
   getMangaRecommendations,
   getMangaStatistics,
 } from '@/api/client/manga.client';
-import { createHandle, createMangaThunkWithId, toDataWithExtendedBasicPagination } from '@/utils';
+import { bilderHandleAsync, createMangaThunkWithId, toDataWithExtendedBasicPagination } from '@/utils';
 
 type DataKeys = Exclude<keyof MangaFullState, 'status'>;
 
@@ -50,7 +50,7 @@ export const mangaFullByIdSlice = createSlice({
     resetMangaFull: () => initialState,
   },
   extraReducers: (builder) => {
-    const handleAsync = createHandle(builder, initialState);
+    const handleAsync = bilderHandleAsync(builder, initialState);
 
     handleAsync('item', fetchFullMangaById);
     handleAsync('scoreStats', fetchMangaScoreStats);

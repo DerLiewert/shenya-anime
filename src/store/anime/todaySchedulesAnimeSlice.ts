@@ -2,7 +2,7 @@ import { getResource } from '@/api/client/api.client';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { FetchStatus } from '@/typescript';
-import { Anime } from '@/models';
+import { Anime } from '@/typescript';
 import { weekDays } from '@/constants';
 
 interface TodaySchedulesAnimeState {

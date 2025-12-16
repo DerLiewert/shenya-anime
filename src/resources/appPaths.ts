@@ -1,4 +1,4 @@
-import { AnimeSearchParams, JikanSeasonsPlusParams, MangaSearchParams } from '@/models';
+import { AnimeSearchParams, JikanSeasonsPlusParams, MangaSearchParams } from '@/typescript';
 
 function pathWithQuery<T extends {}>(path: string, params: T): string {
   const search = new URLSearchParams(params);

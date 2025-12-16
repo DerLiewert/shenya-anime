@@ -4,7 +4,7 @@ import {
   CharactersSearchParams,
   JikanImages,
   JikanPaginationPlus,
-} from '@/models';
+} from '@/typescript';
 import { getResource } from './api.client';
 import { CharactersEndpoints } from '../endpoints/characters.endpoints';
 

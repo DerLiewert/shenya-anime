@@ -1,4 +1,4 @@
-import { Anime, Manga } from '@/models';
+import { Anime, Manga } from '@/typescript';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface BookmarkState {

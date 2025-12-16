@@ -1,4 +1,4 @@
-import { JikanPaginationBase } from '@/models';
+import { JikanPaginationBase } from '@/typescript';
 
 export type DataWithExtendedBasicPagination<T> = {
   data: T[];

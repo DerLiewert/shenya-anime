@@ -8,7 +8,7 @@ import {
   animeSearchStatus,
   AnimeSearchType,
   animeSearchType,
-} from '@/models';
+} from '@/typescript';
 import {
   AllowedParams,
   commonParamsValidators,

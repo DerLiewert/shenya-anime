@@ -1,6 +1,5 @@
 import React from 'react';
-import BG from '@/assets/manga-bg.jpeg';
-import { JikanNamedResource, MangaFull } from '@/models';
+import { JikanNamedResource, MangaFull } from '@/typescript';
 import {
   EntityPageLayout,
   MangaCharacterTab,
@@ -12,6 +11,7 @@ import {
 import { fetchFullMangaById } from '@/store';
 import { appPaths, mangaTypeOptions } from '@/resources';
 import { isMangaNsfw } from '@/utils';
+import BG from '@/assets/bg/manga-bg.jpg';
 import './MangaPage.scss';
 
 const MangaPage = () => {

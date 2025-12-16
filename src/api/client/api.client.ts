@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { BASE_URL } from '../base.const';
-import { JikanPaginationBase, JikanResponse } from '@/models';
+import { JikanErrorResponse, JikanPaginationBase, JikanResponse } from '@/typescript';
 
 import { limiter, searchParamsToString } from '@/utils';
 
@@ -54,51 +54,27 @@ export async function getResource<T, P = JikanPaginationBase>({
     signal,
   };
 
-  const response = await limiter.schedule(() => api.request<JikanResponse<T, P>>(config), signal, {
-    url,
-    label: `[GET ${url}]`,
-  });
+  const response = await limiter.schedule(
+    () => api.request<JikanResponse<T, P> | JikanErrorResponse>(config),
+    signal,
+    {
+      url,
+      label: `[GET ${url}]`,
+    },
+  );
 
-  console.log('response', response.data);
-
-  if (!response.data.data) {
-    // Можно логировать или включить больше контекста
-    console.log(new Error((response.data as any).message));
-
-    // throw new Promise((resolve, reject) => {
-    //   reject(new Error((response.data as any).message || 'Empty response data received from API'));
-    // });
-
-    throw new Error((response.data as any).message || 'Empty response data received from API');
+  if ((response.data as JikanResponse<T, P>).data) {
+    return response.data as JikanResponse<T, P>;
   } else {
-    // console.log('throw', response);
-    return response.data; // ВОТ ТУТ НУЖНО
+    throw new Error(
+      (response.data as JikanErrorResponse).message || 'Empty response data received from API',
+    );
   }
 
-  //  throw new DOMException('Aborted', 'AbortError');
+  // if (!response.data.data) {
+  //   console.log(new Error((response.data as any).message));
+  //   throw new Error((response.data as any).message || 'Empty response data received from API');
   // } else {
-  //   console.log('else', response);
-
-  // try {
-  //   const response = await limiter.schedule(
-  //     () => api.request<JikanResponse<T, P>>(config),
-  //     signal,
-  //     {
-  //       url,
-  //       label: `[GET ${url}]`,
-  //     },
-  //   );
-
-  //   if (!response.data.data) {
-  //     throw new Error((response.data as any).message ?? 'No data');
-  //   }
-
   //   return response.data;
-  // } catch (e) {
-  //   // ❗ если вдруг limiter не пробрасывает ошибку — продублируем
-  //   throw e;
   // }
-
-  // return limiter.schedule(() => api.request<JikanResponse<T, P>>(config), signal)
-  //   .then(res => res.data);
 }

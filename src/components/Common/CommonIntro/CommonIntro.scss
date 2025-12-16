@@ -5,16 +5,16 @@
   background-color: var(--bg-color-light) !important;
 
   &--anime {
-    background: url('/assets/anime-catalog.webp') center / cover no-repeat;
+    background: url('/assets/bg/anime-catalog.webp') center / cover no-repeat;
   }
   &--manga {
-    background: url('/assets/manga-catalog-bg.jpg') center / cover no-repeat;
+    background: url('/assets/bg/manga-catalog-bg.jpg') center / cover no-repeat;
   }
   &--schedules {
-    background: url('/assets/calendar-bg.jpg') center / cover no-repeat;
+    background: url('/assets/bg/calendar-bg.jpg') center / cover no-repeat;
   }
   &--bookmark {
-    background: url('/assets/bookmark-bg.jpg') center / cover no-repeat;
+    background: url('/assets/bg/bookmark-bg.jpg') center / cover no-repeat;
   }
 
   @include media-max($tablet) {

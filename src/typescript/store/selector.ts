@@ -3,4 +3,4 @@ import { FetchStatus } from '../fetchStatus';
 
 export type StatusSelector = (state: RootState) => FetchStatus | undefined | null;
 
-export type IdSelector = (state: RootState) => number | undefined;
+export type ItemIdSelector = (state: RootState) => number | undefined;

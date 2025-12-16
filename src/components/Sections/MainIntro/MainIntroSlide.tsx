@@ -5,7 +5,7 @@ import { useYoutubeTrailerImage } from '@/hooks';
 import { ArrowIcon, StarIcon, BookmarkButton, SfwImage } from '@/components';
 import { formattedScore, getImageUrl, getShortAnimeRating, isAnimeNsfw } from '@/utils';
 import { appPaths, animeRatingOptions } from '@/resources';
-import { Anime } from '@/models';
+import { Anime } from '@/typescript';
 import clsx from 'clsx';
 import './MainIntro.scss';
 

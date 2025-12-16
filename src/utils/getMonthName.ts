@@ -1,5 +1,5 @@
 import { monthNames } from '@/constants';
-import { AnimeSeasons, animeSeasons } from '@/models';
+import { AnimeSeasons, animeSeasons } from '@/typescript';
 
 export const getMonthName = (month: number): string => {
   return monthNames[month - 1];

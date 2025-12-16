@@ -6,3 +6,5 @@ export * from './InfoRowWithValue';
 export * from './FormatDate';
 export * from './ReturnBack';
 export * from './TrailerButton';
+export * from './BookmarkButton';
+export * from './SfwImage';

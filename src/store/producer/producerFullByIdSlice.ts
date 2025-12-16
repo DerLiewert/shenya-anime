@@ -1,7 +1,6 @@
 import { getProducerFullById } from '@/api';
-import { ProducerFull } from '@/models';
-import { FetchStatus } from '@/typescript';
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { ProducerFull, FetchStatus } from '@/typescript';
 
 interface ProducerFullState {
   item: ProducerFull | null;
@@ -36,7 +35,5 @@ export default producerFullByIdSlice.reducer;
 //========================================================================================================================================================
 export const fetchProducerFullById = createAsyncThunk<ProducerFull, number>(
   'producer-full/fetchProducerFullById',
-  async (id, { signal }) => {
-    return (await getProducerFullById(id, signal)).data;
-  },
+  async (id, { signal }) => (await getProducerFullById(id, signal)).data,
 );

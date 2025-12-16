@@ -4,7 +4,7 @@ import { InfoRow, InfoValue, SfwImage } from '@/components';
 import { getImageUrl, isAnimeNsfw, valueOrDefault } from '@/utils';
 import { specialStatus } from '@/constants';
 import { appPaths } from '@/resources';
-import { Anime } from '@/models';
+import { Anime } from '@/typescript';
 import clsx from 'clsx';
 import './BroadcastItem.scss';
 

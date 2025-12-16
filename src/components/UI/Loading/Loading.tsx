@@ -1,9 +1,10 @@
 import { CryoIcon } from '@/components';
+import clsx from 'clsx';
 import './Loading.scss';
 
 export const Loading = ({ className }: { className?: string }) => {
   return (
-    <div className={`${className} loading`}>
+    <div className={clsx(className, 'loading')}>
       <div className="loading__animation">
         <CryoIcon />
         <CryoIcon />

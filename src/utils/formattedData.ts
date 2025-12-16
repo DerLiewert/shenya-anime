@@ -27,3 +27,4 @@ export const getUniqueItems = <T extends { mal_id: number }>(items: Array<T>): A
     (item, index, arr) => index === arr.findIndex((obj) => obj.mal_id === item.mal_id),
   );
 };
+

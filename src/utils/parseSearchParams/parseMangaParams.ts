@@ -6,7 +6,7 @@ import {
   MangaSearchStatus,
   mangaSearchType,
   MangaSearchType,
-} from '@/models';
+} from '@/typescript';
 import {
   AllowedParams,
   commonParamsValidators,

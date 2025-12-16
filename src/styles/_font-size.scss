@@ -1,0 +1,83 @@
+.fz-48 {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+
+  @include media-max($tablet) {
+    font-size: 36px;
+  }
+  @include media-max($mobile) {
+    font-size: 28px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 24px;
+  }
+}
+
+.fz-36 {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: math.div(48, 36);
+
+  @include media-max($tablet) {
+    font-size: 32px;
+  }
+  @include media-max($mobile) {
+    font-size: 26px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 20px;
+  }
+}
+
+.fz-24 {
+  font-size: 24px;
+  font-weight: 600;
+
+  @include media-max($tablet) {
+    font-size: 20px;
+  }
+  @include media-max($mobile) {
+    font-size: 18px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 16px;
+  }
+}
+
+.fz-20 {
+  font-size: 20px;
+  @include media-max($tablet) {
+    font-size: 16px;
+  }
+  @include media-max($mobile) {
+    font-size: 14px;
+  }
+}
+
+.fz-16 {
+  font-size: 16px;
+  @include media-max($mobile) {
+    font-size: 14px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 13px;
+  }
+}
+
+.fz-14 {
+  font-size: 14px;
+  @include media-max($mobile) {
+    font-size: 13px;
+  }
+  @include media-max($mobileSmall) {
+    font-size: 12px;
+  }
+}
+
+.fz-13 {
+  font-size: 13px;
+  @include media-max($mobile) {
+    font-size: 12px;
+  }
+}
