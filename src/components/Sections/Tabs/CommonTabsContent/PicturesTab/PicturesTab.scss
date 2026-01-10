@@ -31,16 +31,6 @@
     width: 100%;
     height: 100%;
   }
-
-  &__message,
-  &__show-more-wrapper {
-    &:not(:first-child) {
-      margin-top: 20px;
-      @include media-max($mobile) {
-        margin-top: 15px;
-      }
-    }
-  }
 }
 
 .pictures-tab-gallery {

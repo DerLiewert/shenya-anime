@@ -1,1 +1,1 @@
-export {default as RandomAnime} from './RandomAnime'
+export * from './RandomAnime'

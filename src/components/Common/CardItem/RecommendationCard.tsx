@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AnimeTooltip, MangaTooltip, SfwImage } from '@/components';
 import { getImageUrl } from '@/utils';
 import { appPaths } from '@/resources';
 import { RecommendationEntry } from '@/typescript';
+import { AnimeTooltip, MangaTooltip, SfwImage } from '@/components';
 import clsx from 'clsx';
 import './CardItem.scss';
 
@@ -16,12 +16,11 @@ interface RecommendationCard {
 
 export const RecommendationCard = React.forwardRef<HTMLAnchorElement, RecommendationCard>(
   ({ item, linkPath, nsfw = false, className }, ref) => {
-    const { images, title } = item;
     return (
-      <Link to={linkPath} ref={ref} className={clsx(className, 'card-item border-opacity')}>
+      <Link ref={ref} to={linkPath} className={clsx(className, 'card-item border-opacity')}>
         <SfwImage
           classWrapper="card-item__image-block border-radius"
-          src={getImageUrl(images)}
+          src={getImageUrl(item.images)}
           alt="Poster"
           loading="lazy"
           nsfw={nsfw}
@@ -29,8 +28,8 @@ export const RecommendationCard = React.forwardRef<HTMLAnchorElement, Recommenda
         />
 
         <div className="card-item__content">
-          <h3 className="card-item__title title title--fz-14 visible-line" title={title}>
-            {title}
+          <h3 className="card-item__title title title--fz-14 visible-line" title={item.title}>
+            {item.title}
           </h3>
         </div>
       </Link>
@@ -43,16 +42,15 @@ interface RecommendationCardWithTooltip {
   className?: string;
   tooltip?: boolean;
   nsfw?: boolean;
-  key: any;
 }
 
 // ========== AnimeRecommendationCard ==========
-export const AnimeRecommendationCard: React.FC<RecommendationCardWithTooltip> = ({
+export const AnimeRecommendationCard = ({
   item,
   className,
   nsfw = false,
   tooltip = true,
-}) => {
+}: RecommendationCardWithTooltip) => {
   const renderCard = () => (
     <RecommendationCard
       nsfw={nsfw}
@@ -65,12 +63,12 @@ export const AnimeRecommendationCard: React.FC<RecommendationCardWithTooltip> = 
 };
 
 // ========== MangaRecommendationCard ==========
-export const MangaRecommendationCard: React.FC<RecommendationCardWithTooltip> = ({
+export const MangaRecommendationCard = ({
   item,
   className,
   nsfw = false,
   tooltip = true,
-}) => {
+}: RecommendationCardWithTooltip) => {
   const renderCard = () => (
     <RecommendationCard
       nsfw={nsfw}

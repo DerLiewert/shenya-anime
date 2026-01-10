@@ -37,7 +37,7 @@
   &__item {
   }
 
-  &__link {
+  &__btn {
     font-size: 14px;
     min-width: 32px;
     height: 28px;
@@ -69,6 +69,11 @@
     &._active {
       border-color: var(--primary-color);
       background-color: var(--primary-color);
+    }
+
+    &:disabled {
+      pointer-events: none;
+      opacity: .5;
     }
   }
 

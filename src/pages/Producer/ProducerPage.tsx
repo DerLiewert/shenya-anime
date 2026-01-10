@@ -1,18 +1,18 @@
 import React from 'react';
 import BG from '@/assets/bg/people-bg.jpg';
+import { fetchProducerFullById } from '@/store';
 import { ProducerFull } from '@/typescript';
-import { fetchProducerFullById } from '@/store/producer/producerFullByIdSlice';
-import { ProducerAboutTab, EntityPageLayout } from '@/components';
 import { appPaths } from '@/resources';
+import { ProducerAboutTab, EntityPageLayout } from '@/components';
 import './ProducerPage.scss';
 
 const ProducerPage = () => {
   return (
     <EntityPageLayout<ProducerFull>
       fetchAction={fetchProducerFullById}
-      selector={(state) => state.producerFullById.item}
-      status={(state) => state.producerFullById.status}
-      getBasePath={(id) => appPaths.producerFull(id)}
+      itemSelector={(state) => state.producerFullById.item}
+      itemStatusSelector={(state) => state.producerFullById.status.item}
+      createBasePath={(id) => appPaths.producerFull(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.titles[0]?.title,
@@ -33,9 +33,9 @@ const ProducerPage = () => {
 };
 export default ProducerPage;
 
-/* =====================
- === ProducerResources ===
-===================== */
+/* ========================
+==== ProducerResources ====
+======================== */
 const ProducerResources: React.FC<{ item: ProducerFull }> = ({ item }) => {
   const resources = item && item.external ? item.external : [];
 

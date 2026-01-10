@@ -1,18 +1,24 @@
 import { AnimeStatus, MangaStatus } from '@/typescript';
 
-type StatusClass = '_released' | '_ongoing' | '_anons' | '_unknown';
+enum StatusClass {
+  RELEASE = '_released',
+  ONGOING = '_ongoing',
+  ANONS = '_anons',
+  UNKNOWN = '_unknown',
+}
 
 const animeStatusClassNames: Record<AnimeStatus, StatusClass> = {
-  'Finished Airing': '_released',
-  'Currently Airing': '_ongoing',
-  'Not yet aired': '_anons',
+  'Finished Airing': StatusClass.RELEASE,
+  'Currently Airing': StatusClass.ONGOING,
+  'Not yet aired': StatusClass.ANONS,
 };
+
 const mangaStatusClassNames: Record<MangaStatus, StatusClass> = {
-  Finished: '_released',
-  Publishing: '_ongoing',
-  'On Hiatus': '_ongoing',
-  Discontinued: '_anons',
-  'Not yet published': '_anons',
+  Finished: StatusClass.RELEASE,
+  Publishing: StatusClass.ONGOING,
+  'On Hiatus': StatusClass.ONGOING,
+  Discontinued: StatusClass.ANONS,
+  'Not yet published': StatusClass.ANONS,
 };
 
 const statusClassNames = {
@@ -21,5 +27,5 @@ const statusClassNames = {
 } as const;
 
 export const getStatusClassName = (status: AnimeStatus | MangaStatus | null): string => {
-  return status ? statusClassNames[status] : '_unknown';
+  return status ? statusClassNames[status] : StatusClass.UNKNOWN;
 };

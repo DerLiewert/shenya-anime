@@ -1,4 +1,4 @@
-import { specialStatus } from '@/constants';
+import { fallbackValues } from '@/constants';
 
 type SplitOptions = {
   separator: string;
@@ -17,14 +17,13 @@ export const toFirstUppercase = (value: string): string => {
 };
 
 export const formattedScore = (score: number | null): string => {
-  if (score === null) return specialStatus.notAvailable;
+  if (score === null) return fallbackValues.notAvailable;
   return Number.isInteger(score) ? `${score}.0` : score.toString();
 };
 
-// Некоторые обьекты с сервера (например аниме/манга) могут посторяться в массиве несколькор раз с одинаковым mal_id
+// Некоторые обьекты с сервера (например аниме/манга) могут повторяться в массиве несколькор раз с одинаковым mal_id
 export const getUniqueItems = <T extends { mal_id: number }>(items: Array<T>): Array<T> => {
   return items.filter(
     (item, index, arr) => index === arr.findIndex((obj) => obj.mal_id === item.mal_id),
   );
 };
-

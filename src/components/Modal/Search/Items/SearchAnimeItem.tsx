@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { InfoRow, InfoValue, Score, SfwImage, Status } from '@/components';
-import { specialStatus } from '@/constants';
+import { fallbackValues } from '@/constants';
 import { getImageUrl, getShortAnimeRating, isAnimeNsfw, valueOrDefault } from '@/utils';
 import { appPaths } from '@/resources';
 import { Anime } from '@/typescript';
@@ -38,7 +38,7 @@ const SearchAnimeItem: React.FC<{ item: Anime }> = ({ item }) => {
           </InfoRow>
 
           <InfoRow name="Episodes">
-            <InfoValue>{valueOrDefault(item.episodes, specialStatus.mark)}</InfoValue>
+            <InfoValue>{valueOrDefault(item.episodes, fallbackValues.mark)}</InfoValue>
             {item.duration && item.duration !== 'Unknown' && (
               <InfoValue>{<span>( {item.duration} )</span>}</InfoValue>
             )}
@@ -48,7 +48,7 @@ const SearchAnimeItem: React.FC<{ item: Anime }> = ({ item }) => {
             {item.genres.length > 0 ? (
               item.genres.map((genre) => <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>)
             ) : (
-              <InfoValue>{specialStatus.unknown}</InfoValue>
+              <InfoValue>{fallbackValues.unknown}</InfoValue>
             )}
           </InfoRow>
         </div>

@@ -67,7 +67,7 @@
   }
 
   &__body {
-    margin-left: 27.446%;
+    margin-left: calc(25.256% + 25px);
     @include media-between($tablet, $pc) {
       margin-left: calc(23% + 25px);
     }
@@ -117,7 +117,7 @@
 
   &__inner {
     display: flex;
-    column-gap: 30px;
+    column-gap: 25px;
     padding-top: 20px;
     @include media-max($pc) {
       // column-gap: 2.14285714vw;
@@ -201,6 +201,20 @@
       }
     }
 
+    .sfw-image {
+      width: 100%;
+      height: 100%;
+    }
+
+    img {
+      @include media-min($mobile) {
+        min-height: 200px;
+      }
+      @include media-min($tablet) {
+        min-height: 240px;
+      }
+    }
+
     @include media-max($tablet) {
       width: 30%;
       position: absolute;
@@ -224,7 +238,7 @@
       }
       img {
         position: relative;
-        width: auto;
+        // width: auto;
       }
       ._skeleton {
         position: relative;

@@ -1,29 +1,29 @@
-import React from 'react';
+import React, { JSX } from 'react';
 import { Link } from 'react-router-dom';
-import { getImageUrl } from '@/utils';
+import { AnimeAndMangaOf, AnimeAndMangaType, Nullable } from '@/typescript';
 import { BookmarkButton, Score, SfwImage, Status } from '@/components';
-import { AnimeAndMangaOf, AnimeAndMangaType } from '@/typescript';
+import { getImageUrl } from '@/utils';
 import clsx from 'clsx';
 import './CardItem.scss';
 
 interface CardItemProps<T extends AnimeAndMangaType = AnimeAndMangaType> {
-  linkPath: string;
-  item: AnimeAndMangaOf<T> & { year: number | null };
-  className?: string;
-  nsfw: boolean;
   cardType: T;
-  ref?: React.Ref<HTMLDivElement>;
+  item: AnimeAndMangaOf<T> & { year: Nullable<number> };
+  nsfw: boolean;
+  linkPath: string;
+  className?: string;
 }
 
-const CardItem = React.forwardRef<HTMLDivElement, CardItemProps>(
-  ({ linkPath, item, cardType, className, nsfw }, ref) => {
+export const CardItem = React.forwardRef(
+  <T extends AnimeAndMangaType>(
+    { linkPath, item, cardType, className, nsfw }: CardItemProps<T>,
+    ref: React.Ref<HTMLDivElement>,
+  ) => {
     const { images, title, type, year, status, score } = item;
     return (
       <div className={clsx(className, 'card-item border-opacity _title-parent')} ref={ref}>
         <BookmarkButton
-          className="card-item__bookmark "
-          // bookmarkedClassName="btn--stroke"
-          // noBookmarkedClassName="btn--white"
+          className="card-item__bookmark"
           type={cardType}
           item={item}
           withText={false}
@@ -53,6 +53,6 @@ const CardItem = React.forwardRef<HTMLDivElement, CardItemProps>(
       </div>
     );
   },
-);
-
-export default CardItem;
+) as <T extends AnimeAndMangaType>(
+  props: CardItemProps<T> & { ref?: React.Ref<HTMLDivElement> },
+) => JSX.Element;

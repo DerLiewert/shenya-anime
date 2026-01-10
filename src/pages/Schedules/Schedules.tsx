@@ -1,16 +1,11 @@
 import React from 'react';
 import { Routes, useNavigate } from 'react-router-dom';
-// import { CommonIntro, Broadcast, Seasonal } from '@/components';
-import { CommonIntro } from '@/components';
-import { NotFound } from '@/pages';
-import { TabRoute } from '@/typescript';
-import Broadcast from '@/components/Sections/Broadcast/Broadcast';
-import Seasonal from '@/components/Sections/Seasonal/Seasonal';
+import { usePathSegments, useScrollTarget } from '@/hooks';
+import { generateRoutes, isValidPath } from '@/utils';
 import { appPaths } from '@/resources';
-import { usePathSegments } from '@/hooks';
-import { generateRoutes } from '@/utils';
-import { setScrollToTop } from '@/store';
-import { useDispatch } from 'react-redux';
+import { TabRoute } from '@/typescript';
+import { NotFound } from '@/pages';
+import { CommonIntro, Broadcast, Seasonal } from '@/components';
 import './Schedules.scss';
 
 const routeItems: TabRoute[] = [
@@ -23,24 +18,18 @@ const pagePath = appPaths.schedules;
 function Schedules() {
   const navigate = useNavigate();
   const tabSegments = usePathSegments(pagePath);
+  const tabsRef = React.useRef<HTMLDivElement>(null);
 
-  const dispatch = useDispatch();
-  React.useEffect(() => {
-    dispatch(setScrollToTop(false));
-    return () => {
-      dispatch(setScrollToTop(true));
-    };
-  }, []);
+  useScrollTarget(tabsRef);
 
-  if (tabSegments.length > 0 && !routeItems.find((obj) => obj.value === tabSegments[0]))
-    return <NotFound />;
+  if (!isValidPath(tabSegments, routeItems)) return <NotFound />;
 
   return (
     <div className="schedules">
       <CommonIntro bgPrefix="schedules" title="Schedules Anime" />
       <div className="schedules__tabs schedules-tabs">
         <div className="container">
-          <div className="schedules-tabs__list tab-list">
+          <div className="schedules-tabs__list tab-list" ref={tabsRef}>
             {routeItems.map((item) => (
               <div
                 key={item.value}

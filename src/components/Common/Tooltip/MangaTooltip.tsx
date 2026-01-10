@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchStatus } from '@/hooks';
-import { specialStatus } from '@/constants';
+import { commonMessages, fallbackValues } from '@/constants';
+import { valueOrDefault } from '@/utils';
 import { appPaths, mangaTypeOptions } from '@/resources';
 import {
   InfoRow,
@@ -12,33 +13,22 @@ import {
   Score,
   Status,
   Tooltip,
+  TooltipCommonProps,
+  TooltipContentProps,
 } from '@/components';
-
-import type { FetchStatus } from '@/typescript';
-import type { Manga } from '@/typescript';
-
 import './Tooltip.scss';
-import { valueOrDefault } from '@/utils';
 
-type MangaTooltipProps = { children: React.ReactElement } & (
-  | { id: number; item?: never }
-  | { id?: never; item: Manga }
-);
-
-export const MangaTooltip = (props: MangaTooltipProps) => {
+export const MangaTooltip = (props: TooltipCommonProps<'manga'>) => {
   return (
     <Tooltip
       type="manga"
-      tooltipContent={(item, status) => <MangaTooltipContent item={item} status={status} />}
+      tooltipContent={({ item, status }) => <MangaTooltipContent item={item} status={status} />}
       {...props}
     />
   );
 };
 
-const MangaTooltipContent: React.FC<{
-  item: Manga | null | undefined;
-  status: FetchStatus | null;
-}> = ({ item, status }) => {
+const MangaTooltipContent: React.FC<TooltipContentProps<'manga'>> = ({ item, status }) => {
   const { isLoading, isError, isIdle } = useFetchStatus(status, true);
 
   if (isIdle) return null;
@@ -52,7 +42,7 @@ const MangaTooltipContent: React.FC<{
   if (isError)
     return (
       <div className="tooltip">
-        <EmptyValueMessage message="Something went wrong!!!" />
+        <EmptyValueMessage message={commonMessages.error} />
       </div>
     );
 
@@ -91,15 +81,15 @@ const MangaTooltipContent: React.FC<{
                 {item.type}
               </InfoValue>
             ) : (
-              <InfoValue>{specialStatus.unknown}</InfoValue>
+              <InfoValue>{fallbackValues.unknown}</InfoValue>
             )}
           </InfoRow>
 
           <InfoRow name="Chapters">
-            <InfoValue>{valueOrDefault(item.chapters, specialStatus.mark)}</InfoValue>
+            <InfoValue>{valueOrDefault(item.chapters, fallbackValues.mark)}</InfoValue>
           </InfoRow>
           <InfoRow name="Volumes">
-            <InfoValue>{valueOrDefault(item.volumes, specialStatus.mark)}</InfoValue>
+            <InfoValue>{valueOrDefault(item.volumes, fallbackValues.mark)}</InfoValue>
           </InfoRow>
 
           <InfoRow name="Published">
@@ -115,7 +105,7 @@ const MangaTooltipContent: React.FC<{
                   )}
                 </>
               ) : (
-                specialStatus.unknown
+                fallbackValues.unknown
               )}
             </InfoValue>
           </InfoRow>
@@ -162,7 +152,7 @@ const MangaTooltipContent: React.FC<{
                 </InfoValue>
               ))
             ) : (
-              <InfoValue>{specialStatus.unknown}</InfoValue>
+              <InfoValue>{fallbackValues.unknown}</InfoValue>
             )}
           </InfoRow>
 

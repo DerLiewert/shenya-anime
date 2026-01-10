@@ -12,7 +12,7 @@ import { getSeasonName, toFirstUppercase } from '@/utils';
 import { fetchIntroAnime, fetchSeasonalAnime, fetchTopManga } from '@/store';
 import './Home.scss';
 
-const Home: React.FC = () => {
+const Home = () => {
   return (
     <>
       <MainIntro />
@@ -22,7 +22,7 @@ const Home: React.FC = () => {
           title: 'Top Anime',
           link: { url: appPaths.anime, text: 'View all' },
         }}
-        selector={(state) => state.introAnime}
+        selector={(state) => state.topAnime}
         renderCard={(item) => <AnimeCard item={item} />}
         fetchAction={fetchIntroAnime}
       />

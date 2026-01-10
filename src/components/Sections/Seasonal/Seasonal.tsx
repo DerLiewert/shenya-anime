@@ -1,32 +1,42 @@
 import React from 'react';
+import Select from 'react-select';
+import isEqual from 'lodash.isequal';
 import Skeleton from 'react-loading-skeleton';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
-import { AnimeCard, EmptyValueMessage, Pagination } from '@/components';
 import { fetchSeasonsList, fetchSeasonsAnime } from '@/store';
+import { animeEmptyValueMessages, commonMessages } from '@/constants';
 import { getSeasonName, getUniqueItems, parseSeasonAnimeParams, scrollToTop } from '@/utils';
 import { seasonOptions } from '@/resources';
-import Select from 'react-select';
-import isEqual from 'lodash.isequal';
+import { animeSeasons, JikanSeasonsPlusParams } from '@/typescript';
+import { AnimeCard, EmptyValueMessage, Pagination } from '@/components';
 import './Seasonal.scss';
-import { animeSeasons } from '@/typescript';
-import { animeEmptyValueMessages, commonMessages } from '@/constants';
 
-function Seasonal() {
+function getDefaultSeasonParams(): JikanSeasonsPlusParams {
+  const fullDate = new Date();
+  const currentMonth = fullDate.getMonth();
+  const currentYear = fullDate.getFullYear();
+
+  return {
+    year: currentMonth === 11 ? currentYear + 1 : currentYear,
+    season: getSeasonName(),
+  };
+}
+
+export const Seasonal = () => {
   const seasonalRef = React.useRef<HTMLDivElement>(null);
-
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
 
-  const { items: seasonsList, status: seasonsStatus } = useAppSelector(
-    (state) => state.seasonsList,
-  );
-  const { isSuccess: isSuccessSeasons } = useFetchStatus(seasonsStatus);
+  const seasonsList = useAppSelector((state) => state.seasonsList.items);
+  const seasonsFetchStatus = useFetchStatus((state) => state.seasonsList.status, true);
 
   const { items, pagination, status } = useAppSelector((state) => state.seasonsAnime);
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
+
+  const defaultParamsRef = React.useRef<JikanSeasonsPlusParams>(getDefaultSeasonParams());
 
   const yearOptions = React.useMemo(
     () => seasonsList.map((obj) => ({ value: obj.year, label: obj.year })),
@@ -38,6 +48,7 @@ function Seasonal() {
       parseSeasonAnimeParams({
         allAllowed: false,
         rules: {
+          season: { include: animeSeasons },
           year:
             seasonsList.length > 0
               ? {
@@ -47,54 +58,47 @@ function Seasonal() {
                   },
                 }
               : true,
-          season: { include: animeSeasons },
           page: pagination?.last_visible_page
             ? { include: { from: 1, to: pagination.last_visible_page } }
-            : false,
+            : { include: { from: 1 } },
         },
       }),
     [pagination?.last_visible_page, seasonsList],
   );
 
   const appNavigate = useAppNavigate(parseSearchParams);
-  const [searchParams, setSearchParams] = React.useState(getSearchParams());
-
-  function getSearchParams() {
-    const urlParams = parseSearchParams(location.search);
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    const defaultParams = {
-      year: currentMonth === 11 ? currentYear + 1 : currentYear, // если декабрь, то это уже сезон следующего года (декабрь 2025 - зима 2026)
-      season: getSeasonName(),
-      page: undefined,
-    };
-    return { ...defaultParams, ...urlParams };
-  }
+  const [searchParams, setSearchParams] = React.useState<JikanSeasonsPlusParams>({
+    ...defaultParamsRef.current,
+    ...parseSearchParams(location.search),
+  });
 
   React.useEffect(() => {
-    appNavigate(searchParams, { replace: true });
-    abortableDispatch(fetchSeasonsAnime, searchParams);
-
-    if (!isSuccessSeasons) dispatch(fetchSeasonsList());
+    if (!seasonsFetchStatus.isSuccess && !seasonsFetchStatus.isLoading)
+      dispatch(fetchSeasonsList());
   }, []);
 
   React.useEffect(() => {
-    appNavigate(getSearchParams(), { replace: true });
-  }, [appNavigate]);
+    const urlParams = parseSearchParams(location.search);
+    const mergedParams = {
+      ...defaultParamsRef.current,
+      ...urlParams,
+    };
+
+    appNavigate(mergedParams, { replace: true });
+
+    if (!isEqual(searchParams, mergedParams)) {
+      setSearchParams(mergedParams);
+    }
+  }, [appNavigate, parseSearchParams, location.search]);
 
   React.useEffect(() => {
-    const newParams = getSearchParams();
-    if (!isEqual(searchParams, newParams)) {
-      appNavigate(newParams, { replace: true });
-      setSearchParams(newParams);
-      abortableDispatch(fetchSeasonsAnime, newParams);
-    }
-  }, [abortableDispatch, location.search]);
+    abortableDispatch(fetchSeasonsAnime, { params: { ...searchParams, limit: 24 } });
+  }, [searchParams]);
 
   return (
     <div className="seasonal" ref={seasonalRef}>
       <div className="seasonal__filter">
-        {isSuccessSeasons ? (
+        {seasonsFetchStatus.isSuccess ? (
           <Select
             className="seasonal__select select"
             classNamePrefix="select"
@@ -110,7 +114,7 @@ function Seasonal() {
             unstyled
           />
         ) : (
-          <Skeleton className="select__control " containerClassName="select seasonal__select" />
+          <Skeleton className="select__control" containerClassName="select seasonal__select" />
         )}
 
         {seasonOptions && seasonOptions.length > 0 && (
@@ -162,6 +166,4 @@ function Seasonal() {
       )}
     </div>
   );
-}
-
-export default Seasonal;
+};

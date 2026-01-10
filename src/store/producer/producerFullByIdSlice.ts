@@ -1,15 +1,15 @@
 import { getProducerFullById } from '@/api';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { ProducerFull, FetchStatus } from '@/typescript';
+import { createSlice } from '@reduxjs/toolkit';
+import { ProducerFull } from '@/typescript';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import { createEntityDetailsState, entityDetailsBuilder, EntityDetailsStateBase } from '../_common';
 
-interface ProducerFullState {
-  item: ProducerFull | null;
-  status: FetchStatus | null;
-}
+
+/* Сразу на основе EntityDetailsState, на случай, если добавится доп. инфо, например pictures: [] */
+interface ProducerFullState extends EntityDetailsStateBase<ProducerFull> {}
 
 const initialState: ProducerFullState = {
-  item: null,
-  status: null,
+  ...createEntityDetailsState(),
 };
 
 const producerFullByIdSlice = createSlice({
@@ -17,23 +17,15 @@ const producerFullByIdSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchProducerFullById.pending, (state) => {
-      state.status = FetchStatus.LOADING;
-    });
-    builder.addCase(fetchProducerFullById.fulfilled, (state, action) => {
-      state.item = action.payload;
-      state.status = FetchStatus.SUCCESS;
-    });
-    builder.addCase(fetchProducerFullById.rejected, (state) => {
-      state.status = FetchStatus.ERROR;
-    });
+    const handleAsync = entityDetailsBuilder(builder, initialState);
+    handleAsync('item', fetchProducerFullById);
   },
 });
 
 export default producerFullByIdSlice.reducer;
 
 //========================================================================================================================================================
-export const fetchProducerFullById = createAsyncThunk<ProducerFull, number>(
+export const fetchProducerFullById = createAppAsyncThunk<ProducerFull, number>(
   'producer-full/fetchProducerFullById',
   async (id, { signal }) => (await getProducerFullById(id, signal)).data,
 );

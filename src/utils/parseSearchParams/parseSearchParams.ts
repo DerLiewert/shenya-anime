@@ -43,13 +43,25 @@ export const commonParamsValidators: ParamsValidators<JikanSearchParams> = {
 };
 
 //========================================================================================================================================================
-function isRange(value: unknown): value is { from: number; to: number } {
+
+type RequireAtLeastOne<T, Keys extends keyof T = keyof T> = Partial<T> &
+  {
+    [K in Keys]-?: Required<Pick<T, K>>;
+  }[Keys];
+
+type Range<T extends number = number> = RequireAtLeastOne<{ from?: T; to?: T }>;
+
+function isRange(value: unknown): value is Range {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
+  }
+
+  const v = value as Record<string, unknown>;
+
   return (
-    typeof value === 'object' &&
-    value !== null &&
-    !Array.isArray(value) &&
-    'from' in value &&
-    'to' in value
+    ('from' in v || 'to' in v) &&
+    (v.from === undefined || (typeof v.from === 'number' && Number.isFinite(v.from))) &&
+    (v.to === undefined || (typeof v.to === 'number' && Number.isFinite(v.to)))
   );
 }
 
@@ -65,9 +77,12 @@ export type ParamRule<T> =
   | false // запрещён
   | {
       include?: [NonNullable<T>] extends [number]
-        ? readonly T[] | { from: NonNullable<T>; to: NonNullable<T> }
+        ? readonly NonNullable<T>[] | Range<NonNullable<T>>
         : readonly T[]; // разрешённые значения
-      exclude?: readonly T[]; // запрещённые значения
+      exclude?: [NonNullable<T>] extends [number]
+        ? readonly NonNullable<T>[] | Range<NonNullable<T>>
+        : readonly T[]; // запрещённые значения
+      // exclude?: readonly T[]; // запрещённые значения
     };
 
 export interface AllowedParams<T extends object> {
@@ -106,14 +121,30 @@ export function parseSearchParams<T extends object, K extends keyof T = keyof T>
 
     // если параметр (rule) - обьект, значит есть запрещёные или разрешёные значения для него
     if (typeof rule === 'object') {
-      const checkAllowed = (val: any) => {
-        // if (rule.include && !rule.include.includes(val)) return false;
+      const checkAllowed = (val: T[K]) => {
         if (rule.include) {
           if (Array.isArray(rule.include) && !rule.include.includes(val)) return false;
-          if (isRange(rule.include) && (val < rule.include.from || val > rule.include.to))
+          if (
+            isRange(rule.include) &&
+            ((rule.include.from !== undefined && val < rule.include.from) ||
+              (rule.include.to !== undefined && val > rule.include.to))
+          )
             return false;
         }
-        if (rule.exclude && rule.exclude.includes(val)) return false;
+
+        if (rule.exclude) {
+          if (Array.isArray(rule.exclude) && rule.exclude.includes(val)) return false;
+          if (isRange(rule.exclude)) {
+            const { from, to } = rule.exclude;
+            const hasFrom = from !== undefined;
+            const hasTo = to !== undefined;
+
+            if (hasFrom && hasTo && val >= from && val <= to) return false;
+            if (hasFrom && !hasTo && val >= from) return false;
+            if (!hasFrom && hasTo && val <= to) return false;
+          }
+        }
+
         return true;
       };
 
@@ -123,7 +154,7 @@ export function parseSearchParams<T extends object, K extends keyof T = keyof T>
           .split(',')
           .map((x) => x.trim())
           .filter((x) => /^\d+$/.test(x))
-          .filter((x) => checkAllowed(x));
+          .filter((x) => checkAllowed(x as T[K]));
 
         if (filtered.length === 0) continue;
         result[key] = filtered.join(',') as T[K];

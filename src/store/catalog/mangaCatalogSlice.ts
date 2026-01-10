@@ -9,6 +9,7 @@ import {
 } from '@/typescript';
 
 import axios from 'axios';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
 
 interface InitialState {
   items: Manga[];
@@ -46,10 +47,10 @@ const mangaCatalogSlice = createSlice({
 export default mangaCatalogSlice.reducer;
 
 //========================================================================================================================================================
-export const fetchMangaByParams = createAsyncThunk<
+export const fetchMangaByParams = createAppAsyncThunk<
   JikanResponse<Manga[], JikanPaginationPlus>,
   MangaSearchParams
 >(
   'manga-catalog/fetchMangaByParams',
-  async (queryParams, { signal }) => await getMangaSearch({ limit: 24, ...queryParams}, signal),
+  async (queryParams, { signal }) => await getMangaSearch({ limit: 24, ...queryParams }, signal),
 );

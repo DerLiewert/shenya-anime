@@ -1,8 +1,7 @@
-import React from 'react';
 import { fetchMangaNews } from '@/store/manga/mangaFullByIdSlice';
 import { NewsTab } from '../CommonTabsContent';
 
-const MangaNewsTab: React.FC = () => {
+export const MangaNewsTab = () => {
   return (
     <NewsTab
       newsSelector={(state) => state.mangaFullById.news}
@@ -11,5 +10,3 @@ const MangaNewsTab: React.FC = () => {
     />
   );
 };
-
-export default MangaNewsTab;

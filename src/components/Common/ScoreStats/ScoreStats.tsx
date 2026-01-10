@@ -3,16 +3,12 @@ import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from 'recharts';
 import { fetchMangaScoreStats, fetchAnimeScoreStats } from '@/store';
-import { animeEmptyValueMessages, mangaEmptyValueMessages } from '@/constants';
+import { animeEmptyValueMessages, commonMessages, mangaEmptyValueMessages } from '@/constants';
 import { EmptyValueMessage, Loading } from '@/components';
 import { AnimeAndMangaType } from '@/typescript';
 import './ScoreStats.scss';
 
-interface ScoreStatsProps<T extends AnimeAndMangaType> {
-  type: T;
-}
-
-const ScoreStats = <T extends AnimeAndMangaType>({ type }: ScoreStatsProps<T>) => {
+export const ScoreStats = <T extends AnimeAndMangaType>({ type }: { type: T }) => {
   const isAnime = type === 'anime';
   const abortableDispatch = useAbortableDispatch();
   const { scoreStats, status } = useAppSelector((state) =>
@@ -26,7 +22,7 @@ const ScoreStats = <T extends AnimeAndMangaType>({ type }: ScoreStatsProps<T>) =
 
   if (isIdle) return null;
   if (isLoading) return <Loading />;
-  if (isError) return <EmptyValueMessage message="Something went wrong" />;
+  if (isError) return <EmptyValueMessage message={commonMessages.error} />;
   if (isSuccess && scoreStats.length === 0) {
     return (
       <EmptyValueMessage
@@ -79,5 +75,3 @@ const ScoreStats = <T extends AnimeAndMangaType>({ type }: ScoreStatsProps<T>) =
     </ResponsiveContainer>
   );
 };
-
-export default ScoreStats;

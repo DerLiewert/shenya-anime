@@ -1,12 +1,10 @@
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
-import { useYoutubeTrailerImage } from '@/hooks';
-import { ArrowIcon, StarIcon, BookmarkButton, SfwImage } from '@/components';
+import { ArrowIcon, StarIcon, BookmarkButton, SfwImage, TrailerImage } from '@/components';
 import { formattedScore, getImageUrl, getShortAnimeRating, isAnimeNsfw } from '@/utils';
 import { appPaths, animeRatingOptions } from '@/resources';
 import { Anime } from '@/typescript';
-import clsx from 'clsx';
 import './MainIntro.scss';
 
 interface MainIntroSlide {
@@ -15,18 +13,10 @@ interface MainIntroSlide {
 }
 
 export const MainIntroSlide: React.FC<MainIntroSlide> = ({ item, shouldRenderImage = true }) => {
-  const { src, onLoad, isFallback, isLoading } = useYoutubeTrailerImage(item.trailer);
-
   return (
     <div className="main-slide__container container">
-      {src && shouldRenderImage && (
-        <img
-          className={clsx('main-slide__bg', { _loading: isLoading, '_not-found': isFallback })}
-          src={src}
-          alt="Background image"
-          aria-hidden
-          onLoad={onLoad}
-        />
+      {shouldRenderImage && (
+        <TrailerImage trailer={item.trailer} className={'main-slide__bg'} isLoadingClass />
       )}
 
       <div className="main-slide__body">

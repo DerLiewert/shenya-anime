@@ -7,11 +7,11 @@ import {
   AnimePicturesTab,
   AnimeRecommendationsTab,
   AnimeDetailsTab,
-  AnimeEpisodesTab,
   AnimeStaffTab,
   AnimeVideosTab,
   EntityPageLayout,
   ReturnBack,
+  EpisodesTab,
 } from '@/components';
 import { appPaths, animeTypeOptions } from '@/resources';
 import { isAnimeNsfw, toFirstUppercase } from '@/utils';
@@ -22,9 +22,9 @@ const AnimePage = () => {
     <EntityPageLayout<AnimeFull>
       isNsfw={(item) => (item ? isAnimeNsfw(item) : false)}
       fetchAction={fetchFullAnimeById}
-      selector={(state) => state.animeFullById.item}
-      status={(state) => state.animeFullById.status.item}
-      getBasePath={(id) => appPaths.animeFull(id)}
+      itemSelector={(state) => state.animeFullById.item}
+      itemStatusSelector={(state) => state.animeFullById.status.item}
+      createBasePath={(id) => appPaths.animeFull(id)}
       render={(item) => ({
         title: item && item.title,
         subtitles: item
@@ -83,7 +83,7 @@ const AnimePage = () => {
           {
             value: 'episodes',
             label: 'Episodes',
-            element: <AnimeEpisodesTab />,
+            element: <EpisodesTab />,
           },
           {
             value: 'characters',

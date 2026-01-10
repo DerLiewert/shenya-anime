@@ -1,18 +1,16 @@
 import React from 'react';
+import clsx from 'clsx';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
 import { useForm, Controller } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
-
-import { fetchMangaGenres } from '@/store/genres/mangaGenresSlice';
-import { fetchMangaByParams } from '@/store/catalog/mangaCatalogSlice';
-
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
+import { fetchMangaGenres, fetchMangaByParams, minusOpenModal, plusOpenModal } from '@/store';
 import { getUniqueItems, onScoreChange, parseMangaParams, scrollToTop } from '@/utils';
 import { mangaOrderByOptions, mangaStatusOptions, mangaTypeOptions } from '@/resources';
 import { CommonIntro, EmptyValueMessage, FilterIcon, MangaCard, Pagination } from '@/components';
-
+import { breakpoints } from '@/constants';
 import {
   MangaSearchOrder,
   MangaSearchParams,
@@ -22,11 +20,7 @@ import {
   ExtractOptionValue,
   SelectOption,
 } from '@/typescript';
-
-import clsx from 'clsx';
 import './CatalogPage.scss';
-import { breakpoints } from '@/constants';
-import { minusOpenModal, plusOpenModal } from '@/store';
 
 const setSortForOrderBy = (param: MangaSearchOrder | undefined): SortOptions | undefined => {
   const sort: Partial<Record<MangaSearchOrder, SortOptions>> = {
@@ -39,7 +33,7 @@ const setSortForOrderBy = (param: MangaSearchOrder | undefined): SortOptions | u
 };
 
 //========================================================================================================================================================
-const MangaCatalogPage: React.FC = () => {
+const MangaCatalogPage = () => {
   const cardsRef = React.useRef<HTMLDivElement>(null);
 
   const dispatch = useAppDispatch();
@@ -69,7 +63,7 @@ const MangaCatalogPage: React.FC = () => {
             genres.length > 0 ? { include: genres.map((obj) => obj.mal_id.toString()) } : true,
           page: pagination?.last_visible_page
             ? { include: { from: 1, to: pagination.last_visible_page } }
-            : true,
+            : { include: { from: 1 } },
         },
       }),
     [genres, pagination?.last_visible_page],
@@ -87,6 +81,25 @@ const MangaCatalogPage: React.FC = () => {
     };
   }, [location.search]);
 
+  React.useEffect(() => {
+    appNavigate(searchParams, { replace: true });
+  }, [appNavigate]);
+
+  // Получение даных об аниме за указанными параметрами
+  React.useEffect(() => {
+    if (isGenresLoading) return;
+    abortableDispatch(fetchMangaByParams, searchParams);
+  }, [searchParams, genresStatus]);
+
+  // Скрываем фильтры поиска если ширина окна isTablet (чтоб не были сразу открытыми, если ширина обратно станет !isTablet)
+  React.useEffect(() => {
+    if (!isTablet && isShowFilters) closeFilters();
+  }, [isTablet]);
+
+  React.useEffect(() => {
+    scrollToTop(cardsRef);
+  }, [location.search]);
+
   const openFilters = () => {
     dispatch(plusOpenModal());
     setIsShowFilters(true);
@@ -96,21 +109,6 @@ const MangaCatalogPage: React.FC = () => {
     dispatch(minusOpenModal());
     setIsShowFilters(false);
   };
-
-  // Скрываем фильтры поиска если ширина окна isTablet (чтоб не были сразу открытыми, если ширина обратно станет !isTablet)
-  React.useEffect(() => {
-    if (!isTablet && isShowFilters) closeFilters();
-  }, [isTablet]);
-
-  // Получение даных об аниме за указанными параметрами
-  React.useEffect(() => {
-    if (isGenresLoading) return;
-    abortableDispatch(fetchMangaByParams, searchParams);
-  }, [searchParams, genresStatus]);
-
-  React.useEffect(() => {
-    appNavigate(searchParams, { replace: true });
-  }, [appNavigate]);
 
   return (
     <div className="catalog">
@@ -250,7 +248,7 @@ type FormValues = SelectValues & {
 interface CatalogSidebar {
   isModal?: boolean;
   isOpen?: boolean;
-  selectedValues: MangaSearchParams; // Pick<AnimeSearchParams, 'type' | 'status' | 'rating' | 'min_score' | 'max_score' | 'genres'>;
+  selectedValues: MangaSearchParams;
   className?: string;
   onSubmit?: (data: FormValues) => void;
   onReset?: () => void;
@@ -266,12 +264,11 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
   onReset,
   onClose,
 }) => {
-  const dispatch = useAppDispatch();
-  const { items: genres, status: genresStatus } = useAppSelector((state) => state.mangaGenres);
-  const { isLoading: isGenresLoading, isSuccess: isGenresSuccess } = useFetchStatus(genresStatus);
-
   const filterRef = React.useRef<HTMLFormElement>(null);
   const sidebarRef = React.useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const genres = useAppSelector((state) => state.mangaGenres.items);
+  const fetchGenresStatus = useFetchStatus((state) => state.mangaGenres.status);
 
   const mangaGenresOptions = React.useMemo(() => {
     return genres.length > 0
@@ -303,6 +300,10 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
 
   // Закрытие модального окна
   React.useEffect(() => {
+    // Получить жанры аниме, если их нет
+    if (genres.length === 0) dispatch(fetchMangaGenres());
+
+    // Закрытие модального окна
     if (!onClose) return;
 
     const closeModal = (e: MouseEvent) => {
@@ -314,12 +315,6 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
     return () => {
       document.removeEventListener('click', closeModal);
     };
-  }, []);
-
-  React.useEffect(() => {
-    // Получить жанры аниме, если их нет
-    if (isGenresSuccess && genresStatus.length > 0) return;
-    dispatch(fetchMangaGenres());
   }, []);
 
   // Получение даных об аниме по выбраным параметрам
@@ -394,7 +389,7 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
           </div>
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">Genre</div>
-            {isGenresLoading ? (
+            {fetchGenresStatus.isLoading ? (
               <Skeleton className="select__control " containerClassName="select" />
             ) : (
               renderSelect('genres', mangaGenresOptions, 'Genres for one manga ...', true)

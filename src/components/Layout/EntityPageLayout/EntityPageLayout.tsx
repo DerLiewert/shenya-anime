@@ -2,28 +2,27 @@ import React from 'react';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import { Route, Routes, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useAppSelector } from '@/app/hooks';
+import { AppAsyncThunk } from '@/app/appAsyncThunk';
 import {
   useAbortableDispatch,
   useFetchStatus,
   useMatchMedia,
   usePathSegments,
-  useYoutubeTrailerImage,
+  useScrollTarget,
 } from '@/hooks';
+import { breakpoints, LG_LICENSE_KEY } from '@/constants';
+import { getImageUrl, generateRoutes, isValidPath } from '@/utils';
 import { NotFound } from '@/pages';
 import {
   BookmarkButton,
   Breadcrumbs,
-  PlayCircleIcon,
   SfwImage,
   TabList,
   TrailerButton,
+  TrailerImage,
 } from '@/components';
-import { getImageUrl, generateRoutes } from '@/utils';
-import { breakpoints } from '@/constants';
 
-import type { AsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '@/app/store';
-import type { FetchStatus, StatusSelector, TabRoute } from '@/typescript';
 import type {
   AnimeFull,
   AnimeYoutubeVideo,
@@ -31,165 +30,122 @@ import type {
   MangaFull,
   PersonFull,
   ProducerFull,
+  FetchStatus,
+  StatusSelector,
+  TabRoute,
 } from '@/typescript';
 
 import LightGallery from 'lightgallery/react';
-import lgVideo from 'lightgallery/plugins/video';
 import lgZoom from 'lightgallery/plugins/zoom';
 import 'lightgallery/scss/lg-zoom.scss';
 import 'lightgallery/scss/lg-video.scss';
 
 import clsx from 'clsx';
 import './EntityPageLayout.scss';
-import { useDispatch } from 'react-redux';
-import { setScrollToTop } from '@/store';
-
-//========================================================================================================================================================
-
-const isValidPath = (pathParts: string[], tabs: TabRoute[]): boolean => {
-  if (pathParts.length === 0) return true;
-
-  const [current, ...rest] = pathParts;
-
-  const tab = tabs.find((t) => t.value === current);
-
-  if (!tab) return false;
-  if (rest.length === 0) return true;
-  if (!tab.children) return false;
-
-  return isValidPath(rest, tab.children);
-};
-
-//========================================================================================================================================================
 
 type ItemTypes = AnimeFull | MangaFull | PersonFull | CharacterFull | ProducerFull;
 type NullableItemTypes<T> = T | null;
 
-interface EntityRenderResult {
+type BookmarkByEntity<T> =
+  T extends AnimeFull ? 'anime' :
+  T extends MangaFull ? 'manga' :
+  never;
+
+interface EntityRenderResult<T> {
   title: string | null;
   subtitles?: string[];
   resources?: React.ReactElement | null;
   trailer?: AnimeYoutubeVideo | null;
-  bookmark?: 'anime' | 'manga';
+  bookmark?: BookmarkByEntity<T>;
   breadcrumbs?: { label: string | number; url: string }[];
   tabs: TabRoute[];
 }
 
 interface EntityPageLayoutProps<T extends ItemTypes> {
   // Redux-related
-  fetchAction: AsyncThunk<T, any, any>;
-  selector: (state: RootState) => NullableItemTypes<T>;
-  status: StatusSelector | FetchStatus | undefined | null;
+  fetchAction: AppAsyncThunk<T, any>;
+  itemSelector: (state: RootState) => NullableItemTypes<T>;
+  itemStatusSelector: StatusSelector | FetchStatus | undefined | null;
 
   // Base
-  getBasePath: (id: number) => string;
+  createBasePath: (id: number) => string;
   introBg?: string;
   isNsfw?: (item: NullableItemTypes<T>) => boolean;
 
   // Render logic
-  render: (item: NullableItemTypes<T>) => EntityRenderResult;
+  render: (item: NullableItemTypes<T>) => EntityRenderResult<T>;
 }
 
 const EntityPageLayout = <T extends ItemTypes>({
   isNsfw = () => false,
   introBg,
-  getBasePath,
+  createBasePath,
   fetchAction,
-  selector,
-  status,
+  itemSelector,
+  itemStatusSelector,
   render,
 }: EntityPageLayoutProps<T>) => {
+  const tabsRef = React.useRef<HTMLDivElement>(null);
+  const isTablet = useMatchMedia('max', breakpoints.tablet);
+  const isMobile = useMatchMedia('max', breakpoints.mobile);
+
   const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
   const navigate = useNavigate();
   const id = Number(useParams().id);
-  const basePath = getBasePath(id);
+  const basePath = createBasePath(id);
   const tabSegments = usePathSegments(basePath);
 
-  const item = useAppSelector(selector);
-  const renderItem = React.useMemo(() => render(item), [item]);
-  const { src, onLoad, isFallback } = useYoutubeTrailerImage(renderItem.trailer);
-  const { isLoading, isSuccess, isError } = useFetchStatus(status);
-
-  const isTablet = useMatchMedia('max', breakpoints.tablet);
-  const isMobile = useMatchMedia('max', breakpoints.mobile);
+  const item = useAppSelector(itemSelector);
+  const renderItem = React.useMemo(() => render(item), [item, render]);
+  const { isLoading, isSuccess, isError } = useFetchStatus(itemStatusSelector);
 
   const [activeTab, setActiveTab] = React.useState(tabSegments[0]);
   const [isPosterLoading, setIsPosterLoading] = React.useState(true);
-  const tabsRef = React.useRef<HTMLDivElement>(null);
 
-  const dispatch = useDispatch();
-  React.useEffect(() => {
-    dispatch(setScrollToTop(false));
-    return () => {
-      dispatch(setScrollToTop(true));
-    };
-  }, []);
+  useScrollTarget(tabsRef);
 
   React.useEffect(() => {
     abortableDispatch(fetchAction, id);
-  }, [id]);
+  }, [id, fetchAction]);
 
   React.useEffect(() => {
-    if (activeTab === tabSegments[0]) return;
-    setActiveTab(tabSegments[0]);
-    // scrollToTop(tabsRef, true);
-  }, [location, renderItem.tabs]);
+    if (activeTab !== tabSegments[0]) setActiveTab(tabSegments[0]);
+  }, [location.pathname, renderItem.tabs]);
 
   React.useEffect(() => {
-    // scrollToTop(tabsRef);
-  }, [location.pathname]);
-
-  React.useEffect(() => {
-    // window.scrollTo({ top: 0 });
-  }, [id]);
-
-  React.useEffect(() => {
-    setIsPosterLoading(true);
+    if (!isPosterLoading) setIsPosterLoading(true);
   }, [item]);
 
   // Рендер постера аниме
   const renderPoster = () =>
     item ? (
-      // <LightGallery
-      //   addClass="pictures-tab-gallery"
-      //   elementClassNames="full-page-leftside__poster"
-      //   licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
-      //   plugins={[lgZoom]}
-      //   speed={300}
-      //   thumbHeight={'60px'}
-      //   thumbWidth={80}
-      //   mobileSettings={{
-      //     showCloseIcon: true,
-      //     download: true,
-      //     controls: false,
-      //   }}>
-      //   <a href={getImageUrl(item.images)}>
-      //     {/* <SfwImage
-      //       classWrapper="full-page-leftside__poster border-radius"
-      //       nsfw={isNsfw(item)}
-      //       src={getImageUrl(item.images)}
-      //       alt="Poster"
-      //     /> */}
-      //     <SfwImage
-      //       classWrapper="border-radius"
-      //       nsfw={isNsfw(item)}
-      //       src={getImageUrl(item.images)}
-      //       alt="Poster"
-      //     />
-      //   </a>
-      // </LightGallery>
-      <SfwImage
-        classWrapper={clsx('full-page-leftside__poster border-radius', {
+      <LightGallery
+        addClass="pictures-tab-gallery"
+        elementClassNames={clsx('full-page-leftside__poster border-radius', {
           'full-page-leftside__poster--loading': isPosterLoading,
         })}
-        nsfw={isNsfw(item)}
-        src={getImageUrl(item.images)}
-        alt="Poster"
-        onLoad={() => {
-          setIsPosterLoading(false);
-        }}
-      />
+        licenseKey={LG_LICENSE_KEY}
+        plugins={[lgZoom]}
+        speed={300}
+        thumbHeight={'60px'}
+        thumbWidth={80}
+        mobileSettings={{
+          showCloseIcon: true,
+          download: true,
+          controls: false,
+        }}>
+        <a href={getImageUrl(item.images)}>
+          <SfwImage
+            nsfw={isNsfw(item)}
+            src={getImageUrl(item.images)}
+            alt="Poster"
+            onLoad={() => {
+              setIsPosterLoading(false);
+            }}
+          />
+        </a>
+      </LightGallery>
     ) : (
       <Skeleton
         className="img _skeleton"
@@ -215,15 +171,7 @@ const EntityPageLayout = <T extends ItemTypes>({
         ) : !renderItem.trailer ? (
           <img src={introBg} alt="Background image" aria-hidden />
         ) : (
-          src && (
-            <img
-              className={clsx({ '_not-found': isFallback })}
-              src={src}
-              onLoad={onLoad}
-              alt="Background image"
-              aria-hidden
-            />
-          )
+          <TrailerImage trailer={renderItem.trailer} />
         )}
 
         <div className="full-page-intro__container container">
@@ -260,14 +208,6 @@ const EntityPageLayout = <T extends ItemTypes>({
                 {!isMobile && renderPoster()}
                 {(renderItem.trailer || renderItem.bookmark) && (
                   <div className="full-page-leftside__buttons">
-                    {/* {renderItem.trailer &&
-                      renderItem.trailer.embed_url &&
-                      (item ? (
-                        <TrailerButton trailer={renderItem.trailer} />
-                      ) : (
-                        <Skeleton height="40px" className="border-radius" />
-                      ))} */}
-
                     {(renderItem.trailer || renderItem.trailer === null) &&
                       (!item ? (
                         <Skeleton height="40px" className="border-radius" />

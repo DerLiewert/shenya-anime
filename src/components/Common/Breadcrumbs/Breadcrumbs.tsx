@@ -1,33 +1,26 @@
-import React from 'react';
+import clsx from 'clsx';
 import { Link } from 'react-router-dom';
-
 import { FreeMode, Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css/free-mode';
-
-import clsx from 'clsx';
 import './Breadcrumbs.scss';
 
 interface BreadcrumbsProps {
-  className?: string;
   items: Array<{
     label: string | number;
     url: string;
   }>;
   isCurrentLast?: boolean;
+  className?: string;
 }
 
-export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
-  className,
-  items,
-  isCurrentLast = true,
-}) => {
+export const Breadcrumbs = ({ className, items, isCurrentLast = true }: BreadcrumbsProps) => {
   if (items.length === 0) return null;
   return (
     <Swiper
-      wrapperTag="ul"
-      wrapperClass="breadcrumbs__wrapper"
       className={clsx(className, 'breadcrumbs')}
+      wrapperClass="breadcrumbs__wrapper"
+      wrapperTag="ul"
       modules={[FreeMode, Scrollbar]}
       slidesPerView="auto"
       freeMode={true}

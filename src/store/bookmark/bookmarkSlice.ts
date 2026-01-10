@@ -18,7 +18,7 @@ const bookmarkSlice = createSlice({
   name: 'bookmark',
   initialState,
   reducers: {
-    addBookmarkedItem(
+    toggleBookmarkedItem(
       state,
       action: PayloadAction<{ type: keyof BookmarkState; item: Anime | Manga }>,
     ) {
@@ -31,5 +31,5 @@ const bookmarkSlice = createSlice({
   },
 });
 
-export const { addBookmarkedItem } = bookmarkSlice.actions;
+export const { toggleBookmarkedItem } = bookmarkSlice.actions;
 export default bookmarkSlice.reducer;

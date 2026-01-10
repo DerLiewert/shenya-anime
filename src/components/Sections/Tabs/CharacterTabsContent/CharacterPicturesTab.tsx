@@ -1,9 +1,8 @@
-import React from 'react';
 import { PicturesTab } from '@/components';
 import { characterEmptyValueMessages } from '@/constants';
 import { fetchCharacterPictures } from '@/store';
 
-const CharacterPicturesTab: React.FC = () => {
+export const CharacterPicturesTab = () => {
   return (
     <PicturesTab
       selector={(state) => state.characterFullById.pictures}
@@ -13,5 +12,3 @@ const CharacterPicturesTab: React.FC = () => {
     />
   );
 };
-
-export default CharacterPicturesTab;

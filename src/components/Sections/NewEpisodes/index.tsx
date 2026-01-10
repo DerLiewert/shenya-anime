@@ -1,1 +1,1 @@
-export { default as NewEpisodes } from './NewEpisodes';
+export * from './NewEpisodes';

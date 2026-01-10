@@ -1,5 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   getAnimeCharacters,
   getAnimeEpisodes,
@@ -22,26 +21,29 @@ import {
   Recommendation,
   StatisticsScore,
 } from '@/typescript';
-import { DataWithExtendedBasicPagination, FetchStatus } from '@/typescript';
-import { createAnimeThunkWithId, bilderHandleAsync, toDataWithExtendedBasicPagination } from '@/utils';
+import { DataWithPagePagination } from '@/typescript';
+import { createAnimeThunkWithId, toDataWithPagePagination } from '@/utils';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import {
+  createEntityDetailsState,
+  entityDetailsBuilder,
+  EntityDetailsStateBase,
+} from '../_common/entityDetails.helper';
+import { FetchListArgs } from '../_common';
 
-type DataKeys = Exclude<keyof AnimeFullState, 'status'>;
-
-export interface AnimeFullState {
-  item: AnimeFull | null;
+export interface AnimeFullState extends EntityDetailsStateBase<AnimeFull> {
   scoreStats: StatisticsScore[];
-  episodes: DataWithExtendedBasicPagination<AnimeEpisode>;
+  episodes: DataWithPagePagination<AnimeEpisode>;
   characters: AnimeCharacter[];
   pictures: JikanImages[];
   videos: AnimeVideos | null;
-  news: DataWithExtendedBasicPagination<JikanNews>;
+  news: DataWithPagePagination<JikanNews>;
   staff: AnimeStaff[];
   recommendations: Recommendation[];
-  status: Partial<Record<DataKeys, FetchStatus>>;
 }
 
 const initialState: AnimeFullState = {
-  item: null,
+  ...createEntityDetailsState(),
   scoreStats: [],
   episodes: {
     data: [],
@@ -56,7 +58,6 @@ const initialState: AnimeFullState = {
   },
   recommendations: [],
   staff: [],
-  status: {},
 };
 
 export const animeFullByIdSlice = createSlice({
@@ -71,7 +72,7 @@ export const animeFullByIdSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    const handleAsync = bilderHandleAsync(builder, initialState);
+    const handleAsync = entityDetailsBuilder(builder, initialState);
 
     handleAsync('item', fetchFullAnimeById);
     handleAsync('scoreStats', fetchAnimeScoreStats);
@@ -81,21 +82,13 @@ export const animeFullByIdSlice = createSlice({
     handleAsync('recommendations', fetchAnimeRecommendations);
     handleAsync('staff', fetchAnimeStaff);
     handleAsync('episodes', fetchAnimeEpisodes, (state, action) => {
-      const page = action.meta.arg.page ? action.meta.arg.page : 1;
-      const isShowMore = page && page > 1;
-
       const { data, pagination } = action.payload;
-
-      state.episodes.data = isShowMore ? [...state.episodes.data, ...data] : data;
+      state.episodes.data = action.meta.arg.append ? [...state.episodes.data, ...data] : data;
       state.episodes.pagination = pagination;
     });
     handleAsync('news', fetchAnimeNews, (state, action) => {
-      const page = action.meta.arg.page ? action.meta.arg.page : 1;
-      const isShowMore = page && page > 1;
-
       const { data, pagination } = action.payload;
-
-      state.news.data = isShowMore ? [...state.news.data, ...data] : data;
+      state.news.data = action.meta.arg.append ? [...state.news.data, ...data] : data;
       state.news.pagination = pagination;
     });
   },
@@ -106,7 +99,7 @@ export default animeFullByIdSlice.reducer;
 
 //========================================================================================================================================================
 
-export const fetchFullAnimeById = createAsyncThunk<AnimeFull, number>(
+export const fetchFullAnimeById = createAppAsyncThunk<AnimeFull, number>(
   'anime-full/fetchFullAnimeById',
   async (id, { signal }) => (await getAnimeFullById(id, signal)).data,
 );
@@ -143,17 +136,17 @@ export const fetchAnimeStaff = createAnimeThunkWithId<AnimeStaff[]>(
 
 //========================================================================================================================================================
 export const fetchAnimeEpisodes = createAnimeThunkWithId<
-  DataWithExtendedBasicPagination<AnimeEpisode>,
-  { page?: number }
->('anime-full/fetchAnimeEpisodes', async (id, { page = 1 }, signal) => {
+  DataWithPagePagination<AnimeEpisode>,
+  FetchListArgs<{ page?: number }>
+>('anime-full/fetchAnimeEpisodes', async (id, { params: { page = 1 } }, signal) => {
   const res = await getAnimeEpisodes(id, page, signal);
-  return toDataWithExtendedBasicPagination(res, page);
+  return toDataWithPagePagination(res, page);
 });
 
 export const fetchAnimeNews = createAnimeThunkWithId<
-  DataWithExtendedBasicPagination<JikanNews>,
-  { page?: number }
->('anime-full/fetchAnimeNews', async (id, { page = 1 }, signal) => {
+  DataWithPagePagination<JikanNews>,
+  FetchListArgs<{ page?: number }>
+>('anime-full/fetchAnimeNews', async (id, { params: { page = 1 } }, signal) => {
   const res = await getAnimeNews(id, page, signal);
-  return toDataWithExtendedBasicPagination(res, page);
+  return toDataWithPagePagination(res, page);
 });

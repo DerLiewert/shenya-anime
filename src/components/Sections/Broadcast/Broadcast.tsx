@@ -5,22 +5,29 @@ import isEqual from 'lodash.isequal';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/app/hooks';
 import { fetchSchedulesAnime } from '@/store';
+import { schedulesFilter, SchedulesParams } from '@/typescript';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus } from '@/hooks';
 import { animeEmptyValueMessages, commonMessages } from '@/constants';
 import { scrollToTop, getUniqueItems, parseBroadcastAnimeParams } from '@/utils';
 import { weekDaysOptions } from '@/resources';
 import { BroadcastItem, EmptyValueMessage, Pagination } from '@/components';
-import { schedulesFilter } from '@/typescript';
-
 import './Broadcast.scss';
 
-const Broadcast = () => {
-  const broadcastRef = React.useRef<HTMLDivElement>(null);
+function getDefaultBroadcastParams() {
+  const day = weekDaysOptions.find((obj) => obj.value === schedulesFilter[new Date().getDay()]);
+  return {
+    filter: day ? day.value : weekDaysOptions[0].value,
+  };
+}
 
+export const Broadcast = () => {
+  const broadcastRef = React.useRef<HTMLDivElement>(null);
   const abortableDispatch = useAbortableDispatch();
   const location = useLocation();
   const { items, status, pagination } = useAppSelector((state) => state.schedulesAnime);
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
+
+  const defaultParamsRef = React.useRef<SchedulesParams>(getDefaultBroadcastParams());
 
   const parseSearchParams = React.useMemo(
     () =>
@@ -30,33 +37,36 @@ const Broadcast = () => {
           filter: true,
           page: pagination?.last_visible_page
             ? { include: { from: 1, to: pagination.last_visible_page } }
-            : true,
+            : { include: { from: 1 } },
         },
       }),
     [pagination?.last_visible_page],
   );
 
   const appNavigate = useAppNavigate(parseSearchParams);
-  const [searchParams, setSearchParams] = React.useState(getSearchParams());
-
-  function getSearchParams() {
-    const urlParams = parseSearchParams(location.search);
-    const day = weekDaysOptions.find((obj) => obj.value === schedulesFilter[new Date().getDay()]);
-    return { filter: day ? day.value : weekDaysOptions[0].value, ...urlParams };
-  }
+  const [searchParams, setSearchParams] = React.useState<SchedulesParams>({
+    ...defaultParamsRef.current,
+    ...parseSearchParams(location.search),
+  });
 
   React.useEffect(() => {
-    appNavigate(searchParams, { replace: true });
-    abortableDispatch(fetchSchedulesAnime, searchParams as any);
-  }, []);
+    const mergedParams = {
+      ...defaultParamsRef.current,
+      ...parseSearchParams(location.search),
+    };
 
-  React.useEffect(() => {
-    const newParams = getSearchParams();
-    if (!isEqual(searchParams, newParams)) {
-      setSearchParams(newParams);
-      abortableDispatch(fetchSchedulesAnime, newParams as any);
+    appNavigate(mergedParams, { replace: true });
+
+    if (!isEqual(searchParams, mergedParams)) {
+      setSearchParams(mergedParams);
     }
-  }, [location.search]);
+  }, [location.search, parseSearchParams, appNavigate]);
+
+  React.useEffect(() => {
+    abortableDispatch(fetchSchedulesAnime, {
+      params: { ...searchParams, limit: 18 },
+    });
+  }, [searchParams]);
 
   return (
     <div className="broadcast" ref={broadcastRef}>
@@ -96,7 +106,7 @@ const Broadcast = () => {
           currentPage={pagination.current_page}
           totalItems={pagination.items.total}
           itemsPerPage={pagination.items.per_page}
-          className="catalog-cards__pagination"
+          className="broadcast__pagination"
           onChangePage={(page) => {
             appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
             scrollToTop(broadcastRef);
@@ -106,5 +116,3 @@ const Broadcast = () => {
     </div>
   );
 };
-
-export default Broadcast;

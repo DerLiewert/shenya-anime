@@ -1,1 +1,1 @@
-export { default as ScoreStats } from './ScoreStats';
+export * from './ScoreStats';

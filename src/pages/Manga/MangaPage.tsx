@@ -5,9 +5,10 @@ import {
   MangaCharacterTab,
   MangaNewsTab,
   MangaPicturesTab,
-  MangaDetailsTab,
   MangaRecommendationsTab,
+  MangaDetailsTab,
 } from '@/components';
+// import { MangaDetailsTab } from '@/components/Sections/Tabs/MangaTabsContent/DetailsTab/MangaDetailsTab';
 import { fetchFullMangaById } from '@/store';
 import { appPaths, mangaTypeOptions } from '@/resources';
 import { isMangaNsfw } from '@/utils';
@@ -19,9 +20,9 @@ const MangaPage = () => {
     <EntityPageLayout<MangaFull>
       isNsfw={(item) => (item ? isMangaNsfw(item) : false)}
       fetchAction={fetchFullMangaById}
-      selector={(state) => state.mangaFullById.item}
-      status={(state) => state.mangaFullById.status.item}
-      getBasePath={(id) => appPaths.mangaFull(id)}
+      itemSelector={(state) => state.mangaFullById.item}
+      itemStatusSelector={(state) => state.mangaFullById.status.item}
+      createBasePath={(id) => appPaths.mangaFull(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.title,

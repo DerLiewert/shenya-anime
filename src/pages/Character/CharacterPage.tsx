@@ -17,9 +17,9 @@ const CharacterPage = () => {
   return (
     <EntityPageLayout<CharacterFull>
       fetchAction={fetchCharacterFullById}
-      selector={(state) => state.characterFullById.item}
-      status={(state) => state.characterFullById.status.item}
-      getBasePath={(id) => appPaths.characterFull(id)}
+      itemSelector={(state) => state.characterFullById.item}
+      itemStatusSelector={(state) => state.characterFullById.status.item}
+      createBasePath={(id) => appPaths.characterFull(id)}
       introBg={BG}
       render={(item) => {
         const anime = item && item.anime[0] && item.anime[0].anime;

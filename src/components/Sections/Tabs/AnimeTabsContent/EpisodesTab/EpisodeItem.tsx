@@ -1,7 +1,8 @@
 import { StarIcon } from '@/components/Icons';
-import { specialStatus } from '@/constants';
+import { fallbackValues } from '@/constants';
 import { AnimeEpisode } from '@/typescript';
 import { formattedScore } from '@/utils';
+import './EpisodesTab.scss';
 
 export const EpisodeItem: React.FC<{ episode: AnimeEpisode }> = ({ episode }) => {
   return (
@@ -27,7 +28,7 @@ export const EpisodeItem: React.FC<{ episode: AnimeEpisode }> = ({ episode }) =>
       </div>
       <div className="episode-item__bottom">
         <div className="episode-item__date">
-          {episode.aired ? episode.aired.split('T')[0] : specialStatus.unknown}
+          {episode.aired ? episode.aired.split('T')[0] : fallbackValues.unknown}
         </div>
         <div className="episode-item__score">
           <StarIcon />

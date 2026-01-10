@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 import {
   CommonCharacter,
   JikanImages,
@@ -7,7 +7,7 @@ import {
   Recommendation,
   StatisticsScore,
 } from '@/typescript';
-import { DataWithExtendedBasicPagination, FetchStatus } from '@/typescript';
+import { DataWithPagePagination } from '@/typescript';
 import {
   getMangaCharacters,
   getMangaFullById,
@@ -16,22 +16,25 @@ import {
   getMangaRecommendations,
   getMangaStatistics,
 } from '@/api/client/manga.client';
-import { bilderHandleAsync, createMangaThunkWithId, toDataWithExtendedBasicPagination } from '@/utils';
+import { createMangaThunkWithId, toDataWithPagePagination } from '@/utils';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import {
+  createEntityDetailsState,
+  entityDetailsBuilder,
+  EntityDetailsStateBase,
+  FetchListArgs,
+} from '../_common';
 
-type DataKeys = Exclude<keyof MangaFullState, 'status'>;
-
-export interface MangaFullState {
-  item: MangaFull | null;
+export interface MangaFullState extends EntityDetailsStateBase<MangaFull> {
   scoreStats: StatisticsScore[];
   characters: CommonCharacter[];
   pictures: JikanImages[];
-  news: DataWithExtendedBasicPagination<JikanNews>;
+  news: DataWithPagePagination<JikanNews>;
   recommendations: Recommendation[];
-  status: Partial<Record<DataKeys, FetchStatus>>;
 }
 
 const initialState: MangaFullState = {
-  item: null,
+  ...createEntityDetailsState(),
   scoreStats: [],
   characters: [],
   pictures: [],
@@ -40,7 +43,6 @@ const initialState: MangaFullState = {
     pagination: null,
   },
   recommendations: [],
-  status: {},
 };
 
 export const mangaFullByIdSlice = createSlice({
@@ -50,7 +52,7 @@ export const mangaFullByIdSlice = createSlice({
     resetMangaFull: () => initialState,
   },
   extraReducers: (builder) => {
-    const handleAsync = bilderHandleAsync(builder, initialState);
+    const handleAsync = entityDetailsBuilder(builder, initialState);
 
     handleAsync('item', fetchFullMangaById);
     handleAsync('scoreStats', fetchMangaScoreStats);
@@ -58,11 +60,8 @@ export const mangaFullByIdSlice = createSlice({
     handleAsync('pictures', fetchMangaPictures);
     handleAsync('recommendations', fetchMangaRecommendations);
     handleAsync('news', fetchMangaNews, (state, action) => {
-      const page = action.meta.arg.page ? action.meta.arg.page : 1;
-      const isShowMore = page && page > 1;
-
       const { data, pagination } = action.payload;
-      state.news.data = isShowMore ? [...state.news.data, ...data] : data;
+      state.news.data = action.meta.arg.append ? [...state.news.data, ...data] : data;
       state.news.pagination = pagination;
     });
   },
@@ -73,7 +72,7 @@ export default mangaFullByIdSlice.reducer;
 
 //========================================================================================================================================================
 
-export const fetchFullMangaById = createAsyncThunk<MangaFull, number>(
+export const fetchFullMangaById = createAppAsyncThunk<MangaFull, number>(
   'anime-full/fetchFullById',
   async (id, { signal }) => (await getMangaFullById(id, signal)).data,
 );
@@ -100,9 +99,9 @@ export const fetchMangaRecommendations = createMangaThunkWithId<Recommendation[]
 
 //========================================================================================================================================================
 export const fetchMangaNews = createMangaThunkWithId<
-  DataWithExtendedBasicPagination<JikanNews>,
-  { page?: number }
->('manga-full/fetchNews', async (id, { page = 1 }, signal) => {
+  DataWithPagePagination<JikanNews>,
+  FetchListArgs<{ page?: number }>
+>('manga-full/fetchNews', async (id, { params: { page = 1 } }, signal) => {
   const res = await getMangaNews(id, page, signal);
-  return toDataWithExtendedBasicPagination(res, page);
+  return toDataWithPagePagination(res, page);
 });

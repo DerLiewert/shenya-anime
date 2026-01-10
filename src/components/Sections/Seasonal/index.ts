@@ -1,1 +1,1 @@
-export {default as Seasonal} from './Seasonal'
+export * from './Seasonal';

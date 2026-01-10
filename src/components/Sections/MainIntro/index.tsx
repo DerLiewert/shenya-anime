@@ -1,2 +1,2 @@
-export { default as MainIntro } from './MainIntro';
+export * from './MainIntro';
 export * from './MainIntroSlide';

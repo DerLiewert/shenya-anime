@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { AsyncThunk, AsyncThunkAction } from '@reduxjs/toolkit';
 import { useAppDispatch } from '@/app/hooks';
-import { AsyncThunkConfig } from '@/typescript';
+import { AppAsyncThunk } from '@/app/appAsyncThunk';
 
-export type AbortableDispatchFn = <Returned, Arg, ThunkApiConfig extends {} = AsyncThunkConfig>(
-  thunk: AsyncThunk<Returned, Arg, ThunkApiConfig>,
-  arg?: Parameters<AsyncThunk<Returned, Arg, ThunkApiConfig>>[0],
+export type AbortableDispatchFn = <Returned, Arg>(
+  thunk: AppAsyncThunk<Returned, Arg>,
+  arg?: Parameters<AppAsyncThunk<Returned, Arg>>[0],
   key?: string,
-) => AsyncThunkAction<Returned, Arg, ThunkApiConfig>;
+) => Promise<Returned>;
+// ) => AsyncThunkAction<Returned, Arg, AsyncThunkConfig>;
 
 export type AbortableDispatch = AbortableDispatchFn & {
   abort: (keyOrThunk?: string | Function) => void;
@@ -16,6 +16,20 @@ export type AbortableDispatch = AbortableDispatchFn & {
 //========================================================================================================================================================
 let uniqueId = 0;
 const thunkKeyMap = new WeakMap<Function, string>();
+
+type Handler = {
+  <Returned, Arg>(
+    thunk: AppAsyncThunk<NonNullable<Returned>, Arg>,
+    arg: Parameters<AppAsyncThunk<Returned, Arg>>[0],
+    key?: string,
+  ): Promise<Returned>;
+
+  <Returned>(
+    thunk: AppAsyncThunk<NonNullable<Returned>>,
+    arg?: undefined,
+    key?: string,
+  ): Promise<Returned>;
+};
 
 export const useAbortableDispatch = () => {
   const dispatch = useAppDispatch();
@@ -28,10 +42,10 @@ export const useAbortableDispatch = () => {
     };
   }, []);
 
-  const abortableDispatch = useCallback(
-    (<Returned, Arg, ThunkApiConfig extends {} = AsyncThunkConfig>(
-      thunk: AsyncThunk<Returned, Arg, ThunkApiConfig>,
-      arg?: Parameters<AsyncThunk<Returned, Arg, ThunkApiConfig>>[0],
+  const abortableDispatch = useCallback<Handler>(
+    <Returned, Arg>(
+      thunk: AppAsyncThunk<NonNullable<Returned>, Arg>,
+      arg: Parameters<typeof thunk>[0], // Parameters<AppAsyncThunk<Returned, Arg>>[0],
       key?: string,
     ) => {
       let resolvedKey = key ?? (thunk.typePrefix || thunk.name);
@@ -51,7 +65,7 @@ export const useAbortableDispatch = () => {
       controllersRef.current.set(resolvedKey, controller);
 
       const action = thunk(arg as any, { signal: controller.signal });
-      const promise = dispatch(action as any);
+      const promise = dispatch(action);
 
       promise.finally(() => {
         if (controllersRef.current.get(resolvedKey) === controller) {
@@ -60,7 +74,7 @@ export const useAbortableDispatch = () => {
       });
 
       return promise;
-    }) as AbortableDispatch,
+    },
     [dispatch],
   );
 
@@ -85,5 +99,32 @@ export const useAbortableDispatch = () => {
     }
   };
 
-  return abortableDispatch;
+  return abortableDispatch as Handler & {
+    abort: (keyOrThunk?: string | Function) => void;
+  };
 };
+
+// export const useAbortableDispatch = () => {
+//   const dispatch = useAppDispatch();
+//   const inFlight = React.useRef<Map<string, any>>(new Map());
+
+//   return React.useCallback(
+//     (thunk: any, arg?: any, key?: string) => {
+//       const resolvedKey = key ?? thunk.typePrefix;
+
+//       inFlight.current.get(resolvedKey)?.abort();
+
+//       const promise = dispatch(thunk(arg));
+//       inFlight.current.set(resolvedKey, promise);
+
+//       promise.finally(() => {
+//         if (inFlight.current.get(resolvedKey) === promise) {
+//           inFlight.current.delete(resolvedKey);
+//         }
+//       });
+
+//       return promise;
+//     },
+//     [dispatch],
+//   );
+// };

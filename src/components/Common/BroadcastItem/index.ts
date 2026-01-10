@@ -1,1 +1,1 @@
-export {default as BroadcastItem} from './BroadcastItem'
+export * from './BroadcastItem';

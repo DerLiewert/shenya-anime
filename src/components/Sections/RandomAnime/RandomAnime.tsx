@@ -1,17 +1,17 @@
 import React from 'react';
+import clsx from 'clsx';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus, useYoutubeTrailerImage } from '@/hooks';
 import { clearRandomAnimeState, fetchRandomAnime } from '@/store';
-import { Score, ArrowIcon, BookmarkButton, EmptyValueMessage, SfwImage } from '@/components';
-import { getImageUrl, isAnimeNsfw, valueOrDefault } from '@/utils';
-import { appPaths, animeTypeOptions } from '@/resources';
-import clsx from 'clsx';
-import './RandomAnime.scss';
 import { animeEmptyValueMessages } from '@/constants';
+import { appPaths, animeTypeOptions } from '@/resources';
+import { getImageUrl, isAnimeNsfw, valueOrDefault } from '@/utils';
+import { Score, ArrowIcon, BookmarkButton, EmptyValueMessage, SfwImage } from '@/components';
+import './RandomAnime.scss';
 
-const RandomAnime: React.FC = () => {
+export const RandomAnime = () => {
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const { item, status } = useAppSelector((state) => state.randomAnime);
@@ -183,5 +183,3 @@ const RandomAnime: React.FC = () => {
     </section>
   );
 };
-
-export default RandomAnime;

@@ -1,18 +1,25 @@
 import { getAnimeSearch } from '@/api';
 import { FetchStatus } from '@/typescript';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { RootState } from '@/app/store';
+import { createSlice } from '@reduxjs/toolkit';
 import { Anime } from '@/typescript';
 import { randomInteger } from '@/utils';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import {
+  handleAsyncFulfilledItem,
+  handleAsyncPending,
+  handleAsyncRejected,
+} from '../_common/common.helper';
 
 interface randomAnimeState {
   item: Anime | null;
   status: FetchStatus | null;
+  prevStatus: FetchStatus | null;
 }
 
 const initialState: randomAnimeState = {
   item: null,
   status: null,
+  prevStatus: null,
 };
 
 export const randomAnimeSlice = createSlice({
@@ -22,18 +29,9 @@ export const randomAnimeSlice = createSlice({
     clearRandomAnimeState: () => initialState,
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchRandomAnime.pending, (state) => {
-      state.status = FetchStatus.LOADING;
-    });
-    builder.addCase(fetchRandomAnime.fulfilled, (state, action) => {
-      state.item = action.payload;
-      state.status = FetchStatus.SUCCESS;
-    });
-
-    builder.addCase(fetchRandomAnime.rejected, (state, action) => {
-      if (action.meta.aborted) return;
-      state.status = FetchStatus.ERROR;
-    });
+    builder.addCase(fetchRandomAnime.pending, handleAsyncPending);
+    builder.addCase(fetchRandomAnime.fulfilled, handleAsyncFulfilledItem);
+    builder.addCase(fetchRandomAnime.rejected, handleAsyncRejected);
   },
 });
 
@@ -42,7 +40,7 @@ export const { clearRandomAnimeState } = randomAnimeSlice.actions;
 export default randomAnimeSlice.reducer;
 
 //========================================================================================================================================================
-export const fetchRandomAnime = createAsyncThunk<Anime, number, { state: RootState }>(
+export const fetchRandomAnime = createAppAsyncThunk<Anime, number>(
   'random-anime/fetchRandomAnime',
   async (minScore = 8, thunkAPI) => {
     // Получаем количество страниц

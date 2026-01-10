@@ -1,3 +1,4 @@
+export * from './api.client';
 export * from './anime.client';
 export * from './manga.client';
 export * from './character.client';

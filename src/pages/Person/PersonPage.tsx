@@ -17,9 +17,9 @@ const PersonPage = () => {
   return (
     <EntityPageLayout<PersonFull>
       fetchAction={fetchPersonFullById}
-      selector={(state) => state.personFullById.item}
-      status={(state) => state.personFullById.status.item}
-      getBasePath={(id) => appPaths.personFull(id)}
+      itemSelector={(state) => state.personFullById.item}
+      itemStatusSelector={(state) => state.personFullById.status.item}
+      createBasePath={(id) => appPaths.personFull(id)}
       introBg={BG}
       render={(item) => ({
         title: item && item.name,
@@ -31,14 +31,6 @@ const PersonPage = () => {
             ].filter((str) => Boolean(str.trim()))
           : [],
         resources: item && <AdditionalInfo item={item} />,
-        // breadcrumbs: item
-        //   ? [
-        //       { label: 'Top', url: '#' },
-        //       { label: 'People', url: '#' },
-        //       { label: item.name, url: '#' },
-        //     ]
-        //   : [],
-
         tabs: item
           ? [
               {

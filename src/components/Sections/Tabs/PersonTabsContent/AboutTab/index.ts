@@ -1,1 +1,1 @@
-export { default as PersonAboutTab } from './AboutTab';
+export * from './PersonAboutTab';

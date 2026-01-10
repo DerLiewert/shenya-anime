@@ -1,17 +1,17 @@
-import React from 'react';
 import { PersonVoices } from '@/typescript';
-import { EntityTabItem, EntityTab } from '@/components';
+import { EntityTabItem, EntitiesTab } from '@/components';
 import { personEmptyValueMessages } from '@/constants';
 import { appPaths } from '@/resources';
 
-const PersonVoicesTab: React.FC = () => {
+export const PersonVoicesTab = () => {
   return (
-    <EntityTab<PersonVoices>
+    <EntitiesTab<PersonVoices>
       status={(state) => state.personFullById.status.item}
       emptyValueMessage={personEmptyValueMessages.voices}
       selector={(state) => (state.personFullById.item ? state.personFullById.item.voices : [])}
-      entityItem={(item, index) => {
-        return (
+      itemsBodyClass="tab-grid-2"
+      items={(options) =>
+        options.items.slice(0, options.visibleCount).map((item) => (
           <EntityTabItem
             key={item.anime.mal_id + '_' + item.character.mal_id}
             linkUrl={appPaths.characterFull(item.character.mal_id)}
@@ -22,10 +22,8 @@ const PersonVoicesTab: React.FC = () => {
               { prefix: 'Role', text: item.role },
             ]}
           />
-        );
-      }}
+        ))
+      }
     />
   );
 };
-
-export default PersonVoicesTab;

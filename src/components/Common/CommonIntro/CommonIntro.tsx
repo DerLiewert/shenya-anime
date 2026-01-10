@@ -4,10 +4,10 @@ import './CommonIntro.scss';
 type CommonIntroProps = {
   title: string;
   subtitle?: React.ReactNode;
-  bgPrefix?: 'anime' | 'manga' | 'schedules' | 'bookmark';
+  bgPrefix: 'anime' | 'manga' | 'schedules' | 'bookmark';
 };
 
-const CommonIntro: React.FC<CommonIntroProps> = ({ title, subtitle, bgPrefix }) => {
+export const CommonIntro = ({ title, subtitle, bgPrefix }: CommonIntroProps) => {
   return (
     <section className={`common-intro common-intro--${bgPrefix}`}>
       <div className="container">
@@ -20,4 +20,3 @@ const CommonIntro: React.FC<CommonIntroProps> = ({ title, subtitle, bgPrefix }) 
   );
 };
 
-export default CommonIntro;

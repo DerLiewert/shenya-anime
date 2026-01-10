@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { Link } from 'react-router-dom';
 import { fetchTodaySchedulesAnime } from '@/store';
@@ -10,7 +10,7 @@ import { getUniqueItems } from '@/utils';
 import { appPaths } from '@/resources';
 import './NewEpisodes.scss';
 
-const NewEpisodes: React.FC = () => {
+export const NewEpisodes = () => {
   const abortableDispatch = useAbortableDispatch();
   const { items, status } = useAppSelector((state) => state.todaySchedulesAnime);
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
@@ -65,5 +65,3 @@ const NewEpisodes: React.FC = () => {
     </div>
   );
 };
-
-export default NewEpisodes;

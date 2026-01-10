@@ -1,26 +1,23 @@
-import React from 'react';
 import { CardItem, MangaTooltip } from '@/components';
 import { appPaths } from '@/resources';
-import { Manga } from '@/typescript';
 import { isMangaNsfw } from '@/utils';
+import { Manga } from '@/typescript';
 
 interface MangaCardProps {
   item: Manga;
-  className?: string;
   tooltip?: boolean;
+  className?: string;
 }
 
-const MangaCard: React.FC<MangaCardProps> = ({ item, className, tooltip = true }) => {
+export const MangaCard = ({ item, className, tooltip = true }: MangaCardProps) => {
   const renderCardItem = () => (
     <CardItem
-      cardType="manga"
       className={className}
-      linkPath={appPaths.mangaFull(item.mal_id)}
+      cardType="manga"
       item={{ ...item, year: item.published.prop.from.year }}
+      linkPath={appPaths.mangaFull(item.mal_id)}
       nsfw={isMangaNsfw(item)}
     />
   );
   return tooltip ? <MangaTooltip item={item}>{renderCardItem()}</MangaTooltip> : renderCardItem();
 };
-
-export default MangaCard;

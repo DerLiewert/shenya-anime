@@ -3,19 +3,25 @@ import Tippy from '@tippyjs/react';
 import { getAnimeById, getMangaById } from '@/api';
 import { useMatchMedia } from '@/hooks';
 import { breakpoints } from '@/constants';
-import { AnimeAndMangaMap, AnimeAndMangaType, EntityMap, FetchStatus } from '@/typescript';
+import { AnimeAndMangaOf, AnimeAndMangaType, FetchStatus, Nullable } from '@/typescript';
 
-type CommonTooltipProps<T extends AnimeAndMangaType> = {
+export type TooltipProps<T extends AnimeAndMangaType> = TooltipCommonProps<T> & {
   type: T;
-  children: React.ReactElement;
-  tooltipContent: (
-    item: AnimeAndMangaMap[T] | undefined,
-    status: FetchStatus | null,
-  ) => React.ReactElement;
+  tooltipContent: TooltipContent<T>;
 };
 
-type TooltipProps<T extends AnimeAndMangaType> = CommonTooltipProps<T> &
-  ({ id: number; item?: never } | { id?: never; item: AnimeAndMangaMap[T] });
+export type TooltipCommonProps<T extends AnimeAndMangaType> = {
+  children: React.ReactElement;
+} & ({ id: number; item?: never } | { id?: never; item: AnimeAndMangaOf<T> });
+
+export type TooltipContent<T extends AnimeAndMangaType> = (
+  props: TooltipContentProps<T>,
+) => React.ReactElement;
+
+export type TooltipContentProps<T extends AnimeAndMangaType> = {
+  item: Nullable<AnimeAndMangaOf<T>>;
+  status: FetchStatus | null;
+};
 
 export const Tooltip = <T extends AnimeAndMangaType>({
   type,
@@ -25,7 +31,7 @@ export const Tooltip = <T extends AnimeAndMangaType>({
   tooltipContent,
 }: TooltipProps<T>) => {
   const [entityItem, setEntityItem] = React.useState(item);
-  const [status, setStatus] = React.useState<FetchStatus | null>(item ? FetchStatus.SUCCESS : null);
+  const [status, setStatus] = React.useState(item ? FetchStatus.SUCCESS : null);
   const isMobile = useMatchMedia('max', breakpoints.mobile);
 
   const onShowTippy = () => {
@@ -35,8 +41,8 @@ export const Tooltip = <T extends AnimeAndMangaType>({
 
     const getAnime = async () => {
       try {
-        const { data } = type === 'anime' ? await getAnimeById(id) : await getMangaById(id);
-        setEntityItem(data as AnimeAndMangaMap[T]);
+        const { data } = await (type === 'anime' ? getAnimeById(id) : getMangaById(id));
+        setEntityItem(data as AnimeAndMangaOf<T>);
         setStatus(FetchStatus.SUCCESS);
       } catch (error) {
         setStatus(FetchStatus.ERROR);
@@ -48,7 +54,7 @@ export const Tooltip = <T extends AnimeAndMangaType>({
 
   return (
     <Tippy
-      content={tooltipContent(entityItem, status)}
+      content={tooltipContent({item: entityItem, status})}
       visible={isMobile ? false : undefined}
       placement="right-start"
       theme="custom"

@@ -1,65 +1,34 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { SchedulesEndpoints } from '@/api';
-import { getResource } from '@/api/client/api.client';
-import {
-  Anime,
-  JikanPaginationPlus,
-  JikanResponse,
-  SchedulesFilter,
-  AsyncThunkConfig,
-  FetchStatus,
-} from '@/typescript';
+import { createSlice } from '@reduxjs/toolkit';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import { SchedulesEndpoints, getResource } from '@/api';
+import { Anime, JikanPaginationPlus, JikanResponse, SchedulesParams } from '@/typescript';
+import { asyncListFullBuilder, createAsyncListFullState, FetchListArgs } from '../_common';
 
-interface SchedulesAnimeState {
-  items: Anime[];
-  pagination: JikanPaginationPlus | null;
-  status: FetchStatus | null;
-}
-
-const initialState: SchedulesAnimeState = {
-  items: [],
-  pagination: null,
-  status: null,
-};
+//============ Slice ============//
+const initialState = createAsyncListFullState<Anime, JikanPaginationPlus>();
 
 export const schedulesAnimeSlice = createSlice({
   name: 'schedules-anime',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchSchedulesAnime.pending, (state, action) => {
-      state.status = FetchStatus.LOADING;
-    });
-    builder.addCase(fetchSchedulesAnime.fulfilled, (state, action) => {
-      const { data, pagination } = action.payload;
-      state.items = data ? data : [];
-      state.pagination = pagination ? pagination : null;
-      state.status = FetchStatus.SUCCESS;
-    });
-    builder.addCase(fetchSchedulesAnime.rejected, (state, action) => {
-      if (action.meta.aborted) return;
-      state.status = FetchStatus.ERROR;
-    });
+    asyncListFullBuilder(builder, fetchSchedulesAnime);
   },
 });
 
-export const fetchSchedulesAnime = createAsyncThunk<
+//============ Thunk ============//
+export const fetchSchedulesAnime = createAppAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
-  { filter: SchedulesFilter; page?: number },
-  AsyncThunkConfig
->('schedules-anime/fetchAnimeItems', async ({ page, filter }, { signal }) => {
+  FetchListArgs<SchedulesParams>
+>('schedules-anime/fetchAnimeItems', async ({ params }, { signal }) => {
   const data = await getResource<Anime[], JikanPaginationPlus>({
     endpoint: SchedulesEndpoints.schedules,
     queryParams: {
-      filter,
-      page,
-      limit: 24,
+      ...params,
     },
     signal,
   });
   return data;
 });
-
-// export const {  } = schedulesAnimeSlice.actions;
 
 export default schedulesAnimeSlice.reducer;

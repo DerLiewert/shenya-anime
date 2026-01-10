@@ -1,11 +1,10 @@
-import React from 'react';
+import clsx from 'clsx';
 import { Link } from 'react-router-dom';
 import { InfoRow, InfoValue, SfwImage } from '@/components';
 import { getImageUrl, isAnimeNsfw, valueOrDefault } from '@/utils';
-import { specialStatus } from '@/constants';
+import { fallbackValues } from '@/constants';
 import { appPaths } from '@/resources';
 import { Anime } from '@/typescript';
-import clsx from 'clsx';
 import './BroadcastItem.scss';
 
 interface BroadcastItemProps {
@@ -13,7 +12,7 @@ interface BroadcastItemProps {
   className?: string;
 }
 
-const BroadcastItem: React.FC<BroadcastItemProps> = ({ item, className }) => {
+export const BroadcastItem = ({ item, className }: BroadcastItemProps) => {
   return (
     <Link
       to={appPaths.animeFull(item.mal_id)}
@@ -33,7 +32,7 @@ const BroadcastItem: React.FC<BroadcastItemProps> = ({ item, className }) => {
         </h4>
         <ul className="broadcast-item__list">
           <InfoRow name="Episodes" className="broadcast-item__list-item fz-13">
-            <InfoValue>{valueOrDefault(item.episodes, specialStatus.mark)}</InfoValue>
+            <InfoValue>{valueOrDefault(item.episodes, fallbackValues.mark)}</InfoValue>
           </InfoRow>
 
           <InfoRow name="Type" className="broadcast-item__list-item fz-13">
@@ -48,14 +47,14 @@ const BroadcastItem: React.FC<BroadcastItemProps> = ({ item, className }) => {
                     {index < arr.length - 1 && ','}
                   </InfoValue>
                 ))
-              : specialStatus.unknown}
+              : fallbackValues.unknown}
           </InfoRow>
 
           <InfoRow name="Broadcast" className="broadcast-item__list-item fz-13 _broadcast">
             <InfoValue>
               {item.broadcast.time
                 ? `${item.broadcast.time}, ${item.broadcast.timezone}`
-                : specialStatus.unknown}
+                : fallbackValues.unknown}
             </InfoValue>
           </InfoRow>
         </ul>
@@ -63,5 +62,3 @@ const BroadcastItem: React.FC<BroadcastItemProps> = ({ item, className }) => {
     </Link>
   );
 };
-
-export default BroadcastItem;

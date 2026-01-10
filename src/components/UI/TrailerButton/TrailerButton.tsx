@@ -1,28 +1,26 @@
 import { PlayCircleIcon } from '@/components';
 import { AnimeYoutubeVideo } from '@/typescript';
+import { LG_LICENSE_KEY } from '@/constants';
 
 import LightGallery from 'lightgallery/react';
 import lgVideo from 'lightgallery/plugins/video';
 import 'lightgallery/scss/lg-zoom.scss';
 import 'lightgallery/scss/lg-video.scss';
 
+import './TrailerButton.scss';
 import clsx from 'clsx';
 
-interface TrailerButton {
+interface TrailerButtonProps {
   trailer: AnimeYoutubeVideo;
   className?: string;
   lightGalleryClass?: string;
 }
 
-export const TrailerButton: React.FC<TrailerButton> = ({
-  trailer,
-  className,
-  lightGalleryClass,
-}) => {
+export const TrailerButton = ({ trailer, className, lightGalleryClass }: TrailerButtonProps) => {
   return (
     <LightGallery
       addClass={lightGalleryClass}
-      licenseKey="7EC452A9-0CFD441C-BD984C7C-17C8456E"
+      licenseKey={LG_LICENSE_KEY}
       plugins={[lgVideo]}
       download={false}
       controls={false}

@@ -1,0 +1,15 @@
+.anime-recommendations-tab {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+
+  @include media-max($mobile) {
+    gap: 10px;
+  }
+  @include media-max(700px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  @include media-max($mobileSmall) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

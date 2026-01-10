@@ -1,18 +1,18 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { AsyncThunkConfig, ItemIdSelector } from '@/typescript';
+import { ItemIdSelector } from '@/typescript';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
 
-type ThunkWithIdCallback<Returned, Arg = undefined> = (
+type ThunkWithIdCallback<Returned, Arg = any> = (
   id: number,
   arg: Arg,
   signal: AbortSignal,
 ) => Promise<Returned>;
 
 function createThunkWithId(getIdFromState: ItemIdSelector) {
-  return function <Returned, Arg = void>(
+  return function <Returned, Arg = any>(
     typePrefix: string,
     callback: ThunkWithIdCallback<Returned, Arg>,
   ) {
-    return createAsyncThunk<Returned, Arg, AsyncThunkConfig>(
+    return createAppAsyncThunk<Returned, Arg>(
       typePrefix,
       async (arg, { getState, signal, rejectWithValue }) => {
         const id = getIdFromState(getState()) ?? null;

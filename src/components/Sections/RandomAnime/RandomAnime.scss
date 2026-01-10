@@ -5,8 +5,8 @@
     padding: 50px 0 30px 280px;
     position: relative;
     z-index: 1;
+
     @include media-max($pc) {
-      // padding-left: 150px;
       padding-left: 17vw;
     }
     @include media-max($tablet) {
@@ -19,8 +19,6 @@
     top: 0;
     left: 0;
     height: 100%;
-    // width: 420px;
-    // width: 38.5vw;
     width: calc(17vw + #{$containerPadding}px / 2 + 230px + 25px);
     object-fit: cover;
     border-radius: 0 20px 20px 0;
@@ -75,10 +73,8 @@
     }
     @include media-max($mobile) {
       border-width: 6px;
-      // border: none;
       padding-left: 10px;
       margin-bottom: 20px;
-      // text-align: center;
     }
     @include media-max($mobileSmall) {
       border-left: 4px solid var(--primary-color);
@@ -92,7 +88,7 @@
     width: 230px;
     height: 320px;
     margin-right: 80px;
-    
+
     @include media-max($pc) {
       margin-right: 70px;
     }
@@ -106,7 +102,6 @@
       height: 300px;
       margin-bottom: 20px;
     }
-    // @include media-between($mobileSmall, $mobile) {
     @include media-between(360px, $mobile) {
       img {
         height: 100%;

@@ -5,7 +5,7 @@ import {
   animeGenresReducer,
   bookmarkReducer,
   characterFullByIdReducer,
-  introAnimeReducer,
+  topAnimeReducer,
   mangaCatalogReducer,
   mangaFullByIdReducer,
   mangaGenresReducer,
@@ -24,7 +24,7 @@ import {
 
 export const store = configureStore({
   reducer: {
-    introAnime: introAnimeReducer,
+    topAnime: topAnimeReducer,
     todaySchedulesAnime: todaySchedulesAnimeReducer,
     seasonalAnime: seasonalAnimeReducer,
     randomAnime: randomAnimeReducer,

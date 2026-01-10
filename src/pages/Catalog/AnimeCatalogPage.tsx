@@ -1,12 +1,14 @@
 import React from 'react';
+import clsx from 'clsx';
 import Select from 'react-select';
 import Skeleton from 'react-loading-skeleton';
 import { useLocation } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
-import { breakpoints } from '@/constants';
+import { fetchAnimeByParams, fetchAnimeGenres, minusOpenModal, plusOpenModal } from '@/store';
 import { scrollToTop, getUniqueItems, parseAnimeSearchParams, onScoreChange } from '@/utils';
+import { breakpoints } from '@/constants';
 import {
   animeOrderByOptions,
   animeRatingOptions,
@@ -24,8 +26,6 @@ import {
   SelectOption,
 } from '@/typescript';
 import { AnimeCard, CommonIntro, EmptyValueMessage, FilterIcon, Pagination } from '@/components';
-import { fetchAnimeByParams, fetchAnimeGenres, minusOpenModal, plusOpenModal } from '@/store';
-import clsx from 'clsx';
 import './CatalogPage.scss';
 
 const setSortForOrderBy = (param: AnimeSearchOrder | undefined): SortOptions | undefined => {
@@ -39,7 +39,7 @@ const setSortForOrderBy = (param: AnimeSearchOrder | undefined): SortOptions | u
 };
 
 //========================================================================================================================================================
-const AnimeCatalogPage: React.FC = () => {
+const AnimeCatalogPage = () => {
   const cardsRef = React.useRef<HTMLDivElement>(null);
 
   const dispatch = useAppDispatch();
@@ -70,7 +70,7 @@ const AnimeCatalogPage: React.FC = () => {
             genres.length > 0 ? { include: genres.map((obj) => obj.mal_id.toString()) } : true,
           page: pagination?.last_visible_page
             ? { include: { from: 1, to: pagination.last_visible_page } }
-            : true,
+            : { include: { from: 1 } },
         },
       }),
     [genres, pagination?.last_visible_page],
@@ -88,6 +88,25 @@ const AnimeCatalogPage: React.FC = () => {
     };
   }, [location.search]);
 
+  React.useEffect(() => {
+    appNavigate(searchParams, { replace: true });
+  }, [appNavigate]);
+
+  // Получение даных об аниме по выбраным параметрам
+  React.useEffect(() => {
+    if (isGenresLoading) return;
+    abortableDispatch(fetchAnimeByParams, {params: searchParams});
+  }, [searchParams, genresStatus]);
+
+  // Если ширина экрана стала >tablet и были открыты филтры - закрываем их
+  React.useEffect(() => {
+    if (!isTablet && isShowFilters) closeFilters();
+  }, [isTablet]);
+
+  React.useEffect(() => {
+    scrollToTop(cardsRef);
+  }, [location.search]);
+
   const openFilters = () => {
     dispatch(plusOpenModal());
     setIsShowFilters(true);
@@ -97,20 +116,6 @@ const AnimeCatalogPage: React.FC = () => {
     dispatch(minusOpenModal());
     setIsShowFilters(false);
   };
-
-  React.useEffect(() => {
-    if (!isTablet && isShowFilters) closeFilters();
-  }, [isTablet]);
-
-  // Получение даных об аниме по выбраным параметрам
-  React.useEffect(() => {
-    if (isGenresLoading) return;
-    abortableDispatch(fetchAnimeByParams, searchParams);
-  }, [searchParams, genresStatus]); // maybe genres
-
-  React.useEffect(() => {
-    appNavigate(searchParams, { replace: true });
-  }, [appNavigate]);
 
   return (
     <div className="catalog">
@@ -220,7 +225,6 @@ const AnimeCatalogPage: React.FC = () => {
                   className="catalog-cards__pagination"
                   onChangePage={(page) => {
                     appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
-                    scrollToTop(cardsRef);
                   }}
                 />
               )}
@@ -251,7 +255,7 @@ type FormValues = SelectValues & {
 interface CatalogSidebar {
   isModal?: boolean;
   isOpen?: boolean;
-  selectedValues: AnimeSearchParams; // Pick<AnimeSearchParams, 'type' | 'status' | 'rating' | 'min_score' | 'max_score' | 'genres'>;
+  selectedValues: AnimeSearchParams;
   className?: string;
   onSubmit?: (data: FormValues) => void;
   onReset?: () => void;
@@ -267,12 +271,11 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
   onReset,
   onClose,
 }) => {
-  const dispatch = useAppDispatch();
-  const { items: genres, status: genresStatus } = useAppSelector((state) => state.animeGenres);
-  const { isLoading: isGenresLoading, isSuccess: isGenresSuccess } = useFetchStatus(genresStatus);
-
   const filterRef = React.useRef<HTMLFormElement>(null);
   const sidebarRef = React.useRef<HTMLDivElement>(null);
+  const dispatch = useAppDispatch();
+  const genres = useAppSelector((state) => state.animeGenres.items);
+  const fetchGenresStatus = useFetchStatus((state) => state.animeGenres.status);
 
   const animeGenresOptions = React.useMemo(() => {
     return genres.length > 0
@@ -303,8 +306,11 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
     };
   }
 
-  // Закрытие модального окна
   React.useEffect(() => {
+    // Получить жанры аниме, если их нет
+    if (genres.length === 0) dispatch(fetchAnimeGenres());
+
+    // Закрытие модального окна
     if (!onClose) return;
 
     const closeModal = (e: MouseEvent) => {
@@ -316,12 +322,6 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
     return () => {
       document.removeEventListener('click', closeModal);
     };
-  }, []);
-
-  React.useEffect(() => {
-    // Получить жанры аниме, если их нет
-    if (isGenresSuccess && genresStatus.length > 0) return;
-    dispatch(fetchAnimeGenres());
   }, []);
 
   // Получение даных об аниме по выбраным параметрам
@@ -400,7 +400,7 @@ const CatalogSidebar: React.FC<CatalogSidebar> = ({
           </div>
           <div className="catalog-sidebar__filters-item filters-item">
             <div className="filters-item__title">Genre</div>
-            {isGenresLoading ? (
+            {fetchGenresStatus.isLoading ? (
               <Skeleton className="select__control" containerClassName="select" />
             ) : (
               renderSelect('genres', animeGenresOptions, 'Genres for one anime ...', true)

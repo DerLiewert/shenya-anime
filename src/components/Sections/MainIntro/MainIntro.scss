@@ -1,9 +1,4 @@
 .main-intro {
-  // min-height: 100vh;
-  // display: flex;
-  // align-items: flex-end;
-  // justify-content: center;
-
   &:first-child {
     margin-top: calc(0px - var(--header-height));
     .main-preview,
@@ -157,8 +152,6 @@
     }
     @include media-max($mobile) {
       display: none;
-      // width: 250px;
-      // height: 360px;
     }
   }
 

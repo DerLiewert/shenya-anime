@@ -1,8 +1,8 @@
 export * from './animeFullByIdSlice'
 export {default as animeFullByIdReducer} from './animeFullByIdSlice'
 
-export * from './introAnimeSlice'
-export {default as introAnimeReducer} from './introAnimeSlice'
+export * from './topAnimeSlice'
+export {default as topAnimeReducer} from './topAnimeSlice'
 
 export * from './randomAnimeSlice'
 export {default as randomAnimeReducer} from './randomAnimeSlice'

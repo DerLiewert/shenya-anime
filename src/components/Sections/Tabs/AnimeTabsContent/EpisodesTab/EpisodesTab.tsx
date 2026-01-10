@@ -5,8 +5,9 @@ import { EmptyValueMessage, EpisodeItem, Loading } from '@/components';
 import { animeEmptyValueMessages, commonMessages } from '@/constants';
 import { fetchAnimeEpisodes } from '@/store';
 import './EpisodesTab.scss';
+import { isAppendItems } from '@/utils';
 
-const EpisodesTab: React.FC = () => {
+export const EpisodesTab = () => {
   const dispatch = useAppDispatch();
   const abortableDispatch = useAbortableDispatch();
   const { data: episodes, pagination } = useAppSelector((state) => state.animeFullById.episodes);
@@ -17,16 +18,18 @@ const EpisodesTab: React.FC = () => {
 
   const fetchEpisodes = () => {
     if (pagination && episodes.length < visibleCount && pagination.has_next_page) {
+      const nextPage = pagination.current_page ? pagination.current_page + 1 : undefined;
       dispatch(
         fetchAnimeEpisodes({
-          page: pagination.current_page ? pagination.current_page + 1 : undefined,
+          params: { page: nextPage },
+          append: isAppendItems(pagination.current_page, nextPage),
         }),
       );
     }
   };
 
   React.useEffect(() => {
-    if (episodes.length === 0 && !isSuccess) abortableDispatch(fetchAnimeEpisodes, { page: 1 });
+    if (episodes.length === 0 && !isSuccess) abortableDispatch(fetchAnimeEpisodes,{params: { page: 1 }});
   }, []);
 
   React.useEffect(() => {
@@ -67,5 +70,3 @@ const EpisodesTab: React.FC = () => {
     </div>
   );
 };
-
-export default EpisodesTab;

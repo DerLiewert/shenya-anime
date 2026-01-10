@@ -1,1 +1,1 @@
-export {default as Broadcast} from './Broadcast'
+export * from './Broadcast'

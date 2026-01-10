@@ -1,10 +1,23 @@
-import { TopEndpoints } from '@/api';
-import { getResource } from '@/api/client/api.client';
-import { FetchStatus } from '@/typescript';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import { getResource, TopEndpoints } from '@/api';
 import { Manga } from '@/typescript';
+import { asyncListBaseBuilder, createAsyncListBaseState } from '../_common';
 
-export const fetchTopManga = createAsyncThunk<Manga[]>(
+const initialState = createAsyncListBaseState<Manga>();
+
+export const mangaTopSlice = createSlice({
+  name: 'top-manga',
+  initialState,
+  reducers: {},
+  extraReducers: (builder) => {
+    asyncListBaseBuilder(builder, fetchTopManga);
+  },
+});
+
+export default mangaTopSlice.reducer;
+
+export const fetchTopManga = createAppAsyncThunk<Manga[]>(
   'top-manga/fetchTopManga',
   async (_, { signal }) => {
     const { data } = await getResource<Manga[]>({
@@ -15,35 +28,3 @@ export const fetchTopManga = createAsyncThunk<Manga[]>(
     return data;
   },
 );
-
-interface topMangaState {
-  items: Manga[];
-  status: FetchStatus | null;
-}
-
-const initialState: topMangaState = {
-  items: [],
-  status: null,
-};
-
-export const mangaTopSlice = createSlice({
-  name: 'top-manga',
-  initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(fetchTopManga.pending, (state, action) => {
-      state.status = FetchStatus.LOADING;
-    });
-    builder.addCase(fetchTopManga.fulfilled, (state, action) => {
-      state.items = action.payload;
-      state.status = FetchStatus.SUCCESS;
-    });
-    builder.addCase(fetchTopManga.rejected, (state, action) => {
-      state.status = FetchStatus.ERROR;
-    });
-  },
-});
-
-// export const {  } = mangaTopSlice.actions;
-
-export default mangaTopSlice.reducer;

@@ -28,7 +28,6 @@
   &__body {
   }
 
-
   &__slider {
     @include media-max($mobile) {
       margin: 0 -10px;
@@ -94,7 +93,7 @@
         rgba(var(--bg-color-rgb), 0.5) 28.365%,
         rgb(var(--bg-color-rgb)) 100%
       );
-      img {
+      svg {
         transform: rotate(180deg);
       }
     }

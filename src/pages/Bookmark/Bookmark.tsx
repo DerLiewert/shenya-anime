@@ -1,13 +1,12 @@
 import React from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
 import { AnimeCard, CommonIntro, EmptyValueMessage, MangaCard } from '@/components';
 import { AnimeAndMangaOf, AnimeAndMangaType, TabRoute } from '@/typescript';
 import { appPaths } from '@/resources';
-import { usePathSegments } from '@/hooks';
-import { setScrollToTop } from '@/store';
+import { usePathSegments, useScrollTarget } from '@/hooks';
+import { isValidPath } from '@/utils';
 import NotFound from '../NotFound/NotFound';
 import './Bookmark.scss';
 
@@ -27,26 +26,20 @@ const routeItems: TabRoute[] = [
 const pagePath = appPaths.bookmark;
 
 const Bookmark = () => {
+  const bookmarkTabsRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const tabSegments = usePathSegments(pagePath);
 
-  const dispatch = useDispatch();
-  React.useEffect(() => {
-    dispatch(setScrollToTop(false));
-    return () => {
-      dispatch(setScrollToTop(true));
-    };
-  }, []);
+  useScrollTarget(bookmarkTabsRef);
 
-  if (tabSegments.length > 0 && !routeItems.find((obj) => obj.value === tabSegments[0]))
-    return <NotFound />;
+  if (!isValidPath(tabSegments, routeItems)) return <NotFound />;
 
   return (
     <div className="bookmark">
       <CommonIntro bgPrefix="bookmark" title="Bookmark" />
       <div className="container">
         <div className="bookmark__inner">
-          <div className="bookmark__list tab-list">
+          <div className="bookmark__list tab-list" ref={bookmarkTabsRef}>
             {routeItems.map((item) => (
               <div
                 key={item.value}
@@ -77,30 +70,38 @@ export default Bookmark;
 //========================================================================================================================================================
 interface BookmarkedItems<T extends AnimeAndMangaType> {
   type: T;
-  selector: (state: RootState) => { [key in number]: AnimeAndMangaOf<T> };
+  selector: (state: RootState) => Record<number, AnimeAndMangaOf<T>>;
 }
 
 function BookmarkedItems<T extends AnimeAndMangaType>({ type, selector }: BookmarkedItems<T>) {
   const items = useAppSelector(selector);
-
   // Чтоб при удалении айтема из Bookmarked, он оставался на странице до её обновления (на случай, если случайно удалили, чтоб сразу не исчезло)
-  const [tempData, setTempData] = React.useState({ type, items });
-  React.useEffect(() => {
-    setTempData({ type, items });
-  }, [selector]);
+  const [tempItemsByType, setTempItemsByType] = React.useState<Partial<Record<T, typeof items>>>(
+    {},
+  );
 
-  if (Object.values(tempData.items).length === 0)
+  React.useEffect(() => {
+    setTempItemsByType((prev) => ({ ...prev, [type]: items }));
+  }, [type]);
+
+  React.useEffect(() => {
+    setTempItemsByType((prev) => ({ ...prev, [type]: { ...prev[type], ...items } }));
+  }, [items]);
+
+  const tempItems = tempItemsByType[type] ?? {};
+
+  if (Object.values(tempItems).length === 0)
     return <EmptyValueMessage message={`No bookmarked ${type}`} />;
 
   return (
     <div className="bookmark__items">
-      {Object.values(tempData.items)
+      {Object.values(tempItems)
         .sort((a, b) => {
           if (a.score && b.score) return b.score - a.score;
           else return 0;
         })
         .map((item) => {
-          switch (tempData.type) {
+          switch (type) {
             case 'anime':
               return <AnimeCard item={item as AnimeAndMangaOf<'anime'>} key={item.mal_id} />;
             case 'manga':

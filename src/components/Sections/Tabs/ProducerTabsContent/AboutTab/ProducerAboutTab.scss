@@ -1,0 +1,13 @@
+.about-producer {
+  &__text {
+    min-height: 2px;
+    line-height: 1.5;
+    & + & {
+      margin-top: 3px;
+    }
+
+    a {
+      text-decoration: underline;
+    }
+  }
+}

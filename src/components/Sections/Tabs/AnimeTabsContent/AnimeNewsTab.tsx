@@ -1,8 +1,7 @@
-import React from 'react';
-import { fetchAnimeNews } from '@/store/anime/animeFullByIdSlice';
+import { fetchAnimeNews } from '@/store';
 import { NewsTab } from '../CommonTabsContent';
 
-const AnimeNewsTab: React.FC = () => {
+export const AnimeNewsTab = () => {
   return (
     <NewsTab
       newsSelector={(state) => state.animeFullById.news}
@@ -11,5 +10,3 @@ const AnimeNewsTab: React.FC = () => {
     />
   );
 };
-
-export default AnimeNewsTab;

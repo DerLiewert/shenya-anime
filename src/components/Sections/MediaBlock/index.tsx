@@ -1,1 +1,1 @@
-export { default as MediaBlock } from './MediaBlock';
+export * from './MediaBlock';

@@ -1,1 +1,1 @@
-export {default as EntityTabItem} from './EntityTabItem'
+export * from './EntityTabItem'

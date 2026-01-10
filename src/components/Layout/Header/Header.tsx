@@ -18,7 +18,7 @@ const links = [
   { path: appPaths.schedules, label: 'Schedules' },
 ] as const;
 
-const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
+const Header = ({ onSearchOpen }: { onSearchOpen: () => void }) => {
   const headerRef = React.useRef<HTMLElement>(null);
   const location = useLocation();
   const activeLink = links.findIndex(
@@ -93,7 +93,7 @@ const Header: React.FC<{ onSearchOpen: () => void }> = ({ onSearchOpen }) => {
             <button className="header__action-btn" aria-label="Search" onClick={onSearchOpen}>
               <SearchIcon />
             </button>
-            <Link className="header__action-btn" to={appPaths.bookmark} >
+            <Link className="header__action-btn" to={appPaths.bookmark}>
               <BookmarkIcon />
             </Link>
             <button

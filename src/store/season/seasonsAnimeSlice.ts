@@ -1,42 +1,17 @@
 import { getSeason } from '@/api';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { Anime, AnimeSeasons, JikanPaginationPlus, JikanResponse, FetchStatus } from '@/typescript';
+import { createSlice } from '@reduxjs/toolkit';
+import { Anime, AnimeSeasons, JikanPaginationPlus, JikanResponse } from '@/typescript';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import { asyncListFullBuilder, createAsyncListFullState, FetchListArgs } from '../_common';
 
-interface SeasonsAnimeState {
-  items: Anime[];
-  pagination: JikanPaginationPlus | null;
-  season: {
-    year: number;
-    season: AnimeSeasons;
-  } | null;
-  status: FetchStatus;
-}
-
-const initialState: SeasonsAnimeState = {
-  items: [],
-  pagination: null,
-  season: null,
-  status: FetchStatus.LOADING,
-};
+const initialState = createAsyncListFullState<Anime, JikanPaginationPlus>();
 
 export const seasonsAnimeSlice = createSlice({
   name: 'seasons-anime',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchSeasonsAnime.pending, (state, action) => {
-      state.status = FetchStatus.LOADING;
-    });
-    builder.addCase(fetchSeasonsAnime.fulfilled, (state, action) => {
-      const { data, pagination } = action.payload;
-      state.items = data ? data : [];
-      state.pagination = pagination ? pagination : null;
-      state.status = FetchStatus.SUCCESS;
-    });
-    builder.addCase(fetchSeasonsAnime.rejected, (state, action) => {
-      if (action.meta.aborted) return;
-      state.status = FetchStatus.ERROR;
-    });
+    asyncListFullBuilder(builder, fetchSeasonsAnime);
   },
 });
 
@@ -44,11 +19,11 @@ export const seasonsAnimeSlice = createSlice({
 export default seasonsAnimeSlice.reducer;
 
 //========================================================================================================================================================
-export const fetchSeasonsAnime = createAsyncThunk<
+export const fetchSeasonsAnime = createAppAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
-  { year: number; season: AnimeSeasons; page?: number | undefined }
+  FetchListArgs<{ year: number; season: AnimeSeasons; page?: number; limit?: number }>
 >(
   'seasons-anime/fetchAnimeItems',
-  async ({ year, season, page = 1 }, { signal }) =>
-    await getSeason({ year, season, queryParams: { page, limit: 24 } }, signal),
+  async ({ params: { year, season, page = 1, limit = 24 } }, { signal }) =>
+    await getSeason({ year, season, queryParams: { page, limit } }, signal),
 );

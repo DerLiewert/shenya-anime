@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
 import { fetchIntroAnime } from '@/store';
@@ -13,13 +14,11 @@ import 'swiper/scss/effect-fade';
 import 'swiper/scss/autoplay';
 
 import mainBg from '@/assets/bg/main-bg.jpg';
-
-import clsx from 'clsx';
 import './MainIntro.scss';
 
-const MainIntro: React.FC = () => {
+export const MainIntro: React.FC = () => {
   const abortableDispatch = useAbortableDispatch();
-  const { items, status } = useAppSelector((state) => state.introAnime);
+  const { items, status } = useAppSelector((state) => state.topAnime);
   const { isLoading, isSuccess, isError } = useFetchStatus(status);
   const uniqueItems = React.useMemo(() => getUniqueItems(items).slice(0, 10), [items]);
 
@@ -43,17 +42,12 @@ const MainIntro: React.FC = () => {
     if (items.length === 0) abortableDispatch(fetchIntroAnime);
   }, []);
 
-  // На случай, если uniqueItems будут как-то обновлять после загрузки (но добавлять мы этого не будем XD). Пока избыточно
-  // React.useEffect(() => {
-  //   if(loadedSlides.size > 0) setLoadedSlides(new Set())
-  // }, [uniqueItems]);
-
   if (isError || (isSuccess && items.length === 0))
     return (
       <div className="main-intro">
         <div className="main-intro__preview main-preview bg">
           <div className="main-preview__image">
-            <img src={mainBg} alt="Main background" aria-hidden />
+            <img src={mainBg} alt="Main background" aria-hidden loading="lazy" />
           </div>
           <div className="container">
             <div className="main-preview__content">
@@ -118,5 +112,3 @@ const ResizeHeightFixer = () => {
 
   return null;
 };
-
-export default MainIntro;

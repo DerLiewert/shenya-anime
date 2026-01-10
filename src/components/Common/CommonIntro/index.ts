@@ -1,1 +1,1 @@
-export {default as CommonIntro} from './CommonIntro'
+export * from './CommonIntro'

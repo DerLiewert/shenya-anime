@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { InfoRow, InfoValue, Score, SfwImage, Status } from '@/components';
-import { specialStatus } from '@/constants';
+import { fallbackValues } from '@/constants';
 import { getImageUrl, isMangaNsfw, valueOrDefault } from '@/utils';
 import { appPaths } from '@/resources';
 import { Manga } from '@/typescript';
@@ -35,14 +35,14 @@ const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
           </InfoRow>
 
           <InfoRow name="Chapters">
-            <InfoValue>{valueOrDefault(item.chapters, specialStatus.mark)}</InfoValue>
+            <InfoValue>{valueOrDefault(item.chapters, fallbackValues.mark)}</InfoValue>
           </InfoRow>
 
           <InfoRow name={item.genres.length > 1 ? 'Genres' : 'Genre'}>
             {item.genres.length > 0 ? (
               item.genres.map((genre) => <InfoValue key={genre.mal_id}>{genre.name}</InfoValue>)
             ) : (
-              <InfoValue>{specialStatus.unknown}</InfoValue>
+              <InfoValue>{fallbackValues.unknown}</InfoValue>
             )}
           </InfoRow>
         </div>

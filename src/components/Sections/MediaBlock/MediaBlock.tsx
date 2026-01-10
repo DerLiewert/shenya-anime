@@ -1,21 +1,20 @@
 import React from 'react';
+import clsx from 'clsx';
 import Skeleton from 'react-loading-skeleton';
 import { AsyncThunk } from '@reduxjs/toolkit';
-import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
-import { EmptyValueMessage, SectionHeader, SectionHeaderProps } from '@/components';
+import { ArrowIcon, EmptyValueMessage, SectionHeader, SectionHeaderProps } from '@/components';
 import { animeEmptyValueMessages, commonMessages, mangaEmptyValueMessages } from '@/constants';
 import { getUniqueItems } from '@/utils';
-import { AnimeAndMangaOf, AnimeAndMangaType, FetchStatus } from '@/typescript';
+import { AnimeAndMangaOf, AnimeAndMangaType, FetchStatus, Nullable } from '@/typescript';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 
-import arrowIcon from '@/assets/arrow.svg';
-
-import clsx from 'clsx';
 import './MediaBlock.scss';
+import { AppAsyncThunk } from '@/app/appAsyncThunk';
+import { RootState } from '@/app/store';
 
 interface MediaBlockProps<
   T extends AnimeAndMangaType,
@@ -24,12 +23,12 @@ interface MediaBlockProps<
   type: T;
   header: SectionHeaderProps;
   subtitle?: string;
-  selector: (state: RootState) => { items: Item[]; status: FetchStatus | null };
+  selector: (state: RootState) => { items: Item[]; status: Nullable<FetchStatus> };
   renderCard: (item: Item) => React.ReactNode;
-  fetchAction?: AsyncThunk<Item[], any, any>;
+  fetchAction?: AppAsyncThunk<Item[]>;
 }
 
-function MediaBlock<T extends AnimeAndMangaType>({
+export function MediaBlock<T extends AnimeAndMangaType>({
   type,
   header,
   subtitle,
@@ -48,11 +47,7 @@ function MediaBlock<T extends AnimeAndMangaType>({
   return (
     <section className="chapter">
       <div className="chapter__container container">
-        <SectionHeader
-          className={clsx('chapter__header', header.className)}
-          title={header.title}
-          link={header.link}
-        />
+        <SectionHeader className={clsx('chapter__header', header.className)} {...header} />
         <div className="chapter__body">
           <h3 className="chapter__sub-title title title--fz-24 title--main-color">{subtitle}</h3>
           {isLoading || (isSuccess && items.length > 0) ? (
@@ -88,13 +83,13 @@ function MediaBlock<T extends AnimeAndMangaType>({
                 type="button"
                 className="chapter__button chapter__button--prev"
                 aria-label="Prev slides">
-                <img src={arrowIcon} alt="Prev slides" aria-hidden />
+                <ArrowIcon />
               </button>
               <button
                 type="button"
                 className="chapter__button chapter__button--next"
                 aria-label="Next slides">
-                <img src={arrowIcon} alt="Next slides" aria-hidden />
+                <ArrowIcon />
               </button>
             </Swiper>
           ) : (
@@ -111,5 +106,3 @@ function MediaBlock<T extends AnimeAndMangaType>({
     </section>
   );
 }
-
-export default MediaBlock;

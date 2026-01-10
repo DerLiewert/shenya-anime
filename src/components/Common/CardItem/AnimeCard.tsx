@@ -1,26 +1,23 @@
-import React from 'react';
 import { AnimeTooltip, CardItem } from '@/components';
 import { appPaths } from '@/resources';
-import { Anime } from '@/typescript';
 import { isAnimeNsfw } from '@/utils';
+import { Anime } from '@/typescript';
 
 interface AnimeCardProps {
   item: Anime;
-  className?: string;
   tooltip?: boolean;
+  className?: string;
 }
 
-const AnimeCard: React.FC<AnimeCardProps> = ({ item, className, tooltip = true }) => {
+export const AnimeCard = ({ item, className, tooltip = true }: AnimeCardProps) => {
   const renderCardItem = () => (
     <CardItem
       className={className}
-      linkPath={appPaths.animeFull(item.mal_id)}
+      cardType='anime'
       item={item}
-      cardType="anime"
+      linkPath={appPaths.animeFull(item.mal_id)}
       nsfw={isAnimeNsfw(item)}
     />
   );
   return tooltip ? <AnimeTooltip item={item}>{renderCardItem()}</AnimeTooltip> : renderCardItem();
 };
-
-export default AnimeCard;

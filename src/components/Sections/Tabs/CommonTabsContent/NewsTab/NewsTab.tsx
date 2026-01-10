@@ -1,27 +1,25 @@
 import React from 'react';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useShowMore } from '@/hooks';
+import { commonMessages, mangaEmptyValueMessages } from '@/constants';
+import { getImageUrl, isAppendItems } from '@/utils';
 import { EmptyValueMessage, Loading } from '@/components';
 import { useFetchStatus } from '@/hooks/useFetchStatus';
-import type { JikanNews } from '@/typescript';
-import type { RootState } from '@/app/store';
+
 import type { AsyncThunk } from '@reduxjs/toolkit';
-import type {
-  AsyncThunkConfig,
-  DataWithExtendedBasicPagination,
-  FetchStatus,
-  StatusSelector,
-} from '@/typescript';
+import type { RootState } from '@/app/store';
+import type { AsyncThunkConfig } from '@/app/appAsyncThunk';
+import type { FetchListArgs } from '@/store/_common';
+import type { DataWithPagePagination, FetchStatus, StatusSelector, JikanNews } from '@/typescript';
+
 import './NewsTab.scss';
-import { getImageUrl } from '@/utils';
-import { commonMessages, mangaEmptyValueMessages } from '@/constants';
 
 interface NewsTabProps {
   status: StatusSelector | FetchStatus | undefined;
-  newsSelector: (state: RootState) => DataWithExtendedBasicPagination<JikanNews>;
+  newsSelector: (state: RootState) => DataWithPagePagination<JikanNews>;
   fetchAction: AsyncThunk<
-    DataWithExtendedBasicPagination<JikanNews>,
-    { page?: number },
+    DataWithPagePagination<JikanNews>,
+    FetchListArgs<{ page?: number }>,
     AsyncThunkConfig
   >;
   visibleNewsCount?: number;
@@ -40,15 +38,17 @@ const NewsTab: React.FC<NewsTabProps> = ({
 
   React.useEffect(() => {
     if (news.length === 0 && (!isSuccess || !isLoading)) {
-      abortableDispatch(fetchAction, { page: 1 });
+      abortableDispatch(fetchAction, { params: { page: 1 } });
     }
   }, []);
 
   React.useEffect(() => {
     if (pagination && news.length < visibleCount && pagination.has_next_page) {
+      const nextPage = pagination.current_page ? pagination.current_page + 1 : undefined;
       dispatch(
         fetchAction({
-          page: pagination.current_page ? pagination.current_page + 1 : undefined,
+          params: { page: nextPage },
+          append: isAppendItems(pagination.current_page, nextPage),
         }),
       );
     }

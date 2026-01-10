@@ -13,11 +13,11 @@ import {
   minusOpenModal,
   plusOpenModal,
   resetSearchState,
-  SearchMap,
 } from '@/store';
 import { SearchAnimeItem, SearchCharacterItem, SearchMangaItem } from './Items';
 import { searchTypeOptions } from '@/resources';
 import { commonMessages } from '@/constants';
+import { SearchType } from '@/typescript';
 import './Search.scss';
 
 const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
@@ -45,7 +45,7 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
   });
 
   const fetchItems = React.useCallback(
-    debounce((type: keyof SearchMap, params) => {
+    debounce((type: SearchType, params) => {
       switch (type) {
         case 'anime':
           abortableDispatch(fetchSearchAnime, params);
@@ -107,7 +107,6 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
       return;
     }
     if (selectedType.value !== type) abortableDispatch.abort();
-    // if (value === inputValue && selectedType.value === type) return;
     fetchItems(selectedType.value, { q: inputValue });
   };
 

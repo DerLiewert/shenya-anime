@@ -1,28 +1,28 @@
-import React from 'react';
 import { PersonAnime } from '@/typescript';
-import { EntityTabItem, EntityTab } from '@/components';
+import { EntityTabItem, EntitiesTab } from '@/components';
 import { personEmptyValueMessages } from '@/constants';
 import { appPaths } from '@/resources';
 
-const PersonAnimeTab: React.FC = () => {
+export const PersonAnimeTab = () => {
   return (
-    <EntityTab<PersonAnime>
+    <EntitiesTab<PersonAnime>
       status={(state) => state.personFullById.status.item}
       emptyValueMessage={personEmptyValueMessages.anime}
       selector={(state) => (state.personFullById.item ? state.personFullById.item.anime : [])}
-      entityItem={(item, index) => {
-        return (
-          <EntityTabItem
-            key={item.anime.mal_id}
-            linkUrl={appPaths.animeFull(item.anime.mal_id)}
-            images={item.anime.images}
-            title={item.anime.title}
-            subtitles={[{ prefix: 'Position', text: item.position }]}
-          />
-        );
-      }}
+      itemsBodyClass="tab-grid-2"
+      items={(options) =>
+        options.items
+          .slice(0, options.visibleCount)
+          .map((item) => (
+            <EntityTabItem
+              key={item.anime.mal_id}
+              linkUrl={appPaths.animeFull(item.anime.mal_id)}
+              images={item.anime.images}
+              title={item.anime.title}
+              subtitles={[{ prefix: 'Position', text: item.position }]}
+            />
+          ))
+      }
     />
   );
 };
-
-export default PersonAnimeTab;

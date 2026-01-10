@@ -1,20 +1,17 @@
 import { getPersonFullById, getPersonPictures } from '@/api';
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-import { JikanImages, PersonFull, FetchStatus } from '@/typescript';
-import { bilderHandleAsync, createPersonThunkWithId } from '@/utils';
+import { createSlice } from '@reduxjs/toolkit';
+import { JikanImages, PersonFull } from '@/typescript';
+import { createPersonThunkWithId } from '@/utils';
+import { createAppAsyncThunk } from '@/app/appAsyncThunk';
+import { createEntityDetailsState, entityDetailsBuilder, EntityDetailsStateBase } from '../_common';
 
-type DataKeys = Exclude<keyof PersonFullState, 'status'>;
-
-interface PersonFullState {
-  item: PersonFull | null;
+interface PersonFullState extends EntityDetailsStateBase<PersonFull> {
   pictures: JikanImages[];
-  status: Partial<Record<DataKeys, FetchStatus>>;
 }
 
 const initialState: PersonFullState = {
-  item: null,
+  ...createEntityDetailsState(),
   pictures: [],
-  status: {},
 };
 
 const personFullByIdSlice = createSlice({
@@ -22,7 +19,7 @@ const personFullByIdSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    const handleAsync = bilderHandleAsync(builder, initialState);
+    const handleAsync = entityDetailsBuilder(builder, initialState);
 
     handleAsync('item', fetchPersonFullById);
     handleAsync('pictures', fetchPersonPictures);
@@ -32,7 +29,7 @@ const personFullByIdSlice = createSlice({
 export default personFullByIdSlice.reducer;
 
 //========================================================================================================================================================
-export const fetchPersonFullById = createAsyncThunk<PersonFull, number>(
+export const fetchPersonFullById = createAppAsyncThunk<PersonFull, number>(
   'person-full/fetchFullById',
   async (id, { signal }) => (await getPersonFullById(id, signal)).data,
 );

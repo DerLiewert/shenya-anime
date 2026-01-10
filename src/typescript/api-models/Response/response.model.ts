@@ -22,6 +22,7 @@ export interface JikanResponse<T, P = JikanPaginationBase> {
 export interface JikanErrorResponse {
   status: number;
   type: string;
+  // message: string | { [key: string]: string };
   message: string;
   error: string;
   report_url: string;

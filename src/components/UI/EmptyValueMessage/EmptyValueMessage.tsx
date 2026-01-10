@@ -1,4 +1,3 @@
-import React from 'react';
 import emptyIcon from '@/assets/empty.png';
 import clsx from 'clsx';
 import './EmptyValueMessage.scss';
@@ -8,7 +7,7 @@ interface EmptyValueMessageProps {
   className?: string;
 }
 
-export const EmptyValueMessage: React.FC<EmptyValueMessageProps> = ({ message, className }) => {
+export const EmptyValueMessage = ({ message, className }: EmptyValueMessageProps) => {
   return (
     <div className={clsx(className, 'empty-value-message')}>
       <img

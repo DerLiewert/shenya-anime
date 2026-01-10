@@ -9,11 +9,10 @@ import {
   JikanResponse,
   Manga,
   MangaSearchParams,
-  EntityMap,
   FetchStatus,
+  SearchMap,
 } from '@/typescript';
-
-export type SearchMap = Pick<EntityMap, 'anime' | 'manga' | 'character'>;
+import { AppAsyncThunk, createAppAsyncThunk } from '@/app/appAsyncThunk';
 
 type SearchSlice = {
   [K in keyof SearchMap]: {
@@ -46,7 +45,7 @@ const searchSlice = createSlice({
   extraReducers: (builder) => {
     function commonBuilder<T extends keyof SearchMap>(
       type: T,
-      thunk: AsyncThunk<JikanResponse<SearchMap[T][], JikanPaginationPlus>, any, {}>,
+      thunk: AppAsyncThunk<JikanResponse<SearchMap[T][], JikanPaginationPlus>, any>,
     ) {
       builder.addCase(thunk.pending, (state) => {
         if (state.type !== type) state.items = [];
@@ -87,17 +86,17 @@ export const { setSearchValue, resetSearchState } = searchSlice.actions;
 export default searchSlice.reducer;
 
 //========================================================================================================================================================
-export const fetchSearchAnime = createAsyncThunk<
+export const fetchSearchAnime = createAppAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
   Partial<AnimeSearchParams>
 >('search/fetchSearchAnime', async (qearyParams) => await getAnimeSearch(qearyParams));
 
-export const fetchSearchManga = createAsyncThunk<
+export const fetchSearchManga = createAppAsyncThunk<
   JikanResponse<Manga[], JikanPaginationPlus>,
   Partial<MangaSearchParams>
 >('search/fetchSearchManga', async (qearyParams) => await getMangaSearch(qearyParams));
 
-export const fetchSearchCharacter = createAsyncThunk<
+export const fetchSearchCharacter = createAppAsyncThunk<
   JikanResponse<Character[], JikanPaginationPlus>,
   Partial<CharactersSearchParams>
 >('search/fetchSearchCharacter', async (qearyParams) => await getCharacterSearch(qearyParams));

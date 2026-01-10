@@ -1,1 +1,1 @@
-export { default as ProducerAboutTab } from './AboutTab';
+export * from './ProducerAboutTab';

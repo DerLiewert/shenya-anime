@@ -1,28 +1,28 @@
-import React from 'react';
-import { EntityTab, EntityTabItem } from '@/components';
+import { EntitiesTab, EntityTabItem } from '@/components';
 import { CharacterManga } from '@/typescript';
 import { characterEmptyValueMessages } from '@/constants';
 import { appPaths } from '@/resources';
 
-const CharacterMangaTab: React.FC = () => {
+export const CharacterMangaTab = () => {
   return (
-    <EntityTab<CharacterManga>
+    <EntitiesTab<CharacterManga>
       status={(state) => state.characterFullById.status.item}
       emptyValueMessage={characterEmptyValueMessages.manga}
       selector={(state) => (state.characterFullById.item ? state.characterFullById.item.manga : [])}
-      entityItem={(item, index) => {
-        return (
-          <EntityTabItem
-            key={item.manga.mal_id}
-            linkUrl={appPaths.mangaFull(item.manga.mal_id)}
-            images={item.manga.images}
-            title={item.manga.title}
-            subtitles={[{ prefix: 'Role', text: item.role }]}
-          />
-        );
-      }}
+      itemsBodyClass="tab-grid-2"
+      items={(options) =>
+        options.items
+          .slice(0, options.visibleCount)
+          .map((item) => (
+            <EntityTabItem
+              key={item.manga.mal_id}
+              linkUrl={appPaths.mangaFull(item.manga.mal_id)}
+              images={item.manga.images}
+              title={item.manga.title}
+              subtitles={[{ prefix: 'Role', text: item.role }]}
+            />
+          ))
+      }
     />
   );
 };
-
-export default CharacterMangaTab;

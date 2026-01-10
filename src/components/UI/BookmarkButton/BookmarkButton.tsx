@@ -1,6 +1,6 @@
-import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { addBookmarkedItem } from '@/store';
 import { BookmarkIcon } from '@/components';
+import { useAppDispatch, useAppSelector } from '@/app/hooks';
+import { toggleBookmarkedItem } from '@/store';
 import { AnimeAndMangaMap, AnimeAndMangaType } from '@/typescript';
 import clsx from 'clsx';
 import './BookmarkButton.scss';
@@ -14,7 +14,7 @@ interface BookmarkButtonProps<T extends AnimeAndMangaType> {
   noBookmarkedClassName?: string;
 }
 
-const BookmarkButton = <T extends AnimeAndMangaType>({
+export const BookmarkButton = <T extends AnimeAndMangaType>({
   item,
   type,
   withText = true,
@@ -34,12 +34,10 @@ const BookmarkButton = <T extends AnimeAndMangaType>({
         _bookmarked: isBookmarked,
       })}
       onClick={() => {
-        dispatch(addBookmarkedItem({ type, item }));
+        dispatch(toggleBookmarkedItem({ type, item }));
       }}>
       <BookmarkIcon />
       {withText && <span>{isBookmarked ? 'Bookmarked' : 'Bookmark'}</span>}
     </button>
   );
 };
-
-export default BookmarkButton;

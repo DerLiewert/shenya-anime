@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useFetchStatus } from '@/hooks';
-import { specialStatus } from '@/constants';
+import { commonMessages, fallbackValues } from '@/constants';
 import { getShortAnimeRating, valueOrDefault } from '@/utils';
 import { appPaths, animeRatingOptions, animeTypeOptions } from '@/resources';
 import {
@@ -13,32 +13,22 @@ import {
   Score,
   Status,
   Tooltip,
+  TooltipCommonProps,
+  TooltipContentProps,
 } from '@/components';
-
-import type { Anime } from '@/typescript';
-import type { FetchStatus } from '@/typescript';
-
 import './Tooltip.scss';
 
-type AnimeTooltipProps = { children: React.ReactElement } & (
-  | { id: number; item?: never }
-  | { id?: never; item: Anime }
-);
-
-export const AnimeTooltip = (props: AnimeTooltipProps) => {
+export const AnimeTooltip = (props: TooltipCommonProps<'anime'>) => {
   return (
     <Tooltip
       type="anime"
-      tooltipContent={(item, status) => <AnimeTooltipContent item={item} status={status} />}
+      tooltipContent={({ item, status }) => <AnimeTooltipContent item={item} status={status} />}
       {...props}
     />
   );
 };
 
-const AnimeTooltipContent: React.FC<{
-  item: Anime | null | undefined;
-  status: FetchStatus | null;
-}> = ({ item, status }) => {
+const AnimeTooltipContent: React.FC<TooltipContentProps<'anime'>> = ({ item, status }) => {
   const { isLoading, isError, isIdle } = useFetchStatus(status, true);
 
   if (isIdle) return null;
@@ -53,7 +43,7 @@ const AnimeTooltipContent: React.FC<{
   if (isError)
     return (
       <div className="tooltip">
-        <EmptyValueMessage message="Something went wrong!!!" />
+        <EmptyValueMessage message={commonMessages.error} />
       </div>
     );
 
@@ -92,7 +82,7 @@ const AnimeTooltipContent: React.FC<{
                 {item.type}
               </InfoValue>
             ) : (
-              <InfoValue>{specialStatus.unknown}</InfoValue>
+              <InfoValue>{fallbackValues.unknown}</InfoValue>
             )}
 
             {item.rating && (
@@ -110,7 +100,7 @@ const AnimeTooltipContent: React.FC<{
 
           <InfoRow name="Episodes">
             <InfoValue>
-              {valueOrDefault(item.episodes, specialStatus.mark)}
+              {valueOrDefault(item.episodes, fallbackValues.mark)}
               {item.duration && item.duration !== 'Unknown' && (
                 <>
                   &nbsp;&nbsp; {/* 2 spaces */}
@@ -133,7 +123,7 @@ const AnimeTooltipContent: React.FC<{
                   )}
                 </>
               ) : (
-                specialStatus.unknown
+                fallbackValues.unknown
               )}
             </InfoValue>
           </InfoRow>
@@ -162,7 +152,7 @@ const AnimeTooltipContent: React.FC<{
                 </InfoValue>
               ))
             ) : (
-              <InfoValue>{specialStatus.unknown}</InfoValue>
+              <InfoValue>{fallbackValues.unknown}</InfoValue>
             )}
           </InfoRow>
 

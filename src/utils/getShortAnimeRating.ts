@@ -1,6 +1,6 @@
-import { specialStatus } from '@/constants';
-import type { AnimeRating } from '@/typescript';
+import { fallbackValues } from '@/constants';
+import type { AnimeRating, Nullable } from '@/typescript';
 
-export const getShortAnimeRating = (rating: AnimeRating | null): string => {
-  return rating ? rating.split(' - ')[0] : specialStatus.notAvailable;
+export const getShortAnimeRating = (rating: Nullable<AnimeRating>): string => {
+  return rating ? rating.split(' - ')[0] : fallbackValues.notAvailable; // PG-13 - Teens 13 or older => PG-13
 };
