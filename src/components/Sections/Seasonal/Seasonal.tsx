@@ -9,8 +9,8 @@ import { fetchSeasonsList, fetchSeasonsAnime } from '@/store';
 import { animeEmptyValueMessages, commonMessages } from '@/constants';
 import { getSeasonName, getUniqueItems, parseSeasonAnimeParams, scrollToTop } from '@/utils';
 import { seasonOptions } from '@/resources';
-import { animeSeasons, JikanSeasonsPlusParams } from '@/typescript';
 import { AnimeCard, EmptyValueMessage, Pagination } from '@/components';
+import { animeSeasons, JikanSeasonsPlusParams } from '@/typescript';
 import './Seasonal.scss';
 
 function getDefaultSeasonParams(): JikanSeasonsPlusParams {

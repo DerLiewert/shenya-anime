@@ -42,14 +42,6 @@ export const SfwOffIcon = () => {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {/* <path
-        d="M14.9 17.5l1.6 1.6 3.6-3.8"
-        fill="none"
-        stroke="#05884A"
-        stroke-width="1.6"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      /> */}
     </svg>
   );
 };

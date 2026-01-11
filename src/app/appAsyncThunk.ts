@@ -7,4 +7,3 @@ export type AppAsyncThunk<Returned, Arg = any> = AsyncThunk<Returned, Arg, Async
 export const createAppAsyncThunk = createAsyncThunk.withTypes<AsyncThunkConfig>();
 
 export type AbortedAction = AnyAction & { meta: { aborted: boolean } };
-// export type AppAsyncThunk<Returned, Arg extends FetchListArgs<Returned>> = AsyncThunk<Returned, Arg, AsyncThunkConfig>;

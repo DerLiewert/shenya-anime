@@ -104,47 +104,6 @@
   }
 
   /*===================
-  ===== streaming ===== 
-  =====================*/
-  &__streaming {
-  }
-
-  &__streaming-header {
-    margin-bottom: 20px;
-    @include media-max($mobile) {
-      margin-bottom: 15px;
-    }
-  }
-
-  &__streaming-items {
-  }
-
-  &__streaming-item {
-    line-height: math.div(22, 16);
-    padding: 9px 13px;
-    display: flex;
-    align-items: center;
-    &::before {
-      flex-shrink: 0;
-      content: '';
-      width: 20px;
-      height: 20px;
-      background: url('/assets/external-link.svg') center / contain no-repeat;
-      margin-right: 9px;
-    }
-
-    @include media-max($mobile) {
-      padding: 8px 12px;
-
-      &::before {
-        width: 18px;
-        height: 18px;
-        margin-right: 7px;
-      }
-    }
-  }
-
-  /*===================
   ===== producers ===== 
   =====================*/
   &__producers {
@@ -268,45 +227,5 @@
   &__type {
     color: rgba(var(--main-color-rgb), 0.5);
     text-transform: capitalize;
-  }
-}
-
-.big-score {
-  text-align: center;
-  color: var(--primary-color-dark);
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 80px;
-  padding: 3px 5px;
-  border: 1px solid var(--primary-color-dark);
-  border-radius: 5px;
-
-  svg {
-    width: 21px;
-    height: 21px;
-    margin-bottom: 3px;
-    path {
-      fill: var(--primary-color-dark);
-    }
-    @include media-max($mobile) {
-      width: 16px;
-      height: 16px;
-    }
-  }
-
-  &__value {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 2px;
-    @include media-max($mobile) {
-      font-size: 16px;
-    }
-  }
-  &__votes {
-    font-size: 8px;
-    font-weight: 500;
-    letter-spacing: 1px;
-    color: rgba(var(--primary-color-dark-rgb), 0.65);
   }
 }

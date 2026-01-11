@@ -1,15 +1,15 @@
 import React from 'react';
+import clsx from 'clsx';
 import { Link, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useMatchMedia } from '@/hooks';
-import { BookmarkIcon, SearchIcon, SfwOffIcon, SfwOnIcon } from '@/components';
-import { breakpoints } from '@/constants';
-import { appPaths } from '@/resources';
 import { toggleSfw } from '@/store';
-import logo from '@/assets/logo.svg';
-import clsx from 'clsx';
-import './Header.scss';
+import { breakpoints } from '@/constants';
 import { scrollToTop } from '@/utils';
+import { appPaths } from '@/resources';
+import { BookmarkIcon, SearchIcon, SfwOffIcon, SfwOnIcon } from '@/components';
+import logo from '@/assets/logo.svg';
+import './Header.scss';
 
 const links = [
   { path: appPaths.home, label: 'Home' },

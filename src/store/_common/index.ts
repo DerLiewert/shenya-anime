@@ -3,3 +3,4 @@ export * from './asyncListBase.helper';
 export * from './asyncListFull.helper';
 export * from './entityDetails.helper';
 export * from './genres.helper';
+export * from './createThunkWithId.helper';

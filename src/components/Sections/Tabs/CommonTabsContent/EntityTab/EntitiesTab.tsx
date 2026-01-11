@@ -1,6 +1,9 @@
 import React, { JSX } from 'react';
+import clsx from 'clsx';
 import { useAppSelector } from '@/app/hooks';
+import { AsyncThunkConfig } from '@/app/appAsyncThunk';
 import { useAbortableDispatch, useShowMore, useFetchStatus } from '@/hooks';
+import { commonMessages } from '@/constants';
 import { EmptyValueMessage, Loading } from '@/components';
 
 import type { AsyncThunk } from '@reduxjs/toolkit';
@@ -8,9 +11,6 @@ import type { RootState } from '@/app/store';
 import type { FetchStatus, StatusSelector } from '@/typescript';
 
 import './EntityTab.scss';
-import { commonMessages } from '@/constants';
-import clsx from 'clsx';
-import { AsyncThunkConfig } from '@/app/appAsyncThunk';
 
 export type EntitiesTabProps<T> = CommonEntitiesTabProps<T> &
   (WithRenderItems<T> | WithItemsBody<T>);

@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { createAppAsyncThunk } from '@/app/appAsyncThunk';
 import { getResource, SeasonsEndpoints } from '@/api/';
 import { Anime } from '@/typescript';
-import { asyncListBaseBuilder, createAsyncListBaseState } from '../_builders';
+import { asyncListBaseBuilder, createAsyncListBaseState } from '../_common';
 
 //============ Slice ============//
 const initialState = createAsyncListBaseState<Anime>();

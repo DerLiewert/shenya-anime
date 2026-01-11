@@ -7,7 +7,7 @@ import { appPaths } from '@/resources';
 import { Anime } from '@/typescript';
 import './SearchItem.scss';
 
-const SearchAnimeItem: React.FC<{ item: Anime }> = ({ item }) => {
+export const SearchAnimeItem: React.FC<{ item: Anime }> = ({ item }) => {
   return (
     <Link to={appPaths.animeFull(item.mal_id)} className="search-modal__item search-item">
       <SfwImage
@@ -57,4 +57,3 @@ const SearchAnimeItem: React.FC<{ item: Anime }> = ({ item }) => {
   );
 };
 
-export default SearchAnimeItem;

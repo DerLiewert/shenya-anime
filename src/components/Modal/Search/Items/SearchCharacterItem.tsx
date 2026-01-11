@@ -5,7 +5,7 @@ import { appPaths } from '@/resources';
 import { Character } from '@/typescript';
 import './SearchItem.scss';
 
-const SearchMangaItem: React.FC<{ item: Character }> = ({ item }) => {
+export const SearchCharacterItem: React.FC<{ item: Character }> = ({ item }) => {
   return (
     <Link to={appPaths.characterFull(item.mal_id)} className="search-modal__item search-item">
       <div className="search-item__image bg">
@@ -20,5 +20,3 @@ const SearchMangaItem: React.FC<{ item: Character }> = ({ item }) => {
     </Link>
   );
 };
-
-export default SearchMangaItem;

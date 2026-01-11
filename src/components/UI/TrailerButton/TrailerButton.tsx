@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { PlayCircleIcon } from '@/components';
 import { AnimeYoutubeVideo } from '@/typescript';
 import { LG_LICENSE_KEY } from '@/constants';
@@ -8,7 +9,6 @@ import 'lightgallery/scss/lg-zoom.scss';
 import 'lightgallery/scss/lg-video.scss';
 
 import './TrailerButton.scss';
-import clsx from 'clsx';
 
 interface TrailerButtonProps {
   trailer: AnimeYoutubeVideo;

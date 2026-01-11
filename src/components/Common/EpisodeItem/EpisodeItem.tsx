@@ -2,7 +2,7 @@ import { StarIcon } from '@/components/Icons';
 import { fallbackValues } from '@/constants';
 import { AnimeEpisode } from '@/typescript';
 import { formattedScore } from '@/utils';
-import './EpisodesTab.scss';
+import './EpisodeItem.scss';
 
 export const EpisodeItem: React.FC<{ episode: AnimeEpisode }> = ({ episode }) => {
   return (

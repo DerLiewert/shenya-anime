@@ -1,7 +1,7 @@
 import React from 'react';
+import clsx from 'clsx';
 import { AnimeStatus, MangaStatus } from '@/typescript';
 import { getStatusClassName, valueOrDefault } from '@/utils';
-import clsx from 'clsx';
 import './Status.scss';
 
 interface StatusProps {

@@ -1,5 +1,5 @@
-import emptyIcon from '@/assets/empty.png';
 import clsx from 'clsx';
+import emptyIcon from '@/assets/empty.png';
 import './EmptyValueMessage.scss';
 
 interface EmptyValueMessageProps {

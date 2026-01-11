@@ -2,9 +2,9 @@ import React from 'react';
 import { FreeMode, Scrollbar } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as ISwiper } from 'swiper';
+import type { TabRoute } from '@/typescript';
 import clsx from 'clsx';
 import './TabList.scss';
-import { TabRoute } from '@/typescript';
 
 interface TabListProps {
   tabs: Array<TabRoute | { value: string; label: string }>;
@@ -14,7 +14,13 @@ interface TabListProps {
   className?: string;
 }
 
-export const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabClick, className, gap = 0 }) => {
+export const TabList: React.FC<TabListProps> = ({
+  tabs,
+  activeTab,
+  onTabClick,
+  className,
+  gap = 0,
+}) => {
   const tabRefs = React.useRef<Array<HTMLDivElement | null>>([]);
   const swiperRef = React.useRef<ISwiper | null>(null);
 
@@ -63,9 +69,7 @@ export const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabClick, c
     }
   };
 
-  const onClick = (
-    e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>,
-  ) => {
+  const onClick = (e: React.MouseEvent<HTMLDivElement> | React.KeyboardEvent<HTMLDivElement>) => {
     const value = (e.currentTarget as HTMLElement).dataset.value;
     if (!value) return;
 
@@ -114,7 +118,6 @@ export const TabList: React.FC<TabListProps> = ({ tabs, activeTab, onTabClick, c
     </Swiper>
   );
 };
-
 
 function updateTabListSwiper(wrapper: HTMLElement, swiper: ISwiper, left: number) {
   wrapper.style.transition = 'transform 0.3s ease 0s';

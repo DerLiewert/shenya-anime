@@ -1,5 +1,5 @@
-import { CryoIcon } from '@/components';
 import clsx from 'clsx';
+import { CryoIcon } from '@/components';
 import './Loading.scss';
 
 export const Loading = ({ className }: { className?: string }) => {

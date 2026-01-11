@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAppSelector } from '@/app/hooks';
 import clsx from 'clsx';
+import { useAppSelector } from '@/app/hooks';
 import './SfwImage.scss';
 
 interface SfwImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {

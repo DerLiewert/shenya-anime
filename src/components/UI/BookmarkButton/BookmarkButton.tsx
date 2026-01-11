@@ -1,8 +1,8 @@
+import clsx from 'clsx';
 import { BookmarkIcon } from '@/components';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { toggleBookmarkedItem } from '@/store';
 import { AnimeAndMangaMap, AnimeAndMangaType } from '@/typescript';
-import clsx from 'clsx';
 import './BookmarkButton.scss';
 
 interface BookmarkButtonProps<T extends AnimeAndMangaType> {

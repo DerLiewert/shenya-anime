@@ -3,7 +3,7 @@ import { createAppAsyncThunk } from '@/app/appAsyncThunk';
 import { getResource, SchedulesEndpoints } from '@/api';
 import { Anime } from '@/typescript';
 import { weekDays } from '@/constants';
-import { asyncListBaseBuilder, createAsyncListBaseState } from '../_builders';
+import { asyncListBaseBuilder, createAsyncListBaseState } from '../_common';
 
 //============ Thunk ============//
 export const fetchTodaySchedulesAnime = createAppAsyncThunk<Anime[]>(

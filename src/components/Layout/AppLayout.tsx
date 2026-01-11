@@ -1,6 +1,6 @@
-import { scrollToTop } from '@/utils';
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { scrollToTop } from '@/utils';
 
 export const AppLayout = () => {
   const location = useLocation();

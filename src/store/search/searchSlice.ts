@@ -1,5 +1,6 @@
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AppAsyncThunk, createAppAsyncThunk } from '@/app/appAsyncThunk';
 import { getAnimeSearch, getCharacterSearch, getMangaSearch } from '@/api';
-import { AsyncThunk, createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import {
   Anime,
   AnimeSearchParams,
@@ -12,7 +13,7 @@ import {
   FetchStatus,
   SearchMap,
 } from '@/typescript';
-import { AppAsyncThunk, createAppAsyncThunk } from '@/app/appAsyncThunk';
+import { FetchListArgs, handleAsyncPending, handleAsyncRejected } from '../_common';
 
 type SearchSlice = {
   [K in keyof SearchMap]: {
@@ -21,17 +22,19 @@ type SearchSlice = {
   } & {
     pagination: JikanPaginationPlus | null;
     status: FetchStatus | null;
+    prevStatus: FetchStatus | null;
     value: string;
   };
 }[keyof SearchMap];
 
-const initialState = {
-  type: null,
+const initialState: SearchSlice = {
   items: [],
   pagination: null,
-  status: null,
+  type: null,
   value: '',
-} as SearchSlice;
+  status: null,
+  prevStatus: null,
+};
 
 const searchSlice = createSlice({
   name: 'search',
@@ -45,36 +48,29 @@ const searchSlice = createSlice({
   extraReducers: (builder) => {
     function commonBuilder<T extends keyof SearchMap>(
       type: T,
-      thunk: AppAsyncThunk<JikanResponse<SearchMap[T][], JikanPaginationPlus>, any>,
+      thunk: AppAsyncThunk<
+        JikanResponse<SearchMap[T][], JikanPaginationPlus>,
+        FetchListArgs<{ q?: string }>
+      >,
     ) {
       builder.addCase(thunk.pending, (state) => {
         if (state.type !== type) state.items = [];
-        state.status = FetchStatus.LOADING;
+        handleAsyncPending(state);
       });
       builder.addCase(thunk.fulfilled, (state, action) => {
-        const s = state as Extract<SearchSlice, { type: T }>;
-        const page = action.meta.arg.page ? action.meta.arg.page : 1;
-        const isShowMore = page && page > 1;
+        const { data, pagination } = action.payload;
+        const { params, append } = action.meta.arg;
 
-        s.value = action.meta.arg.q ? action.meta.arg.q : '';
-        s.type = type;
-        s.items = (
-          isShowMore ? [...state.items, ...action.payload.data] : action.payload.data
-        ) as typeof s.items;
-        s.pagination = action.payload.pagination ? action.payload.pagination : null;
-        s.status = FetchStatus.SUCCESS;
+        state.prevStatus = state.status;
+
+        state.value = params.q ? params.q : '';
+        state.type = type;
+        state.items = (append ? [...state.items, ...data] : data) as typeof state.items;
+        state.pagination = pagination ? pagination : null;
+
+        state.status = FetchStatus.SUCCESS;
       });
-      builder.addCase(thunk.rejected, (state, action) => {
-        if (action.meta.aborted) {
-          if (state.items.length > 0) {
-            state.status = FetchStatus.SUCCESS;
-          } else {
-            state.status = null;
-          }
-          return;
-        }
-        state.status = FetchStatus.ERROR;
-      });
+      builder.addCase(thunk.rejected, handleAsyncRejected);
     }
     commonBuilder('anime', fetchSearchAnime);
     commonBuilder('manga', fetchSearchManga);
@@ -88,15 +84,15 @@ export default searchSlice.reducer;
 //========================================================================================================================================================
 export const fetchSearchAnime = createAppAsyncThunk<
   JikanResponse<Anime[], JikanPaginationPlus>,
-  Partial<AnimeSearchParams>
->('search/fetchSearchAnime', async (qearyParams) => await getAnimeSearch(qearyParams));
+  FetchListArgs<AnimeSearchParams>
+>('search/fetchSearchAnime', async ({ params }) => await getAnimeSearch(params));
 
 export const fetchSearchManga = createAppAsyncThunk<
   JikanResponse<Manga[], JikanPaginationPlus>,
-  Partial<MangaSearchParams>
->('search/fetchSearchManga', async (qearyParams) => await getMangaSearch(qearyParams));
+  FetchListArgs<MangaSearchParams>
+>('search/fetchSearchManga', async ({ params }) => await getMangaSearch(params));
 
 export const fetchSearchCharacter = createAppAsyncThunk<
   JikanResponse<Character[], JikanPaginationPlus>,
-  Partial<CharactersSearchParams>
->('search/fetchSearchCharacter', async (qearyParams) => await getCharacterSearch(qearyParams));
+  FetchListArgs<CharactersSearchParams>
+>('search/fetchSearchCharacter', async ({ params }) => await getCharacterSearch(params));

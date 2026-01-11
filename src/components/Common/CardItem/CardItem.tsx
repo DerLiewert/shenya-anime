@@ -18,7 +18,7 @@ export const CardItem = React.forwardRef(
   <T extends AnimeAndMangaType>(
     { linkPath, item, cardType, className, nsfw }: CardItemProps<T>,
     ref: React.Ref<HTMLDivElement>,
-  ) => {
+  ): JSX.Element => {
     const { images, title, type, year, status, score } = item;
     return (
       <div className={clsx(className, 'card-item border-opacity _title-parent')} ref={ref}>
@@ -53,6 +53,4 @@ export const CardItem = React.forwardRef(
       </div>
     );
   },
-) as <T extends AnimeAndMangaType>(
-  props: CardItemProps<T> & { ref?: React.Ref<HTMLDivElement> },
-) => JSX.Element;
+);

@@ -1,11 +1,14 @@
 import React from 'react';
 import Select from 'react-select';
 import debounce from 'lodash.debounce';
+import { isEmpty } from 'lodash';
 import { useInView } from 'react-intersection-observer';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus, useShowMore } from '@/hooks';
+import { commonMessages } from '@/constants';
+import { getUniqueItems } from '@/utils';
+import { searchTypeOptions } from '@/resources';
 import { SearchIcon, Loading } from '@/components';
-import { getUniqueItems, isEmpty } from '@/utils';
 import {
   fetchSearchAnime,
   fetchSearchCharacter,
@@ -15,8 +18,6 @@ import {
   resetSearchState,
 } from '@/store';
 import { SearchAnimeItem, SearchCharacterItem, SearchMangaItem } from './Items';
-import { searchTypeOptions } from '@/resources';
-import { commonMessages } from '@/constants';
 import { SearchType } from '@/typescript';
 import './Search.scss';
 
@@ -45,16 +46,16 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
   });
 
   const fetchItems = React.useCallback(
-    debounce((type: SearchType, params) => {
+    debounce((type: SearchType, params: { q: string; page?: number }) => {
       switch (type) {
         case 'anime':
-          abortableDispatch(fetchSearchAnime, params);
+          abortableDispatch(fetchSearchAnime, { params: params });
           break;
         case 'manga':
-          abortableDispatch(fetchSearchManga, params);
+          abortableDispatch(fetchSearchManga, { params: params });
           break;
         case 'character':
-          abortableDispatch(fetchSearchCharacter, params);
+          abortableDispatch(fetchSearchCharacter, { params: params });
           break;
       }
     }, 350),
@@ -132,7 +133,7 @@ const Search: React.FC<{ onSearchClose: () => void }> = ({ onSearchClose }) => {
             <label className="search-modal__field">
               <SearchIcon />
               <input
-                className="search-modal__input fz-16"
+                className="search-modal__input"
                 type="text"
                 placeholder="Search..."
                 value={inputValue}

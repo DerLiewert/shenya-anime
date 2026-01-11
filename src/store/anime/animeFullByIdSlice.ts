@@ -22,14 +22,14 @@ import {
   StatisticsScore,
 } from '@/typescript';
 import { DataWithPagePagination } from '@/typescript';
-import { createAnimeThunkWithId, toDataWithPagePagination } from '@/utils';
+import { toDataWithPagePagination } from '@/utils';
 import { createAppAsyncThunk } from '@/app/appAsyncThunk';
 import {
   createEntityDetailsState,
   entityDetailsBuilder,
   EntityDetailsStateBase,
 } from '../_common/entityDetails.helper';
-import { FetchListArgs } from '../_common';
+import { createAnimeThunkWithId, FetchListArgs } from '../_common';
 
 export interface AnimeFullState extends EntityDetailsStateBase<AnimeFull> {
   scoreStats: StatisticsScore[];

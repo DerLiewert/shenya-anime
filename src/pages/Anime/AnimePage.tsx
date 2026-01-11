@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy } from 'react';
 import { fetchFullAnimeById } from '@/store';
 import { AnimeFull, JikanNamedResource } from '@/typescript';
 import {

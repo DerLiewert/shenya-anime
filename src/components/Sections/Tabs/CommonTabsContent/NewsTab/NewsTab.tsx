@@ -24,7 +24,8 @@ interface NewsTabProps {
   >;
   visibleNewsCount?: number;
 }
-const NewsTab: React.FC<NewsTabProps> = ({
+
+export const NewsTab: React.FC<NewsTabProps> = ({
   newsSelector,
   status,
   fetchAction,
@@ -105,4 +106,3 @@ const NewsTab: React.FC<NewsTabProps> = ({
   );
 };
 
-export default NewsTab;

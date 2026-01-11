@@ -1,9 +1,13 @@
 import { getPersonFullById, getPersonPictures } from '@/api';
 import { createSlice } from '@reduxjs/toolkit';
 import { JikanImages, PersonFull } from '@/typescript';
-import { createPersonThunkWithId } from '@/utils';
 import { createAppAsyncThunk } from '@/app/appAsyncThunk';
-import { createEntityDetailsState, entityDetailsBuilder, EntityDetailsStateBase } from '../_common';
+import {
+  createEntityDetailsState,
+  createPersonThunkWithId,
+  entityDetailsBuilder,
+  EntityDetailsStateBase,
+} from '../_common';
 
 interface PersonFullState extends EntityDetailsStateBase<PersonFull> {
   pictures: JikanImages[];

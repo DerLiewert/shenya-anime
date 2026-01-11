@@ -1,6 +1,6 @@
 import React from 'react';
-import { formattedScore } from '@/utils';
 import clsx from 'clsx';
+import { formattedScore } from '@/utils';
 import './Score.scss';
 
 interface StatusProps {

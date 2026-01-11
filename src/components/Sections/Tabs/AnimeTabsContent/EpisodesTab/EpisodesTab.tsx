@@ -3,9 +3,9 @@ import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useShowMore, useFetchStatus } from '@/hooks';
 import { EmptyValueMessage, EpisodeItem, Loading } from '@/components';
 import { animeEmptyValueMessages, commonMessages } from '@/constants';
+import { isAppendItems } from '@/utils';
 import { fetchAnimeEpisodes } from '@/store';
 import './EpisodesTab.scss';
-import { isAppendItems } from '@/utils';
 
 export const EpisodesTab = () => {
   const dispatch = useAppDispatch();

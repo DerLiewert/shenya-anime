@@ -1,1 +1,1 @@
-export { default as NewsTab } from './NewsTab';
+export * from './NewsTab';

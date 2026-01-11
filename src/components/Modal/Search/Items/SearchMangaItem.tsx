@@ -7,7 +7,7 @@ import { appPaths } from '@/resources';
 import { Manga } from '@/typescript';
 import './SearchItem.scss';
 
-const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
+export const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
   return (
     <Link to={appPaths.mangaFull(item.mal_id)} className="search-modal__item search-item">
       <SfwImage
@@ -51,4 +51,3 @@ const SearchMangaItem: React.FC<{ item: Manga }> = ({ item }) => {
   );
 };
 
-export default SearchMangaItem;

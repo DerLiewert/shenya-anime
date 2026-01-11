@@ -1,1 +1,1 @@
-export {default as ReturnBack} from './ReturnBack'
+export * from './ReturnBack';

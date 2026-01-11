@@ -16,10 +16,11 @@ import {
   getMangaRecommendations,
   getMangaStatistics,
 } from '@/api/client/manga.client';
-import { createMangaThunkWithId, toDataWithPagePagination } from '@/utils';
+import { toDataWithPagePagination } from '@/utils';
 import { createAppAsyncThunk } from '@/app/appAsyncThunk';
 import {
   createEntityDetailsState,
+  createMangaThunkWithId,
   entityDetailsBuilder,
   EntityDetailsStateBase,
   FetchListArgs,

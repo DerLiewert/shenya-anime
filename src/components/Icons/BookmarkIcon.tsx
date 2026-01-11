@@ -18,16 +18,3 @@ export const BookmarkIcon = () => {
     </svg>
   );
 };
-
-//  <svg
-//       xmlns="http://www.w3.org/2000/svg"
-//       width="24"
-//       height="24"
-//       viewBox="0 0 24 24"
-//       fill="none"
-//       stroke="#ffffff"
-//       stroke-width="2"
-//       stroke-linecap="round"
-//       stroke-linejoin="round">
-//       <path d="M18.2 20.8l-6.2-3.6-6.2 3.6V5.4a1.8 1.8 0 0 1 1.8-1.8h8.8a1.8 1.8 0 0 1 1.8 1.8v15.4z" />
-//     </svg>

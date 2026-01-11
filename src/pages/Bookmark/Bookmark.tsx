@@ -2,12 +2,12 @@ import React from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
-import { AnimeCard, CommonIntro, EmptyValueMessage, MangaCard } from '@/components';
+import { usePathSegments, useScrollTarget } from '@/hooks';
 import { AnimeAndMangaOf, AnimeAndMangaType, TabRoute } from '@/typescript';
 import { appPaths } from '@/resources';
-import { usePathSegments, useScrollTarget } from '@/hooks';
 import { isValidPath } from '@/utils';
-import NotFound from '../NotFound/NotFound';
+import { NotFound } from '../NotFound';
+import { AnimeCard, CommonIntro, EmptyValueMessage, MangaCard } from '@/components';
 import './Bookmark.scss';
 
 const routeItems: TabRoute[] = [

@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  // margin: 0;
   padding: 3px;
   border-bottom: 2px solid var(--bg-color);
 
@@ -42,10 +41,16 @@
     &:focus {
       background-color: var(--primary-color-dark);
     }
+
     @media (any-hover: hover) {
       &:hover {
         background-color: var(--primary-color-dark);
       }
+    }
+
+    @include media-max($mobileSmall) {
+      font-size: 14px;
+      padding: 5px 20px;
     }
   }
 }

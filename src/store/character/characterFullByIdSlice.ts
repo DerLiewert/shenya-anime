@@ -1,9 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { getCharacterFullById, getCharacterPictures } from '@/api';
 import { CharacterFull, JikanImages } from '@/typescript';
-import { createCharacterThunkWithId } from '@/utils';
 import { createAppAsyncThunk } from '@/app/appAsyncThunk';
-import { createEntityDetailsState, entityDetailsBuilder, EntityDetailsStateBase } from '../_common';
+import { createCharacterThunkWithId, createEntityDetailsState, entityDetailsBuilder, EntityDetailsStateBase } from '../_common';
 
 interface CharacterFullState extends EntityDetailsStateBase<CharacterFull> {
   pictures: JikanImages[];

@@ -9,7 +9,7 @@ export type FetchListArgs<T> = {
   append?: boolean;
 };
 
-export interface AsyncListFullState<Item, Pagination extends JikanPaginationBase>
+export interface AsyncListFullState<Item, Pagination extends JikanPaginationBase = JikanPaginationBase>
   extends AsyncListBaseState<Item> {
   pagination: Pagination | null;
 }

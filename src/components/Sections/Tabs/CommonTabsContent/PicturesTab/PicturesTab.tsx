@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { JikanImages } from '@/typescript';
 import { LG_LICENSE_KEY } from '@/constants';
 import { getImageUrl } from '@/utils';
@@ -10,12 +11,8 @@ import 'lightgallery/scss/lg-thumbnail.scss';
 import 'lightgallery/scss/lg-zoom.scss';
 
 import './PicturesTab.scss';
-import clsx from 'clsx';
 
-type PicturesTabProps<T extends JikanImages> = Omit<
-  EntitiesTabProps<T>,
-  'itemsBody' | 'items'
-> & {
+type PicturesTabProps<T extends JikanImages> = Omit<EntitiesTabProps<T>, 'itemsBody' | 'items'> & {
   nsfw?: boolean;
 };
 
@@ -53,6 +50,6 @@ export const PicturesTab = <T extends JikanImages>(props: PicturesTabProps<T>) =
       </LightGallery>
     ),
   };
-  
+
   return <EntitiesTab<T> {...entitiesTabProps} />;
 };

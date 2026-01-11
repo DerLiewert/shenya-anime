@@ -1,5 +1,9 @@
 import React from 'react';
+import BG from '@/assets/bg/manga-bg.jpg';
 import { JikanNamedResource, MangaFull } from '@/typescript';
+import { fetchFullMangaById } from '@/store';
+import { appPaths, mangaTypeOptions } from '@/resources';
+import { isMangaNsfw } from '@/utils';
 import {
   EntityPageLayout,
   MangaCharacterTab,
@@ -8,11 +12,6 @@ import {
   MangaRecommendationsTab,
   MangaDetailsTab,
 } from '@/components';
-// import { MangaDetailsTab } from '@/components/Sections/Tabs/MangaTabsContent/DetailsTab/MangaDetailsTab';
-import { fetchFullMangaById } from '@/store';
-import { appPaths, mangaTypeOptions } from '@/resources';
-import { isMangaNsfw } from '@/utils';
-import BG from '@/assets/bg/manga-bg.jpg';
 import './MangaPage.scss';
 
 const MangaPage = () => {

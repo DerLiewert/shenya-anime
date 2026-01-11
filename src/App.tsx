@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, Route, Routes, useLocation, useOutletContext } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { useAppSelector } from './app/hooks';
 import { Header, Footer, Search, AppLayout } from './components';
 import {
@@ -15,11 +15,6 @@ import {
   ProducerPage,
   Bookmark,
 } from './pages';
-import { scrollToTop } from './utils';
-
-// Ленивый импорт
-// const NewsTab = lazy(() => import('./tabs/NewsTab'));
-// const VideosTab = lazy(() => import('./tabs/VideosTab'));
 
 function App() {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);

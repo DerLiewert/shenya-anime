@@ -1,4 +1,4 @@
-import { isEmpty } from '../general';
+import { isEmpty } from 'lodash';
 
 export const searchParamsToObj = (paramsString: string) => {
   const searchParams = new URLSearchParams(paramsString);
