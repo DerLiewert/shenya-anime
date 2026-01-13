@@ -22,6 +22,7 @@ interface NewsTabProps {
     FetchListArgs<{ page?: number }>,
     AsyncThunkConfig
   >;
+  emptyMessage: string;
   visibleNewsCount?: number;
 }
 
@@ -29,6 +30,7 @@ export const NewsTab: React.FC<NewsTabProps> = ({
   newsSelector,
   status,
   fetchAction,
+  emptyMessage,
   visibleNewsCount = 6,
 }) => {
   const dispatch = useAppDispatch();
@@ -89,7 +91,7 @@ export const NewsTab: React.FC<NewsTabProps> = ({
         <EmptyValueMessage className="news-tab__message" message={commonMessages.error} />
       )}
       {isSuccess && news.length === 0 && (
-        <EmptyValueMessage className="news-tab__message" message={mangaEmptyValueMessages.news} />
+        <EmptyValueMessage className="news-tab__message" message={emptyMessage} />
       )}
 
       {news.length > 0 && (news.length > visibleCount || pagination?.has_next_page) && (
@@ -105,4 +107,3 @@ export const NewsTab: React.FC<NewsTabProps> = ({
     </div>
   );
 };
-
