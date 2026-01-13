@@ -1,7 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import Skeleton from 'react-loading-skeleton';
-import { AsyncThunk } from '@reduxjs/toolkit';
+import { AppAsyncThunk } from '@/app/appAsyncThunk';
+import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
 import { useAbortableDispatch, useFetchStatus } from '@/hooks';
 import { ArrowIcon, EmptyValueMessage, SectionHeader, SectionHeaderProps } from '@/components';
@@ -13,8 +14,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 
 import './MediaBlock.scss';
-import { AppAsyncThunk } from '@/app/appAsyncThunk';
-import { RootState } from '@/app/store';
 
 interface MediaBlockProps<
   T extends AnimeAndMangaType,

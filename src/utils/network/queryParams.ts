@@ -1,4 +1,5 @@
-import { isEmpty } from 'lodash';
+import { isEmptyApp } from "../isEmpty";
+
 
 export const searchParamsToObj = (paramsString: string) => {
   const searchParams = new URLSearchParams(paramsString);
@@ -9,7 +10,7 @@ export const searchParamsToObj = (paramsString: string) => {
 export const searchParamsToString = (queryParams: Record<string, unknown>) => {
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(queryParams)) {
-    if (!isEmpty(value)) {
+    if (!isEmptyApp(value)) {
       searchParams.append(key, String(value));
     }
   }

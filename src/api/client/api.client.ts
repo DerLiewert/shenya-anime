@@ -30,6 +30,7 @@ function buildUrl(
   if (!queryParams) return url;
 
   const queryString = searchParamsToString(queryParams);
+  console.log('buildUrl queryParams', queryString);
   return queryString ? `${url}?${queryString}` : url;
 }
 
@@ -47,6 +48,7 @@ export async function getResource<T, P = JikanPaginationBase>({
   signal,
 }: GetResourceOptions<T, P>): Promise<JikanResponse<T, P>> {
   const url = buildUrl(endpoint, pathParams, queryParams);
+  console.log('url', url, queryParams);
 
   const config: AxiosRequestConfig = {
     method: 'get',

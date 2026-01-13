@@ -46,6 +46,7 @@ export const fetchRandomAnime = createAppAsyncThunk<Anime, number>(
     // Получаем количество страниц
     const firstResponse = await getAnimeSearch({ min_score: minScore, limit: 1 }, thunkAPI.signal);
 
+    console.log('firstResponse', firstResponse);
     if (!firstResponse.pagination || firstResponse.pagination.last_visible_page === 0) {
       return thunkAPI.rejectWithValue('Pagination data missing or empty');
     }

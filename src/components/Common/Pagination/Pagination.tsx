@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
-import { isEmpty } from 'lodash';
 import './Pagination.scss';
+import { isEmptyApp } from '@/utils';
 
 type PaginationItem = {
   value: number; // номер страницы
@@ -54,7 +54,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   const onSearchPageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = Number(e.target.value);
 
-    if (isEmpty(e.target.value) || isNaN(value)) setSearchPage(undefined);
+    if (isEmptyApp(e.target.value) || isNaN(value)) setSearchPage(undefined);
     else if (value < 1) setSearchPage(1);
     else if (value > lastPage) setSearchPage(lastPage);
     else setSearchPage(value);

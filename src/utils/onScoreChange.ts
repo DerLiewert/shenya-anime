@@ -1,8 +1,8 @@
-import { isEmpty } from 'lodash';
+import { isEmptyApp } from "./isEmpty";
 
 // Держать значение для minScore и maxScore в пределах min-max
 export const onScoreChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (isEmpty(e.target.value)) return;
+  if (isEmptyApp(e.target.value)) return;
 
   const min = e.target.min;
   const max = e.target.max;
