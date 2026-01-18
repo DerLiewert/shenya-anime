@@ -5,7 +5,7 @@ import Skeleton from 'react-loading-skeleton';
 import { useForm, Controller } from 'react-hook-form';
 import { useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
+import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia, usePageScrollToTop } from '@/hooks';
 import { fetchMangaGenres, fetchMangaByParams, minusOpenModal, plusOpenModal } from '@/store';
 import { getUniqueItems, onScoreChange, parseMangaParams, scrollToTop } from '@/utils';
 import { mangaOrderByOptions, mangaStatusOptions, mangaTypeOptions } from '@/resources';
@@ -81,6 +81,9 @@ const MangaCatalogPage = () => {
     };
   }, [location.search]);
 
+  
+  usePageScrollToTop();
+
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
   }, [appNavigate]);
@@ -95,10 +98,6 @@ const MangaCatalogPage = () => {
   React.useEffect(() => {
     if (!isTablet && isShowFilters) closeFilters();
   }, [isTablet]);
-
-  React.useEffect(() => {
-    scrollToTop(cardsRef);
-  }, [location.search]);
 
   const openFilters = () => {
     dispatch(plusOpenModal());

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Routes, useNavigate } from 'react-router-dom';
-import { usePathSegments, useScrollTarget } from '@/hooks';
+import { usePathSegments, useTabsPageScrollToTop } from '@/hooks';
 import { generateRoutes, isValidPath } from '@/utils';
 import { appPaths } from '@/resources';
 import { TabRoute } from '@/typescript';
@@ -20,7 +20,7 @@ function Schedules() {
   const tabSegments = usePathSegments(pagePath);
   const tabsRef = React.useRef<HTMLDivElement>(null);
 
-  useScrollTarget(tabsRef);
+  useTabsPageScrollToTop(tabsRef);
 
   if (!isValidPath(tabSegments, routeItems)) return <NotFound />;
 

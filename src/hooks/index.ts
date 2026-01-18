@@ -6,4 +6,5 @@ export * from './useFetchStatus';
 export * from './useMatchMedia';
 export * from './useAppNavigate';
 export * from './usePathSegments';
+export * from './usePageScrollToTop';
 export * from './useScrollTarget';

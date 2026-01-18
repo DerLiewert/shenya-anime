@@ -34,7 +34,8 @@ function App() {
         <Header onSearchOpen={() => setIsSearchOpen(true)} />
         <main className="main">
           <Routes>
-            <Route element={<AppLayout />}>
+            {/* <Route element={<AppLayout />}> */}
+            <Route>
               <Route path="/" element={<HomePage />} />
 
               <Route path="/anime" element={<AnimeCatalogPage />} />

@@ -1,7 +1,9 @@
 import emptyIcon from '@/assets/empty.png';
+import { usePageScrollToTop } from '@/hooks';
 import './NotFound.scss';
 
 function NotFound() {
+  usePageScrollToTop();
   return (
     <section className="not-found">
       <div className="container">

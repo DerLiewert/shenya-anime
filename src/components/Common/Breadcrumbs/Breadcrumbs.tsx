@@ -29,9 +29,11 @@ export const Breadcrumbs = ({ className, items, isCurrentLast = true }: Breadcru
       {items.map((item, index, arr) => (
         <SwiperSlide className="breadcrumbs__item" tag="li" key={item.label + '_' + item.url}>
           {isCurrentLast && index === arr.length - 1 ? (
-            <p className="breadcrumbs__text breadcrumbs__text--current">{item.label}</p>
+            <p className="breadcrumbs__text breadcrumbs__text--current visible-line">
+              {item.label}
+            </p>
           ) : (
-            <Link to={item.url} className="breadcrumbs__text">
+            <Link to={item.url} className="breadcrumbs__text visible-line">
               {item.label}
             </Link>
           )}

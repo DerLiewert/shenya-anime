@@ -73,7 +73,7 @@ const AnimePage = () => {
                 label: 'Staff',
                 element: (
                   <>
-                    <ReturnBack textBackTo="Details" className="anime-tabs__back-link" />
+                    <ReturnBack textBackTo="Details" className="full-page-tabs__back-link" />
                     <AnimeStaffTab />
                   </>
                 ),

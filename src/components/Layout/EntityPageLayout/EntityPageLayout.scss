@@ -179,6 +179,12 @@
     padding-left: unset;
   }
 
+  &__poster a {
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+  }
+
   &__poster,
   &__poster.sfw-image {
     position: relative;

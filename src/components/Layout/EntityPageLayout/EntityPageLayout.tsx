@@ -8,7 +8,7 @@ import {
   useFetchStatus,
   useMatchMedia,
   usePathSegments,
-  useScrollTarget,
+  useTabsPageScrollToTop,
 } from '@/hooks';
 import { breakpoints, LG_LICENSE_KEY } from '@/constants';
 import { getImageUrl, generateRoutes, isValidPath } from '@/utils';
@@ -46,10 +46,7 @@ import './EntityPageLayout.scss';
 type ItemTypes = AnimeFull | MangaFull | PersonFull | CharacterFull | ProducerFull;
 type NullableItemTypes<T> = T | null;
 
-type BookmarkByEntity<T> =
-  T extends AnimeFull ? 'anime' :
-  T extends MangaFull ? 'manga' :
-  never;
+type BookmarkByEntity<T> = T extends AnimeFull ? 'anime' : T extends MangaFull ? 'manga' : never;
 
 interface EntityRenderResult<T> {
   title: string | null;
@@ -103,7 +100,7 @@ const EntityPageLayout = <T extends ItemTypes>({
   const [activeTab, setActiveTab] = React.useState(tabSegments[0]);
   const [isPosterLoading, setIsPosterLoading] = React.useState(true);
 
-  useScrollTarget(tabsRef);
+  useTabsPageScrollToTop(tabsRef, [id]);
 
   React.useEffect(() => {
     abortableDispatch(fetchAction, id);

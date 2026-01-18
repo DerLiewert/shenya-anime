@@ -9,6 +9,7 @@
   }
 
   &__item {
+    max-width: 100%;
     width: auto;
     display: flex;
     align-items: center;
@@ -44,9 +45,10 @@
   }
 
   &__text {
-    white-space: nowrap;
-    max-width: 220px;
-    overflow: hidden;
+    // white-space: nowrap;
+    // max-width: 220px;
+    max-width: 100%;
+    // overflow: hidden;
     &--current {
       font-weight: 500;
       color: var(--primary-color);

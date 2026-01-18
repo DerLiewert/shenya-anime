@@ -5,7 +5,6 @@ import { scrollToTop } from '@/utils';
 export const AppLayout = () => {
   const location = useLocation();
   const scrollTargetRef = React.useRef<HTMLElement | null>(null);
-
   const setScrollTarget = React.useCallback((el: HTMLElement | null) => {
     scrollTargetRef.current = el;
   }, []);

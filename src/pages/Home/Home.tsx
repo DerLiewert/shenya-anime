@@ -11,8 +11,10 @@ import { appPaths } from '@/resources';
 import { getSeasonName, toFirstUppercase } from '@/utils';
 import { fetchIntroAnime, fetchSeasonalAnime, fetchTopManga } from '@/store';
 import './Home.scss';
+import { usePageScrollToTop } from '@/hooks';
 
 const Home = () => {
+  usePageScrollToTop();
   return (
     <>
       <MainIntro />

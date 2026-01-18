@@ -28,4 +28,3 @@ export const appPaths = {
   bookmark: '/bookmark',
   notFound: '/not-found',
 } as const;
-

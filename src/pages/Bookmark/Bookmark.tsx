@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { RootState } from '@/app/store';
 import { useAppSelector } from '@/app/hooks';
-import { usePathSegments, useScrollTarget } from '@/hooks';
+import { usePathSegments, useTabsPageScrollToTop } from '@/hooks';
 import { AnimeAndMangaOf, AnimeAndMangaType, TabRoute } from '@/typescript';
 import { appPaths } from '@/resources';
 import { isValidPath } from '@/utils';
@@ -26,11 +26,11 @@ const routeItems: TabRoute[] = [
 const pagePath = appPaths.bookmark;
 
 const Bookmark = () => {
-  const bookmarkTabsRef = React.useRef<HTMLDivElement>(null);
+  const tabsRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const tabSegments = usePathSegments(pagePath);
 
-  useScrollTarget(bookmarkTabsRef);
+  useTabsPageScrollToTop(tabsRef);
 
   if (!isValidPath(tabSegments, routeItems)) return <NotFound />;
 
@@ -39,7 +39,7 @@ const Bookmark = () => {
       <CommonIntro bgPrefix="bookmark" title="Bookmark" />
       <div className="container">
         <div className="bookmark__inner">
-          <div className="bookmark__list tab-list" ref={bookmarkTabsRef}>
+          <div className="bookmark__list tab-list" ref={tabsRef}>
             {routeItems.map((item) => (
               <div
                 key={item.value}

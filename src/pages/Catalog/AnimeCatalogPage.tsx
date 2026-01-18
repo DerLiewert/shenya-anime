@@ -5,7 +5,13 @@ import Skeleton from 'react-loading-skeleton';
 import { useLocation } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { useAbortableDispatch, useAppNavigate, useFetchStatus, useMatchMedia } from '@/hooks';
+import {
+  useAbortableDispatch,
+  useAppNavigate,
+  useFetchStatus,
+  useMatchMedia,
+  usePageScrollToTop,
+} from '@/hooks';
 import { fetchAnimeByParams, fetchAnimeGenres, minusOpenModal, plusOpenModal } from '@/store';
 import { scrollToTop, getUniqueItems, parseAnimeSearchParams, onScoreChange } from '@/utils';
 import { breakpoints } from '@/constants';
@@ -88,6 +94,8 @@ const AnimeCatalogPage = () => {
     };
   }, [location.search]);
 
+  usePageScrollToTop();
+
   React.useEffect(() => {
     appNavigate(searchParams, { replace: true });
   }, [appNavigate]);
@@ -95,17 +103,13 @@ const AnimeCatalogPage = () => {
   // Получение даных об аниме по выбраным параметрам
   React.useEffect(() => {
     if (isGenresLoading) return;
-    abortableDispatch(fetchAnimeByParams, {params: searchParams});
+    abortableDispatch(fetchAnimeByParams, { params: searchParams });
   }, [searchParams, genresStatus]);
 
   // Если ширина экрана стала >tablet и были открыты филтры - закрываем их
   React.useEffect(() => {
     if (!isTablet && isShowFilters) closeFilters();
   }, [isTablet]);
-
-  React.useEffect(() => {
-    scrollToTop(cardsRef);
-  }, [location.search]);
 
   const openFilters = () => {
     dispatch(plusOpenModal());
@@ -225,6 +229,7 @@ const AnimeCatalogPage = () => {
                   className="catalog-cards__pagination"
                   onChangePage={(page) => {
                     appNavigate({ ...searchParams, page: page > 1 ? page : undefined });
+                    scrollToTop(cardsRef);
                   }}
                 />
               )}
