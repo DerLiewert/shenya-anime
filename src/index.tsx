@@ -15,13 +15,13 @@ import App from './App';
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
 root.render(
-  // <HashRouter>
-  <Router>
+  <HashRouter>
+    {/* <Router> */}
     <Provider store={store}>
       <SkeletonTheme baseColor="#1c1c1c" highlightColor="#3a3a3a" duration={1.5}>
         <App />
       </SkeletonTheme>
     </Provider>
-  </Router>,
-  // </HashRouter>,
+    {/* </Router>, */}
+  </HashRouter>,
 );
