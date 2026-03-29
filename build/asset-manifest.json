@@ -1,0 +1,33 @@
+{
+  "files": {
+    "main.css": "/shenya-anime/static/css/main.a6f40d04.css",
+    "main.js": "/shenya-anime/static/js/main.18f4dd99.js",
+    "static/media/character-bg.webp": "/shenya-anime/static/media/character-bg.d8c113f64525d76a3614.webp",
+    "static/media/manga-bg.jpg": "/shenya-anime/static/media/manga-bg.1773a78f4b27b264ac7e.jpg",
+    "static/media/main-bg.jpg": "/shenya-anime/static/media/main-bg.b1cc9812e9537794ac27.jpg",
+    "static/media/logo.svg": "/shenya-anime/static/media/logo.98cd2c99c0567563753785e803b80a60.svg",
+    "static/media/manga-catalog-bg.jpg": "/shenya-anime/static/media/manga-catalog-bg.e77396f2f630f104524f.jpg",
+    "static/media/bookmark-bg.jpg": "/shenya-anime/static/media/bookmark-bg.4a224c21f737e9fb14a5.jpg",
+    "static/media/not-found.jpg": "/shenya-anime/static/media/not-found.8bf51088c69fc4590ea0.jpg",
+    "static/media/anime-catalog.webp": "/shenya-anime/static/media/anime-catalog.90517707bad4ffff2a92.webp",
+    "static/media/empty.png": "/shenya-anime/static/media/empty.6a4b0dfe389110eb7069.png",
+    "static/media/people-bg.jpg": "/shenya-anime/static/media/people-bg.4d63a701c539ae78cd78.jpg",
+    "static/media/calendar-bg.jpg": "/shenya-anime/static/media/calendar-bg.3369334edc4e5e3af1fa.jpg",
+    "static/media/lg.svg?io9a6k": "/shenya-anime/static/media/lg.09cd8e9be7081f216644.svg",
+    "static/media/calendar.svg": "/shenya-anime/static/media/calendar.7717d2ae0bc34f04cfbf.svg",
+    "static/media/lg.woff?io9a6k": "/shenya-anime/static/media/lg.356a0e9cb064c7a196c6.woff",
+    "static/media/lg.ttf?io9a6k": "/shenya-anime/static/media/lg.747d038541bfc6bb8ea9.ttf",
+    "static/media/lg.woff2?io9a6k": "/shenya-anime/static/media/lg.64b800aa30714fd916dc.woff2",
+    "index.html": "/shenya-anime/index.html",
+    "static/media/link.svg": "/shenya-anime/static/media/link.7224e70dd47109ad5de4.svg",
+    "static/media/external-link.svg": "/shenya-anime/static/media/external-link.b3e74375d79b83cf6a4a.svg",
+    "static/media/long-arrow.svg": "/shenya-anime/static/media/long-arrow.b6d5e577f2443e071963.svg",
+    "static/media/star.svg": "/shenya-anime/static/media/star.dbacd8f6da1989b36a47.svg",
+    "main.a6f40d04.css.map": "/shenya-anime/static/css/main.a6f40d04.css.map",
+    "main.18f4dd99.js.map": "/shenya-anime/static/js/main.18f4dd99.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a6f40d04.css",
+    "static/js/main.18f4dd99.js"
+  ]
+}
