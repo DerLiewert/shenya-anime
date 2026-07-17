@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/shenya-anime/static/css/main.a6f40d04.css",
-    "main.js": "/shenya-anime/static/js/main.18f4dd99.js",
+    "main.js": "/shenya-anime/static/js/main.c5ec6f40.js",
     "static/media/character-bg.webp": "/shenya-anime/static/media/character-bg.d8c113f64525d76a3614.webp",
     "static/media/manga-bg.jpg": "/shenya-anime/static/media/manga-bg.1773a78f4b27b264ac7e.jpg",
     "static/media/main-bg.jpg": "/shenya-anime/static/media/main-bg.b1cc9812e9537794ac27.jpg",
@@ -24,10 +24,10 @@
     "static/media/long-arrow.svg": "/shenya-anime/static/media/long-arrow.b6d5e577f2443e071963.svg",
     "static/media/star.svg": "/shenya-anime/static/media/star.dbacd8f6da1989b36a47.svg",
     "main.a6f40d04.css.map": "/shenya-anime/static/css/main.a6f40d04.css.map",
-    "main.18f4dd99.js.map": "/shenya-anime/static/js/main.18f4dd99.js.map"
+    "main.c5ec6f40.js.map": "/shenya-anime/static/js/main.c5ec6f40.js.map"
   },
   "entrypoints": [
     "static/css/main.a6f40d04.css",
-    "static/js/main.18f4dd99.js"
+    "static/js/main.c5ec6f40.js"
   ]
 }
